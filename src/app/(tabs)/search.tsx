@@ -1,9 +1,8 @@
-import { router, useFocusEffect } from 'expo-router';
-import { Fragment, useCallback, useRef, useState, type ReactNode } from 'react';
+import { router } from 'expo-router';
+import { Fragment, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { AppHeader } from '@/components/app-header';
-import { Divider, Icon, Screen, SectionHeader, Text, type IconName } from '@/components/ui';
+import { Divider, Icon, IconButton, Screen, ScreenHeader, SectionHeader, Text, type IconName } from '@/components/ui';
 import { colors, layout, radius, spacing, tones, typography } from '@/constants/theme';
 import { companyStats, experienceLabel, findQuestions, isExperience, summarizeCompanies } from '@/data/repository';
 import { useStore } from '@/data/store';
@@ -20,13 +19,12 @@ export default function SearchScreen() {
   const [position, setPosition] = useState('');
   const [active, setActive] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      setCompany('');
-      setPosition('');
-      setActive(false);
-    }, []),
-  );
+  // The query survives opening a company or post and coming back; Close clears it and returns to browsing.
+  const close = () => {
+    setCompany('');
+    setPosition('');
+    setActive(false);
+  };
 
   const circle = [...friendIds, currentUser.id];
   const experiences = updates.filter((update) => isExperience(update, circle));
@@ -42,14 +40,18 @@ export default function SearchScreen() {
       positions: item.positions.filter((role) => role.toLowerCase().includes(terms.position)),
     }))
     .filter((item) => item.company.toLowerCase().includes(terms.company) && item.positions.length);
-  const questionHits = findQuestions(
-    experiences.filter((update) => update.role.toLowerCase().includes(terms.position)),
-    terms.company,
-  ).filter((hit) => terms.company);
+  // Questions match either field: the text can be typed in the company line, and the position line narrows by role.
+  const questionHits = searching
+    ? findQuestions(
+        experiences.filter((update) => update.role.toLowerCase().includes(terms.position)),
+        terms.company,
+      ).filter((hit) => terms.company || hit.text.toLowerCase().includes(terms.position))
+    : [];
 
   if (!active) {
     return (
-      <Screen scroll={false} header={<AppHeader />}>
+      <Screen scroll={false}>
+        <ScreenHeader title="Search" />
         <Text variant="caption" color={colors.textMuted} style={styles.note}>
           {scopeNote}
         </Text>
@@ -93,7 +95,8 @@ export default function SearchScreen() {
   }
 
   return (
-    <Screen keyboardShouldPersistTaps="handled" header={<AppHeader />}>
+    <Screen keyboardShouldPersistTaps="handled">
+      <ScreenHeader title="Search" right={<IconButton icon="close" label="Close search" onPress={close} />} />
       <Text variant="caption" color={colors.textMuted} style={styles.note}>
         {scopeNote}
       </Text>
@@ -130,7 +133,7 @@ export default function SearchScreen() {
                     <Row
                       key={`${hit.update.id}-${index}`}
                       leading={<IconTile icon={meta.icon} tone={meta.tone} />}
-                      title={<Highlight text={hit.text} query={terms.company} />}
+                      title={<Highlight text={hit.text} query={terms.company || terms.position} />}
                       subtitle={[hit.update.company, hit.update.role, experienceLabel(hit.update), hit.difficulty].filter(Boolean).join(' · ')}
                       onPress={() => openPost(hit.update.id)}
                     />
@@ -307,7 +310,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
 }
 
 const styles = StyleSheet.create({
-  note: { marginBottom: spacing.sm },
+  note: { marginTop: -spacing.md, marginBottom: spacing.sm },
   idle: { flex: 1, minHeight: 0 },
   idleList: { paddingBottom: spacing.md },
   // The two-field bar: white block, one field per line, hairline divider between.
