@@ -54,12 +54,10 @@ export function Section({ title, children }: PropsWithChildren<{ title?: string 
 }
 
 export function ScreenHeader({
-  eyebrow,
   title,
   left,
   right,
 }: {
-  eyebrow?: string;
   title: string;
   left?: ReactNode;
   right?: ReactNode;
@@ -68,11 +66,6 @@ export function ScreenHeader({
     <View style={styles.header}>
       {left ? <View style={styles.headerLeft}>{left}</View> : null}
       <View style={styles.headerText}>
-        {eyebrow ? (
-          <Text variant="label" color={colors.textFaint}>
-            {eyebrow}
-          </Text>
-        ) : null}
         <Text variant="display">{title}</Text>
       </View>
       {right ? <View style={styles.headerRight}>{right}</View> : null}

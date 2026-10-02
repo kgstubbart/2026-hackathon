@@ -19,7 +19,7 @@ export default function ProfileScreen() {
 
   return (
     <Screen>
-      <ScreenHeader eyebrow="Your internship hunt" title="Profile" right={<IconButton icon="edit" label="Edit profile" />} />
+      <ScreenHeader title="Profile" right={<IconButton icon="edit" label="Edit profile" />} />
 
       <View style={styles.profile}>
         <View style={styles.profileTop}>

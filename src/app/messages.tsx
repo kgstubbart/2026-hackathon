@@ -31,7 +31,6 @@ export default function MessagesScreen() {
     );
   }
 
-  const unread = conversations.reduce((sum, conversation) => sum + unreadFor(conversation), 0);
   const visible = conversations.filter((conversation) =>
     getUser(conversation.userId).name.toLowerCase().includes(query.trim().toLowerCase()),
   );
@@ -39,7 +38,7 @@ export default function MessagesScreen() {
   return (
     <Screen flush keyboardShouldPersistTaps="handled">
       <HeaderBlock>
-        <ScreenHeader eyebrow={unread ? `${unread} unread` : 'All caught up'} title="Chats" />
+        <ScreenHeader title="Chats" />
       </HeaderBlock>
       <Section>
         <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
@@ -121,7 +120,7 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
     <Screen flush scroll={false}>
       <HeaderBlock>
         <ScreenHeader
-          eyebrow={user.school}
+         
           title={user.name}
           left={<IconButton icon="back" label="Back" onPress={onBack} />}
           right={<Avatar user={user} size={40} />}

@@ -58,7 +58,7 @@ export default function SearchScreen() {
   if (!searchActive && mode === 'posts') {
     return (
       <Screen scroll={false}>
-        <ScreenHeader eyebrow="Find updates and people" title="Search" />
+        <ScreenHeader title="Search" />
         <ModeToggle mode={mode} onChange={selectMode} />
         <View style={styles.idleLayout}>
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.idleList}>
@@ -86,7 +86,7 @@ export default function SearchScreen() {
 
   return (
     <Screen keyboardShouldPersistTaps="handled">
-      <ScreenHeader eyebrow="Find updates and people" title="Search" />
+      <ScreenHeader title="Search" />
       <ModeToggle mode={mode} onChange={selectMode} />
 
       {mode === 'posts' ? (

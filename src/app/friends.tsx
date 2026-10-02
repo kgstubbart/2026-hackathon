@@ -24,7 +24,7 @@ export default function FriendsScreen() {
 
   return (
     <Screen keyboardShouldPersistTaps="handled">
-      <ScreenHeader eyebrow={`${friendIds.length} friends`} title="Friends" />
+      <ScreenHeader title="Friends" />
       <SearchField value={query} onChangeText={setQuery} placeholder="Search by name or school" />
 
       {requests.length ? (

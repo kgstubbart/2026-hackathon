@@ -92,7 +92,7 @@ Always use `<Text variant="…">` from `@/components/ui`. It sets the size, line
 | `body` | 15 / 21 | 400 | Notes, messages, paragraphs. This is the default. |
 | `callout` | 14 / 19 | 500 | Secondary row text, chips, small button labels, counts |
 | `caption` | 12 / 16 | 500 | Meta info (school, time, term), badges |
-| `label` | 11 / 14 | 700, UPPERCASE, +0.8 tracking | Eyebrows above titles and form field labels |
+| `label` | 11 / 14 | 700, UPPERCASE, +0.8 tracking | Form field labels |
 
 ```tsx
 <Text variant="headline">{author.name}</Text>
@@ -157,7 +157,7 @@ Import from `@/components/ui`.
 | `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style); put the `ScreenHeader` in a `HeaderBlock` first. |
 | `HeaderBlock` | The header of a flush screen | Gutter-padded wrapper so the `ScreenHeader` lines up with the other pages |
 | `Section` | Full-width white block on a flush screen | Optional `title`; the gray background shows between sections. No radius, border or shadow. |
-| `ScreenHeader` | The header of every page except the feed | Optional `eyebrow` (label above the title), a `left` slot (back button) and a `right` slot for `IconButton`s or an `Avatar` |
+| `ScreenHeader` | The header of every page except the feed | No subheading above the title; a `left` slot (back button) and a `right` slot for `IconButton`s or an `Avatar` |
 | `SectionHeader` | Titles inside a screen | Optional `action` (usually a small `Button`) |
 | `Text` | All text | See Typography |
 | `Button` | Actions | `variant`: `primary` (one main action per screen), `secondary`, `outline`, `ghost`. `size`: `sm`, `md`, `lg`. Optional `icon`. |
