@@ -1,10 +1,11 @@
 import type { Update, UpdateKind } from './mock-data';
 
-// The Search tab is a repository of shared experiences: every non-private interview, takehome/OA, offer
-// and acceptance anyone has posted, browsable by company and position.
+// The Search tab is a repository of shared experiences: every interview, takehome/OA, offer and acceptance
+// shared by the friends you are connected with (plus your own), browsable by company and position.
 export const repositoryKinds: UpdateKind[] = ['interview', 'takehome', 'offer', 'accepted'];
 
-export const isExperience = (update: Update) => update.visibility === 'friends' && repositoryKinds.includes(update.kind);
+export const isExperience = (update: Update, circle: string[]) =>
+  update.visibility === 'friends' && repositoryKinds.includes(update.kind) && circle.includes(update.userId);
 
 export type CompanySummary = {
   company: string;
