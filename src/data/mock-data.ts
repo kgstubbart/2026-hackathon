@@ -64,7 +64,7 @@ export type Conversation = {
   messages: Message[];
 };
 
-export const currentUserId = "alex";
+export const currentUserId = "chase";
 // Consecutive weeks (before this one) with at least one logged update.
 export const currentStreakWeeks = 12;
 
@@ -87,9 +87,9 @@ export const seasonStats = {
 
 export const users: User[] = [
   {
-    id: "alex",
-    name: "Alex Morgan",
-    initials: "AM",
+    id: "chase",
+    name: "Chase Ashton",
+    initials: "CA",
     color: "#6C63FF",
     school: "Brigham Young University",
     major: "Computer Science",
@@ -295,7 +295,7 @@ export const initialUpdates: Update[] = (
     },
     {
       id: "u7",
-      userId: "alex",
+      userId: "chase",
       kind: "interview",
       company: "Airbnb",
       role: "Software Engineering Intern",
@@ -314,7 +314,7 @@ export const initialUpdates: Update[] = (
     },
     {
       id: "u8",
-      userId: "alex",
+      userId: "chase",
       kind: "applied",
       company: "Notion",
       role: "Software Engineering Intern",
@@ -344,7 +344,7 @@ export const initialUpdates: Update[] = (
     },
     {
       id: "u10",
-      userId: "alex",
+      userId: "chase",
       kind: "applied",
       company: "Ramp",
       role: "Software Engineering Intern",
@@ -478,7 +478,7 @@ export const initialUpdates: Update[] = (
     },
     {
       id: "u20",
-      userId: "alex",
+      userId: "chase",
       kind: "takehome",
       company: "Notion",
       role: "Software Engineering Intern",
@@ -554,7 +554,7 @@ export const initialComments: Comment[] = [
   {
     id: "c2",
     updateId: "u1",
-    userId: "alex",
+    userId: "chase",
     body: "Huge. Dinner on you?",
     createdAt: minutesAgo(12),
   },
@@ -568,7 +568,7 @@ export const initialComments: Comment[] = [
   {
     id: "c4",
     updateId: "u2",
-    userId: "alex",
+    userId: "chase",
     body: "The rate limiter one is a classic, token bucket and you are golden.",
     createdAt: minutesAgo(40),
   },
@@ -603,7 +603,7 @@ export const initialComments: Comment[] = [
   {
     id: "c9",
     updateId: "u12",
-    userId: "alex",
+    userId: "chase",
     body: "Number of Islands again? They love that one.",
     createdAt: minutesAgo(300),
   },
@@ -617,7 +617,7 @@ export const initialComments: Comment[] = [
   {
     id: "c11",
     updateId: "u9",
-    userId: "alex",
+    userId: "chase",
     body: "Your portfolio is unreal, no way they pass.",
     createdAt: minutesAgo(4_000),
   },
@@ -631,7 +631,7 @@ export const initialComments: Comment[] = [
   {
     id: "c13",
     updateId: "u15",
-    userId: "alex",
+    userId: "chase",
     body: "Accounts Merge is just union find in disguise.",
     createdAt: minutesAgo(300),
   },
