@@ -2,7 +2,7 @@ import { Fragment, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { KindBadge, UpdateCard } from '@/components/update-card';
-import { Avatar, Button, Card, Chip, Divider, Icon, Screen, ScreenHeader, SearchField, SectionHeader, Text, type IconName } from '@/components/ui';
+import { Avatar, Button, Card, Chip, Divider, Icon, Screen, ScreenHeader, SectionHeader, Text, type IconName } from '@/components/ui';
 import { colors, radius, spacing, typography } from '@/constants/theme';
 import type { Update, User } from '@/data/mock-data';
 import { useStore } from '@/data/store';
@@ -202,7 +202,7 @@ function PeopleSearch() {
 
   return (
     <>
-      <SearchField value={query} onChangeText={setQuery} placeholder="Search by name, school, or major" autoFocus />
+      <PeopleSearchInput value={query} onChange={setQuery} />
       <SectionHeader title={normalizedQuery ? 'Matches' : 'People on StrJava'} />
       {people.length ? (
         <Card flush style={styles.feedContainer}>
@@ -225,6 +225,25 @@ function PeopleSearch() {
         </Text>
       )}
     </>
+  );
+}
+
+function PeopleSearchInput({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  return (
+    <View style={styles.fields}>
+      <View style={styles.peopleInputRow}>
+        <Icon name="search" size={20} color={colors.textMuted} />
+        <TextInput
+          value={value}
+          onChangeText={onChange}
+          placeholder="Search by name, school, or major"
+          placeholderTextColor={colors.textFaint}
+          autoFocus
+          autoCorrect={false}
+          style={styles.peopleInput}
+        />
+      </View>
+    </View>
   );
 }
 
@@ -401,16 +420,16 @@ const styles = StyleSheet.create({
   },
   fields: {
     width: '100%',
-    borderWidth: 1.5,
-    borderColor: colors.text,
     borderRadius: 0,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.lg,
     zIndex: 2,
   },
   inputs: { width: '100%' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: spacing.xxxl + spacing.xl, paddingRight: spacing.lg },
+  inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: spacing.xxxl + spacing.xl },
+  peopleInputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: spacing.xxxl + spacing.xl },
   input: { ...typography.headline, fontWeight: '400', flex: 1, height: '100%', color: colors.text, outlineColor: 'transparent' },
+  peopleInput: { ...typography.body, flex: 1, height: '100%', color: colors.text, outlineColor: 'transparent' },
   inputGroup: { position: 'relative' },
   focusedInputGroup: { zIndex: 10 },
   results: { marginTop: spacing.lg, zIndex: 1 },
