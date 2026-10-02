@@ -165,6 +165,7 @@ Import from `@/components/ui`.
 | `Avatar` | People | Initials on the user's color. Optional `ring` color. |
 | `CompanyMark` | Companies | First letter on white, colored from the tones |
 | `TextField` / `FieldLabel` | Forms | `label` renders in the `label` variant above the input |
+| `ComboField` | Share form fields | A dropdown you can type into: suggestions filter as you type and open inline under the field; a typed answer that matches nothing is kept as is. |
 | `SearchField` | Simple pill search | The Search tab uses its own Uber-style field box instead |
 
 App-level components:
@@ -187,7 +188,7 @@ These are deliberate. Keep new work consistent with them.
   4. Action row: icons with counts (congrats, comment, send), with no text labels.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
 - **Search** (Uber "Where to?" style): a bordered `lg` box of stacked fields linked by a dot, line and square rail. A round "+" beside the box adds a field. Results are flat rows: an icon on the left, the title with the **matched text in bold**, a muted subtitle, and hairline dividers that start at the text column.
-- **Forms** (Share): question → option tiles → `Card` of fields (and a second `Card` for a repeatable list, like interview questions) → one large primary button with a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
+- **Forms** (Share): question → option tiles → `Card` of `ComboField`s (and a second `Card` for a repeatable list, like interview questions) → one large primary button with a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
 - **Lists** (Friends, Chats): rows inside a `flush` `Card`, separated by `Divider`s, with the avatar on the left and a single action or meta element on the right.
 
 ## 9. Interaction and accessibility
