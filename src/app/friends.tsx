@@ -1,9 +1,8 @@
-import { router } from 'expo-router';
 import { Fragment, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { KindBadge } from '@/components/update-card';
-import { Avatar, Button, Card, Divider, IconButton, Screen, SearchField, SectionHeader, Text, TopBar } from '@/components/ui';
+import { Avatar, Button, Card, Divider, Screen, ScreenHeader, SearchField, SectionHeader, Text } from '@/components/ui';
 import { colors, spacing } from '@/constants/theme';
 import type { User } from '@/data/mock-data';
 import { useStore } from '@/data/store';
@@ -24,14 +23,8 @@ export default function FriendsScreen() {
   const latestFor = (id: string) => updates.find((update) => update.userId === id && update.visibility === 'friends');
 
   return (
-    <Screen
-      keyboardShouldPersistTaps="handled"
-      header={
-        <TopBar
-          title={`Friends · ${friendIds.length}`}
-          left={<IconButton icon="back" label="Back" tone="muted" onPress={() => (router.canGoBack() ? router.back() : router.navigate('/'))} />}
-        />
-      }>
+    <Screen keyboardShouldPersistTaps="handled">
+      <ScreenHeader eyebrow={`${friendIds.length} friends`} title="Friends" />
       <SearchField value={query} onChangeText={setQuery} placeholder="Search by name or school" />
 
       {requests.length ? (

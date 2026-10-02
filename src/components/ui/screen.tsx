@@ -17,7 +17,7 @@ type ScreenProps = PropsWithChildren<
 
 export function Screen({ children, scroll = true, flush, header, keyboardShouldPersistTaps }: ScreenProps) {
   const insets = useSafeAreaInsets();
-  const top = header ? (flush ? 0 : spacing.lg) : Math.max(insets.top, spacing.lg);
+  const top = header ? 0 : Math.max(insets.top, spacing.lg);
   const column = [styles.column, flush ? styles.flush : styles.gutter];
 
   if (!scroll) {
@@ -70,6 +70,22 @@ export function Section({ title, children }: PropsWithChildren<{ title?: string 
   );
 }
 
+export function ScreenHeader({ eyebrow, title, right }: { eyebrow?: string; title: string; right?: ReactNode }) {
+  return (
+    <View style={styles.header}>
+      <View style={styles.headerText}>
+        {eyebrow ? (
+          <Text variant="label" color={colors.textFaint}>
+            {eyebrow}
+          </Text>
+        ) : null}
+        <Text variant="display">{title}</Text>
+      </View>
+      {right ? <View style={styles.headerRight}>{right}</View> : null}
+    </View>
+  );
+}
+
 export function SectionHeader({ title, action }: { title: string; action?: ReactNode }) {
   return (
     <View style={styles.section}>
@@ -100,6 +116,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     gap: spacing.lg,
   },
+  header: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.md, paddingTop: spacing.sm, paddingBottom: spacing.xl },
+  headerText: { flex: 1, gap: spacing.xs },
+  headerRight: { flexDirection: 'row', gap: spacing.sm },
   section: {
     flexDirection: 'row',
     alignItems: 'center',

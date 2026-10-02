@@ -3,7 +3,7 @@ import { Fragment, useCallback, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { KindBadge, UpdateCard } from '@/components/update-card';
-import { Avatar, Button, Card, Chip, Divider, Icon, Screen, SectionHeader, Text, TopBar, type IconName } from '@/components/ui';
+import { Avatar, Button, Card, Chip, Divider, Icon, Screen, ScreenHeader, SectionHeader, Text, type IconName } from '@/components/ui';
 import { colors, radius, spacing, typography } from '@/constants/theme';
 import type { Update, User } from '@/data/mock-data';
 import { useStore } from '@/data/store';
@@ -57,7 +57,8 @@ export default function SearchScreen() {
 
   if (!searchActive && mode === 'posts') {
     return (
-      <Screen scroll={false} header={<TopBar title="Search" />}>
+      <Screen scroll={false}>
+        <ScreenHeader eyebrow="Find updates and people" title="Search" />
         <ModeToggle mode={mode} onChange={selectMode} />
         <View style={styles.idleLayout}>
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.idleList}>
@@ -84,7 +85,8 @@ export default function SearchScreen() {
   }
 
   return (
-    <Screen keyboardShouldPersistTaps="handled" header={<TopBar title="Search" />}>
+    <Screen keyboardShouldPersistTaps="handled">
+      <ScreenHeader eyebrow="Find updates and people" title="Search" />
       <ModeToggle mode={mode} onChange={selectMode} />
 
       {mode === 'posts' ? (
