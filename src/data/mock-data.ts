@@ -62,20 +62,32 @@ export const initialRequestIds = ['nia'];
 
 const minutesAgo = (minutes: number) => Date.now() - minutes * 60_000;
 
-export const initialUpdates: Update[] = [
+// Newest first, whatever order they are written in below.
+export const initialUpdates: Update[] = ([
   { id: 'u1', userId: 'priya', kind: 'offer', company: 'Goldman Sachs', role: 'Summer Analyst', term: 'Summer 2027', location: 'New York, NY', note: 'Superday paid off. Still processing this one!', createdAt: minutesAgo(18), visibility: 'friends', congrats: 42 },
   { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: '56. Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14 },
   { id: 'u3', userId: 'maya', kind: 'accepted', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', location: 'San Francisco, CA', note: 'Signed! Who else is going to be in SF this summer?', createdAt: minutesAgo(130), visibility: 'friends', congrats: 67 },
   { id: 'u4', userId: 'theo', kind: 'applied', company: 'Spotify', role: 'Data Analyst Intern', term: 'Summer 2027', note: 'Number 14 this week. Keeping the streak alive.', createdAt: minutesAgo(240), visibility: 'private', congrats: 0 },
   { id: 'u12', userId: 'sam', kind: 'takehome', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'OA', questions: [{ text: '146. LRU Cache' }, { text: '200. Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7 },
   { id: 'u5', userId: 'lena', kind: 'milestone', company: 'Microsoft', role: 'UX Research Intern', term: 'Fall 2026', title: 'Wrapped my first research study', note: 'Presented findings to the Teams org. Terrified and thrilled.', createdAt: minutesAgo(410), visibility: 'friends', congrats: 29 },
-  { id: 'u6', userId: 'sam', kind: 'interview', company: 'Duolingo', role: 'Machine Learning Intern', term: 'Summer 2027', stage: 'Phone screen', createdAt: minutesAgo(600), visibility: 'friends', congrats: 11 },
-  { id: 'u7', userId: 'alex', kind: 'interview', company: 'Airbnb', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Technical interview', note: 'Graph problem went well. Fingers crossed.', createdAt: minutesAgo(900), visibility: 'friends', congrats: 16 },
+  { id: 'u6', userId: 'sam', kind: 'interview', company: 'Duolingo', role: 'Machine Learning Intern', term: 'Summer 2027', stage: 'Phone screen', round: 'Round 1', interviewType: 'Mixed', questions: [{ text: 'Tell me about a project you are proud of' }, { text: '217. Contains Duplicate', difficulty: 'Easy' }], createdAt: minutesAgo(600), visibility: 'friends', congrats: 11 },
+  { id: 'u7', userId: 'alex', kind: 'interview', company: 'Airbnb', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Technical interview', round: 'Round 2', interviewType: 'Technical', questions: [{ text: '133. Clone Graph', difficulty: 'Medium' }, { text: '994. Rotting Oranges', difficulty: 'Medium' }], note: 'Graph problem went well. Fingers crossed.', createdAt: minutesAgo(900), visibility: 'friends', congrats: 16 },
   { id: 'u8', userId: 'alex', kind: 'applied', company: 'Notion', role: 'Software Engineering Intern', term: 'Summer 2027', note: 'Referred by Sam. Thank you!', createdAt: minutesAgo(2_800), visibility: 'private', congrats: 0 },
-  { id: 'u9', userId: 'maya', kind: 'interview', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', stage: 'Portfolio review', createdAt: minutesAgo(4_300), visibility: 'friends', congrats: 21 },
+  { id: 'u9', userId: 'maya', kind: 'interview', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', stage: 'Portfolio review', round: 'Round 2', interviewType: 'Behavioral', questions: [{ text: 'Walk me through your favorite project' }, { text: 'How do you handle design critique?' }], createdAt: minutesAgo(4_300), visibility: 'friends', congrats: 21 },
   { id: 'u10', userId: 'alex', kind: 'applied', company: 'Ramp', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(5_900), visibility: 'private', congrats: 0 },
   { id: 'u11', userId: 'jordan', kind: 'applied', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(12_000), visibility: 'private', congrats: 0 },
-];
+  { id: 'u13', userId: 'theo', kind: 'takehome', company: 'Capital One', role: 'Data Analyst Intern', assessmentFormat: 'OA', questions: [{ text: '1. Two Sum' }, { text: '242. Valid Anagram' }, { text: 'SQL: top 3 customers by revenue' }], note: '70 minutes, three questions. The SQL one was the sneaky one.', createdAt: minutesAgo(95), visibility: 'friends', congrats: 5 },
+  { id: 'u14', userId: 'priya', kind: 'interview', company: 'Morgan Stanley', role: 'Summer Analyst', round: 'Round 1', interviewType: 'Behavioral', questions: [{ text: 'Why Morgan Stanley over the other banks?' }, { text: 'Tell me about a time you worked under pressure' }], createdAt: minutesAgo(180), visibility: 'friends', congrats: 9 },
+  { id: 'u15', userId: 'jordan', kind: 'takehome', company: 'Palantir', role: 'Software Engineering Intern', assessmentFormat: 'OA', questions: [{ text: '42. Trapping Rain Water' }, { text: '721. Accounts Merge' }], note: 'HackerRank, 90 minutes. Second one was rough.', createdAt: minutesAgo(360), visibility: 'friends', congrats: 12 },
+  { id: 'u16', userId: 'lena', kind: 'interview', company: 'Microsoft', role: 'UX Research Intern', round: 'Round 1', interviewType: 'Behavioral', questions: [{ text: 'How would you research a feature nobody uses?' }], createdAt: minutesAgo(520), visibility: 'friends', congrats: 7 },
+  { id: 'u17', userId: 'sam', kind: 'takehome', company: 'Roblox', role: 'Machine Learning Intern', assessmentFormat: 'Take-home', questions: [{ text: 'Build a recommender on the sample dataset and write up your approach' }], note: 'Due in five days. Pandas it is.', createdAt: minutesAgo(760), visibility: 'friends', congrats: 6 },
+  { id: 'u18', userId: 'maya', kind: 'interview', company: 'Notion', role: 'Product Design Intern', round: 'Round 1', interviewType: 'Mixed', questions: [{ text: 'Redesign the share dialog' }, { text: 'Tell me about a time you shipped something imperfect' }], createdAt: minutesAgo(1_100), visibility: 'friends', congrats: 15 },
+  { id: 'u19', userId: 'theo', kind: 'interview', company: 'Spotify', role: 'Data Analyst Intern', round: 'Round 2', interviewType: 'Technical', questions: [{ text: '560. Subarray Sum Equals K', difficulty: 'Medium' }, { text: 'SQL: 7-day rolling retention', difficulty: 'Hard' }], note: 'Case study on podcast churn too.', createdAt: minutesAgo(1_500), visibility: 'friends', congrats: 10 },
+  { id: 'u20', userId: 'alex', kind: 'takehome', company: 'Notion', role: 'Software Engineering Intern', assessmentFormat: 'OA', questions: [{ text: '49. Group Anagrams' }, { text: '739. Daily Temperatures' }, { text: '208. Implement Trie (Prefix Tree)' }], note: 'CodeSignal, four sections. Got three.', createdAt: minutesAgo(2_100), visibility: 'friends', congrats: 13 },
+  { id: 'u21', userId: 'sam', kind: 'interview', company: 'Duolingo', role: 'Machine Learning Intern', round: 'Round 2', interviewType: 'Technical', questions: [{ text: '322. Coin Change', difficulty: 'Medium' }, { text: 'Explain the bias-variance tradeoff' }], createdAt: minutesAgo(3_200), visibility: 'friends', congrats: 8 },
+  { id: 'u22', userId: 'priya', kind: 'takehome', company: 'Goldman Sachs', role: 'Summer Analyst', assessmentFormat: 'OA', questions: [{ text: 'HireVue: 5 recorded questions' }, { text: 'Numerical reasoning set' }], createdAt: minutesAgo(8_000), visibility: 'friends', congrats: 11 },
+  { id: 'u23', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', round: 'Round 1', interviewType: 'Technical', questions: [{ text: '208. Implement Trie (Prefix Tree)', difficulty: 'Medium' }, { text: 'Design a key-value store with TTL' }], createdAt: minutesAgo(9_500), visibility: 'friends', congrats: 9 },
+] satisfies Update[]).sort((a, b) => b.createdAt - a.createdAt);
 
 export const initialComments: Comment[] = [
   { id: 'c1', updateId: 'u1', userId: 'maya', body: 'LETS GO PRIYA!! Superday queen.', createdAt: minutesAgo(15) },
@@ -89,6 +101,12 @@ export const initialComments: Comment[] = [
   { id: 'c9', updateId: 'u12', userId: 'alex', body: 'Number of Islands again? They love that one.', createdAt: minutesAgo(300) },
   { id: 'c10', updateId: 'u7', userId: 'maya', body: 'Graph problems are your thing. You got this.', createdAt: minutesAgo(850) },
   { id: 'c11', updateId: 'u9', userId: 'alex', body: 'Your portfolio is unreal, no way they pass.', createdAt: minutesAgo(4_000) },
+  { id: 'c12', updateId: 'u13', userId: 'sam', body: 'Which SQL dialect? I had the same OA last week.', createdAt: minutesAgo(80) },
+  { id: 'c13', updateId: 'u15', userId: 'alex', body: 'Accounts Merge is just union find in disguise.', createdAt: minutesAgo(300) },
+  { id: 'c14', updateId: 'u15', userId: 'theo', body: 'Trapping rain water on a timer is cruel.', createdAt: minutesAgo(280) },
+  { id: 'c15', updateId: 'u18', userId: 'lena', body: 'Share dialog redesign is such a good prompt. What did you go with?', createdAt: minutesAgo(1_000) },
+  { id: 'c16', updateId: 'u20', userId: 'jordan', body: 'Three out of four still clears the bar usually.', createdAt: minutesAgo(2_000) },
+  { id: 'c17', updateId: 'u19', userId: 'priya', body: 'Rolling retention in SQL, respect.', createdAt: minutesAgo(1_400) },
 ];
 
 export const conversations: Conversation[] = [
