@@ -23,14 +23,11 @@ export default function FeedScreen() {
     <View style={styles.screen}>
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
         <View style={[styles.column, styles.topRow]}>
-          <View style={styles.side}>
-            <IconButton icon="plus" label="Share an update" tone="muted" onPress={() => router.navigate('/share')} />
-            <IconButton icon="search" label="Search" tone="muted" onPress={() => router.navigate('/search')} />
-          </View>
+          {/* Empty left side keeps the wordmark centered. */}
+          <View style={styles.side} />
           <Wordmark />
           <View style={[styles.side, styles.sideRight]}>
-            <IconButton icon="chat" label="Chats" tone="muted" onPress={() => router.navigate('/messages')} />
-            <IconButton icon="bell" label="Notifications" tone="muted" badge />
+            <IconButton icon="friends" label="Friends" tone="muted" onPress={() => router.navigate('/friends')} />
           </View>
         </View>
       </View>
@@ -62,7 +59,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg },
-  side: { flexDirection: 'row', gap: spacing.sm, flex: 1 },
+  side: { flexDirection: 'row', flex: 1 },
   sideRight: { justifyContent: 'flex-end' },
   content: { paddingBottom: spacing.xxl },
   stack: { gap: spacing.sm },
