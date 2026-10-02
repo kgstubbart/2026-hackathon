@@ -9,7 +9,8 @@ import { pages } from '@/constants/pages';
 import { colors, radius, shadow, spacing } from '@/constants/theme';
 
 const tabs = pages.filter((page) => page.tab);
-const hiddenPages = pages.filter((page) => !page.tab);
+// Fullscreen pages live in the root stack (outside the tabs group), so they get no trigger.
+const hiddenPages = pages.filter((page) => !page.tab && !page.fullscreen);
 
 export default function AppTabs() {
   return (

@@ -92,7 +92,7 @@ Always use `<Text variant="…">` from `@/components/ui`. It sets the size, line
 | `body` | 15 / 21 | 400 | Notes, messages, paragraphs. This is the default. |
 | `callout` | 14 / 19 | 500 | Secondary row text, chips, small button labels, counts |
 | `caption` | 12 / 16 | 500 | Meta info (school, time, term), badges |
-| `label` | 11 / 14 | 700, UPPERCASE, +0.8 tracking | Eyebrows above titles and form field labels |
+| `label` | 11 / 14 | 700, UPPERCASE, +0.8 tracking | Form field labels |
 
 ```tsx
 <Text variant="headline">{author.name}</Text>
@@ -187,11 +187,12 @@ These are deliberate. Keep new work consistent with them.
 - **Menu** (`src/components/nav-menu.tsx`): a dropdown below the header listing every page in `src/constants/pages.ts`, with the current page highlighted in `primarySoft`. When you add a page, add it to `pages.ts`; set `tab: true` only if it belongs in the tab bar.
 - **Feed posts** (LinkedIn and Threads style): full-width white sections, not floating rounded cards. From top to bottom:
   1. Author header: avatar, name, "major · school", "time · audience icon", and a `more` icon on the right.
-  2. One sentence from `postSentence()`, in the `headline` variant at regular weight with only the kind in bold: "Got an **Interview** at {company} for the {role} position!", "Got an **Offer** from …", "**Accepted** an offer at …".
+  2. One sentence from `postSentence()`, in the `headline` variant at regular weight with the kind, company and role in bold: "Got an **Interview** at **{company}** for the **{role}** position!", "Got an **Offer** from **…**", "**Accepted** an offer at **…**".
   3. The poster's optional comment (`body`, `textMuted`).
   4. Action row: icons with counts (congrats, comment, send), with no text labels.
 
-  No colored box, company mark or kind badge inside posts; the bold keyword carries the kind.
+  No colored box, company mark or kind badge inside posts; the bold words carry the kind, company and role. Nothing else shows in the feed: tapping the post body or the comment icon opens the post page.
+- **Post page** (`/post/[id]`): a `TopBar` titled "Post" with back on the left, then the same post rendered with `detail` (adds the round, type or format line and the question list under the comment), then a "Comments · n" `Section` of rows (32pt avatar, bold name, time, body) and a white composer bar pinned to the bottom like the chat thread.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
 - **Search** (Uber "Where to?" style): a bordered `lg` box of stacked fields linked by a dot, line and square rail. A round "+" beside the box adds a field. Results are flat rows: an icon on the left, the title with the **matched text in bold**, a muted subtitle, and hairline dividers that start at the text column.
 - **Forms** (Share): feed style, not cards. A `TopBar` (close on the left, title centered), then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.

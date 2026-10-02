@@ -2,10 +2,12 @@ import { createContext, useContext, useState, type PropsWithChildren } from 'rea
 
 import {
   currentUserId,
+  initialComments,
   initialFriendIds,
   initialRequestIds,
   initialUpdates,
   users,
+  type Comment,
   type Update,
   type User,
 } from './mock-data';
@@ -21,6 +23,9 @@ type Store = {
   updates: Update[];
   addUpdate: (update: NewUpdate) => void;
   toggleCongrats: (id: string) => void;
+  comments: Comment[];
+  commentsFor: (updateId: string) => Comment[];
+  addComment: (updateId: string, body: string) => void;
   friendIds: string[];
   requestIds: string[];
   toggleFriend: (id: string) => void;
@@ -31,6 +36,7 @@ const StoreContext = createContext<Store | null>(null);
 
 export function StoreProvider({ children }: PropsWithChildren) {
   const [updates, setUpdates] = useState(initialUpdates);
+  const [comments, setComments] = useState(initialComments);
   const [friendIds, setFriendIds] = useState(initialFriendIds);
   const [requestIds, setRequestIds] = useState(initialRequestIds);
 
@@ -48,7 +54,6 @@ export function StoreProvider({ children }: PropsWithChildren) {
           userId: currentUserId,
           createdAt: Date.now(),
           congrats: 0,
-          comments: 0,
           // Applications are personal tracking only; everything else goes to the feed.
           visibility: isPrivateKind(update.kind) ? 'private' : 'friends',
           ...update,
@@ -63,6 +68,13 @@ export function StoreProvider({ children }: PropsWithChildren) {
             : item,
         ),
       ),
+    comments,
+    commentsFor: (updateId) => comments.filter((comment) => comment.updateId === updateId),
+    addComment: (updateId, body) =>
+      setComments((items) => [
+        ...items,
+        { id: `comment-${Date.now()}`, updateId, userId: currentUserId, body, createdAt: Date.now() },
+      ]),
     friendIds,
     requestIds,
     toggleFriend: (id) =>

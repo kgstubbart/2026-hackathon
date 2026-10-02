@@ -21,30 +21,45 @@ export const isPrivateKind = (kind: UpdateKind) => kind === 'applied';
 // Only these kinds appear in the feed; applications and milestones stay on the poster's profile.
 export const feedKinds: UpdateKind[] = ['interview', 'takehome', 'offer', 'accepted'];
 
-// Feed post sentence split around the bolded keyword, e.g. "Got an **Interview** at Stripe for the SWE Intern position!"
+// Feed post sentence as segments; the kind, company and role are bold, the rest regular.
+// e.g. "Got an **Interview** at **Stripe** for the **SWE Intern** position!"
+export type SentenceSegment = { text: string; bold?: boolean };
+
 export function postSentence(
   update: Pick<Update, 'kind' | 'company' | 'role' | 'title' | 'assessmentFormat'>,
-): [string, string, string] {
-  const company = update.company || 'a company';
-  const role = update.role || 'intern';
+): SentenceSegment[] {
+  const company = { text: update.company || 'a company', bold: true };
+  const role = { text: update.role || 'intern', bold: true };
+  const forThe = { text: ' for the ' };
+  const position = { text: ' position!' };
   switch (update.kind) {
     case 'interview':
-      return ['Got an ', 'Interview', ` at ${company} for the ${role} position!`];
+      return [{ text: 'Got an ' }, { text: 'Interview', bold: true }, { text: ' at ' }, company, forThe, role, position];
     case 'takehome':
       // Use the format when known: "Got an OA…" / "Got a Take-home…".
       return [
-        update.assessmentFormat === 'Take-home' ? 'Got a ' : 'Got an ',
-        update.assessmentFormat || 'OA',
-        ` from ${company} for the ${role} position!`,
+        { text: update.assessmentFormat === 'Take-home' ? 'Got a ' : 'Got an ' },
+        { text: update.assessmentFormat || 'OA', bold: true },
+        { text: ' from ' },
+        company,
+        forThe,
+        role,
+        position,
       ];
     case 'offer':
-      return ['Got an ', 'Offer', ` from ${company} for the ${role} position!`];
+      return [{ text: 'Got an ' }, { text: 'Offer', bold: true }, { text: ' from ' }, company, forThe, role, position];
     case 'accepted':
-      return ['', 'Accepted', ` an offer at ${company} for the ${role} position!`];
+      return [{ text: 'Accepted', bold: true }, { text: ' an offer at ' }, company, forThe, role, position];
     case 'applied':
-      return ['', 'Applied', ` to ${company} for the ${role} position!`];
+      return [{ text: 'Applied', bold: true }, { text: ' to ' }, company, forThe, role, position];
     case 'milestone':
-      return ['Hit a ', 'Milestone', ` at ${company}${update.title ? `: ${update.title}` : '!'}`];
+      return [
+        { text: 'Hit a ' },
+        { text: 'Milestone', bold: true },
+        { text: ' at ' },
+        company,
+        { text: update.title ? `: ${update.title}` : '!' },
+      ];
   }
 }
 
