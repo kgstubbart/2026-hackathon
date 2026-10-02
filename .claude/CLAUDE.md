@@ -1,5 +1,23 @@
 @../AGENTS.md
 
+## Product
+
+- **StrJava** — "Strava for internships." Students share internship progress with friends (applied, interviewing, offer, accepted, milestones) and friends cheer them on with congrats.
+- Wordmark: "StrJava" with only "Str" struck through by a single horizontal line (`src/components/wordmark.tsx`). Always render the name through this component in UI.
+- Tabs: Feed (`/`), Friends (`/friends`), Share (`/share`, center + button), Chats (`/messages`), Profile (`/profile`).
+- Feed: StrJava header bar (+ / search on the left, chats / notifications on the right), a Strava-style weekly streak card on top, then a plain chronological feed. No filters, summary boxes, or "recent wins" strips.
+- Feed posts are full-width white sections separated by thin gaps, LinkedIn/Threads style: author header (avatar, name, major · school, time · audience), headline + note, a company/role attachment, and an icon action row (congrats, comment, send). Not floating rounded cards.
+- Streak: flame with consecutive-week count (Strava orange `colors.streak`) and Mon–Sun circles; a day is filled when the user logged an update that day.
+- Data is mock and in-memory (`src/data/mock-data.ts`, `src/data/store.tsx`); there is no backend yet.
+
+## Design system
+
+- All colors, type, spacing, radii and shadows come from `src/constants/theme.ts`. Never hardcode hex values, font sizes or spacing in screens; add a token instead.
+- Build screens from the kit in `src/components/ui/` (`Text`, `Button`, `IconButton`, `Chip`, `Card`, `Avatar`, `CompanyMark`, `TextField`, `SearchField`, `Screen`, `ScreenHeader`, `SectionHeader`).
+- Icons only via `<Icon name=… />` (`src/components/ui/icon.tsx`), which maps a name to SF Symbols (iOS) and Material Symbols (Android/web). Add new icons to that map; never use unicode glyphs or emoji as icons.
+- Update kinds (label, icon, tone color) are defined once in `src/data/update-kinds.ts`; reuse `KindBadge` for kind labels.
+- Primary color is indigo; each update kind has its own tone (sky, amber, mint, primary, rose). Light mode only for now.
+
 ## Commits
 
 - Commit after each completed unit of work; keep commits small and focused.
