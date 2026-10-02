@@ -52,7 +52,7 @@ export default function SearchScreen() {
         <View style={styles.idleLayout}>
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.idleList}>
             <SectionHeader title="Your circle" />
-            <Card flush>
+            <Card flush style={styles.feedContainer}>
               {friendIds.map((friendId, index) => (
                 <Fragment key={friendId}>
                   {index > 0 ? <Divider /> : null}
@@ -88,7 +88,7 @@ export default function SearchScreen() {
           </View>
         </View>
         <View style={styles.results}>
-          <Card flush>
+          <Card flush style={styles.feedContainer}>
           {searching ? (
             <>
               {results.map((update, index) => {
@@ -205,7 +205,7 @@ function PeopleSearch() {
       <SearchField value={query} onChangeText={setQuery} placeholder="Search by name, school, or major" autoFocus />
       <SectionHeader title={normalizedQuery ? 'Matches' : 'People on StrJava'} />
       {people.length ? (
-        <Card flush>
+        <Card flush style={styles.feedContainer}>
           {people.map((user, index) => (
             <Fragment key={user.id}>
               {index > 0 ? <Divider /> : null}
@@ -392,11 +392,18 @@ const styles = StyleSheet.create({
   idleLayout: { flex: 1, minHeight: 0 },
   idleList: { paddingBottom: spacing.md },
   idleSearch: { paddingTop: spacing.md, paddingBottom: spacing.md, backgroundColor: colors.background },
+  feedContainer: {
+    borderRadius: 0,
+    borderWidth: 0,
+    boxShadow: 'none',
+    elevation: 0,
+    shadowOpacity: 0,
+  },
   fields: {
     width: '100%',
     borderWidth: 1.5,
     borderColor: colors.text,
-    borderRadius: radius.lg,
+    borderRadius: 0,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.lg,
     zIndex: 2,
@@ -433,7 +440,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
-    borderRadius: radius.md,
+    borderRadius: 0,
     borderTopWidth: StyleSheet.hairlineWidth,
     paddingVertical: spacing.xs,
   },
@@ -447,10 +454,9 @@ const styles = StyleSheet.create({
   statusText: { fontWeight: '700' },
   expanded: {
     marginVertical: spacing.sm,
-    borderRadius: radius.lg,
+    borderRadius: 0,
     overflow: 'hidden',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    borderWidth: 0,
   },
   empty: { marginTop: spacing.xxl },
   pressed: { opacity: 0.6 },
