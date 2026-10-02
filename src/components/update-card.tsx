@@ -53,8 +53,30 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
 
       <View style={styles.content}>
         <Text variant="headline">{headlineFor(update)}</Text>
+        {update.interviewType ? (
+          <Text variant="callout" color={colors.textMuted}>
+            {update.interviewType}
+          </Text>
+        ) : null}
         {update.note ? <Text variant="body">{update.note}</Text> : null}
       </View>
+
+      {update.questions?.length ? (
+        <View style={styles.questions}>
+          {update.questions.map((question, index) => (
+            <View key={index} style={styles.question}>
+              <Text variant="body" style={styles.questionText}>
+                {question.text}
+              </Text>
+              {question.difficulty ? (
+                <Text variant="caption" color={colors.textMuted}>
+                  {question.difficulty}
+                </Text>
+              ) : null}
+            </View>
+          ))}
+        </View>
+      ) : null}
 
       <View style={[styles.attachment, celebrate && { backgroundColor: tone.bg, borderColor: tone.bg }]}>
         <CompanyMark company={update.company || '?'} size={40} />
@@ -120,6 +142,9 @@ const styles = StyleSheet.create({
   author: { flex: 1 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   content: { gap: spacing.xs },
+  questions: { gap: spacing.xs },
+  question: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
+  questionText: { flexShrink: 1 },
   attachment: {
     flexDirection: 'row',
     alignItems: 'center',

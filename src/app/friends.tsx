@@ -48,7 +48,7 @@ export default function FriendsScreen() {
               <PersonRow
                 key={user.id}
                 user={user}
-                subtitle={latest ? `${latest.company} · ${latest.term}` : user.school}
+                subtitle={latest ? [latest.company, latest.term].filter(Boolean).join(' · ') : user.school}
                 action={latest ? <KindBadge kind={latest.kind} /> : null}
               />
             );

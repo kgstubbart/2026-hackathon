@@ -9,6 +9,7 @@ import { Wordmark } from '@/components/wordmark';
 import { colors, layout, spacing } from '@/constants/theme';
 import { currentStreakWeeks } from '@/data/mock-data';
 import { useStore } from '@/data/store';
+import { isPrivateKind } from '@/data/update-kinds';
 
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
@@ -16,7 +17,9 @@ export default function FeedScreen() {
 
   const mine = updates.filter((update) => update.userId === currentUser.id);
   const feed = updates.filter(
-    (update) => update.userId === currentUser.id || (friendIds.includes(update.userId) && update.visibility === 'friends'),
+    (update) =>
+      !isPrivateKind(update.kind) &&
+      (update.userId === currentUser.id || (friendIds.includes(update.userId) && update.visibility === 'friends')),
   );
 
   return (
