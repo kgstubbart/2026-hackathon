@@ -33,6 +33,8 @@ const icons = {
   clock: ['clock', 'schedule'],
   more: ['ellipsis', 'more_horiz'],
   share: ['square.and.arrow.up', 'ios_share'],
+  clear: ['xmark.circle', 'cancel'],
+  globe: ['globe', 'language'],
 } satisfies Record<string, [SFSymbol, AndroidSymbol]>;
 
 export type IconName = keyof typeof icons;
