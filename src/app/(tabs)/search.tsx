@@ -2,7 +2,8 @@ import { router, useFocusEffect } from 'expo-router';
 import { Fragment, useCallback, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Divider, Icon, Screen, ScreenHeader, SectionHeader, Text, type IconName } from '@/components/ui';
+import { AppHeader } from '@/components/app-header';
+import { Divider, Icon, Screen, SectionHeader, Text, type IconName } from '@/components/ui';
 import { colors, layout, radius, spacing, tones, typography } from '@/constants/theme';
 import { companyStats, experienceLabel, findQuestions, isExperience, summarizeCompanies } from '@/data/repository';
 import { useStore } from '@/data/store';
@@ -48,8 +49,7 @@ export default function SearchScreen() {
 
   if (!active) {
     return (
-      <Screen scroll={false}>
-        <ScreenHeader title="Search" />
+      <Screen scroll={false} header={<AppHeader />}>
         <Text variant="caption" color={colors.textMuted} style={styles.note}>
           {scopeNote}
         </Text>
@@ -93,8 +93,7 @@ export default function SearchScreen() {
   }
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
-      <ScreenHeader title="Search" />
+    <Screen keyboardShouldPersistTaps="handled" header={<AppHeader />}>
       <Text variant="caption" color={colors.textMuted} style={styles.note}>
         {scopeNote}
       </Text>
@@ -308,7 +307,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
 }
 
 const styles = StyleSheet.create({
-  note: { marginTop: -spacing.md, marginBottom: spacing.sm },
+  note: { marginBottom: spacing.sm },
   idle: { flex: 1, minHeight: 0 },
   idleList: { paddingBottom: spacing.md },
   // The two-field bar: white block, one field per line, hairline divider between.

@@ -2,13 +2,17 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Avatar, HeaderBlock, Icon, IconButton, Screen, ScreenHeader, Section, Text } from '@/components/ui';
+import { Avatar, Icon, IconButton, Screen, Section, Text, TopBar } from '@/components/ui';
 import { UpdateCard } from '@/components/update-card';
 import { colors, layout, radius, spacing, typography } from '@/constants/theme';
 import { useStore } from '@/data/store';
 import { timeAgo } from '@/data/update-kinds';
 
 const back = () => (router.canGoBack() ? router.back() : router.navigate('/'));
+
+function PostBar() {
+  return <TopBar title="Post" left={<IconButton icon="back" label="Back" tone="muted" onPress={back} />} />;
+}
 
 // A single post: the full update with its details, then the comment thread and a composer.
 export default function PostScreen() {
@@ -19,8 +23,7 @@ export default function PostScreen() {
 
   if (!update) {
     return (
-      <Screen>
-        <ScreenHeader title="Post" left={<IconButton icon="back" label="Back" onPress={back} />} />
+      <Screen header={<PostBar />}>
         <Text variant="body" color={colors.textMuted} align="center" style={styles.empty}>
           This post is gone.
         </Text>
@@ -36,10 +39,7 @@ export default function PostScreen() {
   };
 
   return (
-    <Screen flush scroll={false}>
-      <HeaderBlock>
-        <ScreenHeader title="Post" left={<IconButton icon="back" label="Back" onPress={back} />} />
-      </HeaderBlock>
+    <Screen flush scroll={false} header={<PostBar />}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
         <ScrollView style={styles.flex} contentContainerStyle={styles.stack} showsVerticalScrollIndicator={false}>
           <UpdateCard

@@ -45,6 +45,23 @@ export const currentUserId = 'alex';
 // Consecutive weeks (before this one) with at least one logged update.
 export const currentStreakWeeks = 12;
 
+// Whole-season totals for StrJava Wrapped (the in-memory updates only cover the last few weeks).
+export const seasonStats = {
+  year: 2026,
+  applications: 47,
+  interviews: 11,
+  takehomes: 5,
+  offers: 2,
+  longestStreakWeeks: 13,
+  congratsReceived: 214,
+  congratsGiven: 163,
+  topCompany: 'Airbnb',
+  topCompanyInterviews: 3,
+  busiestMonth: 'September',
+  hypeFriendId: 'maya',
+  hypeFriendCongrats: 38,
+};
+
 export const users: User[] = [
   { id: 'alex', name: 'Alex Morgan', initials: 'AM', color: '#6C63FF', school: 'University of Michigan', major: 'Computer Science', gradYear: 2028, location: 'Ann Arbor, MI' },
   { id: 'maya', name: 'Maya Chen', initials: 'MC', color: '#F28C6B', school: 'UC Berkeley', major: 'Cognitive Science', gradYear: 2028, location: 'Berkeley, CA' },

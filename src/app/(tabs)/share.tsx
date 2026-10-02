@@ -13,8 +13,7 @@ import {
   Section,
   Text,
   TextField,
-  HeaderBlock,
-  ScreenHeader,
+  TopBar,
 } from "@/components/ui";
 import { colors, spacing, tones } from "@/constants/theme";
 import {
@@ -44,6 +43,15 @@ const toggle =
 
 const unique = (items: string[]) => [...new Set(items.filter(Boolean))];
 
+// A nudge for the optional comment, in the poster's own words.
+const notePlaceholders: Record<ShareKind, string> = {
+  applied: "e.g. Referred by a friend.",
+  interview:
+    "Anything to add? e.g. Two technical rounds and a system design chat tomorrow.",
+  takehome: "e.g. 70 minutes, three questions.",
+  offer: "e.g. Superday paid off!",
+};
+
 // Nobody knows how many rounds there will be: typing a number offers that round, and Final is always there.
 function roundOptions(value: string) {
   const number = value.trim().match(/^(?:round\s*)?(\d+)$/i)?.[1];
@@ -59,6 +67,7 @@ export default function ShareScreen() {
   const [interviewType, setInterviewType] = useState("");
   const [format, setFormat] = useState("");
   const [questions, setQuestions] = useState<DraftQuestion[]>([blankQuestion]);
+  const [note, setNote] = useState("");
 
   const isPrivate = isPrivateKind(kind);
   const hasQuestions = kind === "interview" || kind === "takehome";
@@ -108,6 +117,7 @@ export default function ShareScreen() {
     if (kind === "takehome")
       update.assessmentFormat = format.trim() || undefined;
     if (hasQuestions && filled.length) update.questions = filled;
+    update.note = note.trim() || undefined;
     addUpdate(update);
     setCompany("");
     setPosition("");
@@ -115,24 +125,28 @@ export default function ShareScreen() {
     setInterviewType("");
     setFormat("");
     setQuestions([blankQuestion]);
+    setNote("");
     router.navigate(isPrivate ? "/profile" : "/");
   };
 
   return (
-    <Screen flush keyboardShouldPersistTaps="handled">
-      <HeaderBlock>
-        <ScreenHeader
-         
-          title="Share"
-          right={
+    <Screen
+      flush
+      keyboardShouldPersistTaps="handled"
+      header={
+        <TopBar
+          title="New update"
+          left={
             <IconButton
               icon="close"
               label="Close"
+              tone="muted"
               onPress={() => router.navigate("/")}
             />
           }
         />
-      </HeaderBlock>
+      }
+    >
       <Section title="What happened?">
         <View style={styles.kinds}>
           {shareKinds.map((item) => {
@@ -286,6 +300,21 @@ export default function ShareScreen() {
           ) : null}
         </Section>
       ) : null}
+
+      <Section title="Comment">
+        <TextField
+          multiline
+          value={note}
+          onChangeText={setNote}
+          placeholder={notePlaceholders[kind]}
+          accessibilityLabel="Comment"
+        />
+        <Text variant="caption" color={colors.textFaint}>
+          {isPrivate
+            ? "Optional. Stays private with the application."
+            : "Optional. Shows under your post."}
+        </Text>
+      </Section>
 
       <Section>
         <Button

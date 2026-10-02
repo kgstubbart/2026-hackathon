@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Fragment } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Divider, HeaderBlock, Icon, IconButton, Screen, ScreenHeader, Section, Text } from '@/components/ui';
+import { Divider, Icon, IconButton, Screen, Section, Text, TopBar } from '@/components/ui';
 import { colors, radius, spacing, tones } from '@/constants/theme';
 import type { Update } from '@/data/mock-data';
 import { companyStats, experienceLabel, groupByPosition, isExperience, summarizeCompanies } from '@/data/repository';
@@ -20,13 +20,9 @@ export default function CompanyScreen() {
   const summary = summarizeCompanies(experiences)[0];
 
   return (
-    <Screen flush>
-      <HeaderBlock>
-        <ScreenHeader
-          title={company ?? 'Company'}
-          left={<IconButton icon="back" label="Back" onPress={back} />}
-        />
-      </HeaderBlock>
+    <Screen
+      flush
+      header={<TopBar title={company ?? 'Company'} left={<IconButton icon="back" label="Back" tone="muted" onPress={back} />} />}>
 
       {summary ? (
         groupByPosition(experiences).map((group) => (

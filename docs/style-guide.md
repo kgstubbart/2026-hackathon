@@ -86,7 +86,7 @@ Always use `<Text variant="…">` from `@/components/ui`. It sets the size, line
 
 | Variant | Size / line | Weight | Use for |
 | --- | --- | --- | --- |
-| `display` | 32 / 38 | 800 | Screen titles (via `ScreenHeader`) and big stat numbers. One per screen. |
+| `display` | 32 / 38 | 800 | Big stat numbers only. Pages have no big titles. |
 | `title` | 22 / 28 | 700 | Profile name, large card titles |
 | `headline` | 17 / 23 | 600 | Names, post headlines, section headers, list-row titles, button labels |
 | `body` | 15 / 21 | 400 | Notes, messages, paragraphs. This is the default. |
@@ -154,10 +154,9 @@ Import from `@/components/ui`.
 
 | Component | Use it for | Notes |
 | --- | --- | --- |
-| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style); put the `ScreenHeader` in a `HeaderBlock` first. |
-| `HeaderBlock` | The header of a flush screen | Gutter-padded wrapper so the `ScreenHeader` lines up with the other pages |
+| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style). Main pages pass `<AppHeader />` as `header`; task flows (Share) pass a `TopBar`. |
+| `TopBar` | The bar behind `AppHeader`, and the header of task flows (Share) | Left and right slots (`IconButton`s with `tone="muted"`) and a centered title (a `headline` string or a node such as the `Wordmark`). |
 | `Section` | Full-width white block on a flush screen | Optional `title`; the gray background shows between sections. No radius, border or shadow. |
-| `ScreenHeader` | The header of every page except the feed | No subheading above the title; a `left` slot (back button) and a `right` slot for `IconButton`s or an `Avatar` |
 | `SectionHeader` | Titles inside a screen | Optional `action` (usually a small `Button`) |
 | `Text` | All text | See Typography |
 | `Button` | Actions | `variant`: `primary` (one main action per screen), `secondary`, `outline`, `ghost`. `size`: `sm`, `md`, `lg`. Optional `icon`. |
@@ -169,6 +168,7 @@ Import from `@/components/ui`.
 | `TextField` / `FieldLabel` | Forms | `label` renders in the `label` variant above the input |
 | `ComboField` | Share form fields with many possible answers (company, position, round) | A text field that suggests matches under it while you type. No dropdown arrow, nothing shown until you type; a typed answer that matches nothing is kept as is. |
 | `SearchField` | Pill search on Search, Chats and Friends | |
+| `Sheet` | Bottom sheets for secondary choices (send a post to a friend, post menu, new chat picker) | `Modal` with a scrim, a white panel with rounded top corners and a grab handle. `title` adds a header with a close button (`right` replaces it). Content is a flat list of rows with `Divider`s. Never use `Alert`/`confirm`: confirm destructive rows inline (first tap arms, second tap acts). |
 
 App-level components:
 
@@ -182,7 +182,8 @@ App-level components:
 
 These are deliberate. Keep new work consistent with them.
 
-- **Feed:** a fixed white header bar with exactly three things: the menu (`NavMenu`) on the left, the centered `Wordmark`, and one friends `IconButton` on the right that opens `/friends`. Don't add more header buttons. Below it, the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
+- **App header** (`AppHeader`): a fixed white bar with exactly three things: the menu (`NavMenu`) on the left, the centered `Wordmark`, and one friends `IconButton` on the right that opens `/friends`. Don't add more header buttons. Every main page uses it: pass `header={<AppHeader />}` to `Screen`. Pages have no big title or eyebrow under it; put page actions (like Profile's edit button) in the content. The only exception is Share, a task flow that uses a plain `TopBar` with a close button.
+- **Feed:** the `AppHeader`, then the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
 - **Feed content:** only interviews, offers and accepted offers (`feedKinds` in `update-kinds.ts`). Applications and milestones never appear in the feed.
 - **Menu** (`src/components/nav-menu.tsx`): a dropdown below the header listing every page in `src/constants/pages.ts`, with the current page highlighted in `primarySoft`. When you add a page, add it to `pages.ts`; set `tab: true` only if it belongs in the tab bar.
 - **Feed posts** (LinkedIn and Threads style): full-width white sections, not floating rounded cards. From top to bottom:
@@ -192,12 +193,12 @@ These are deliberate. Keep new work consistent with them.
   4. Action row: icons with counts (congrats, comment, send), with no text labels.
 
   No colored box, company mark or kind badge inside posts; the bold words carry the kind, company and role. Nothing else shows in the feed: tapping the post body or the comment icon opens the post page.
-- **Post page** (`/post/[id]`): `ScreenHeader` "Post" with back on the left, then the same post rendered with `detail` (adds the round, type or format line and the question list under the comment), then a "Comments · n" `Section` of rows (32pt avatar, bold name, time, body) and a white composer bar pinned to the bottom like the chat thread.
+- **Post page** (`/post/[id]`): a `TopBar` titled "Post" with back on the left, then the same post rendered with `detail` (adds the round, type or format line and the question list under the comment), then a "Comments · n" `Section` of rows (32pt avatar, bold name, time, body) and a white composer bar pinned to the bottom like the chat thread.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
-- **Search** (repository, Uber-style bar): a muted caption under the title says the repository is from connected friends. Idle: a flat full-width white list of companies (text only, no marks or icons; `headline` name, muted `caption` stats, `forward` chevron) with the two-field Company / Position bar pinned at the bottom (white block, one field per line, hairline divider). Active: the same bar at the top with inline suggestion dropdowns, then Companies and Questions result lists with the matched text in bold; question rows get a tone icon tile.
-- **Company page**: `ScreenHeader` with back, then a `Section` per position whose rows show the experience label, its questions and "author · time".
-- **Forms** (Share): feed style, not cards. The `ScreenHeader` (close on the right) in a `HeaderBlock`, then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
-- **Lists** (Friends, Chats): rows separated by `Divider`s, with the avatar on the left and a single action or meta element on the right. Chats is feed style: the `ScreenHeader` in a `HeaderBlock`, a `Section` holding the search field, then a full-width white list (no card). A chat thread's `ScreenHeader` has back on the left, the person's name and school, and their avatar on the right; bubbles over the gray background, and a white composer bar with a hairline top border.
+- **Search** (repository, Uber-style bar): a muted caption under the app header says the repository is from connected friends. Idle: a flat full-width white list of companies (text only, no marks or icons; `headline` name, muted `caption` stats, `forward` chevron) with the two-field Company / Position bar pinned at the bottom (white block, one field per line, hairline divider). Active: the same bar at the top with inline suggestion dropdowns, then Companies and Questions result lists with the matched text in bold; question rows get a tone icon tile.
+- **Company page**: a `TopBar` with back on the left and the company name as title (no company mark), then a `Section` per position whose rows show the experience label, its questions and "author · time".
+- **Forms** (Share): feed style, not cards. A `TopBar` (close on the left, title centered), then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
+- **Lists** (Friends, Chats): rows separated by `Divider`s, with the avatar on the left and a single action or meta element on the right. Chats is feed style: the `AppHeader`, a `Section` holding the search field, then a full-width white list (no card). A chat thread keeps the `AppHeader` and adds a white thread bar (back, avatar, name, school) with a hairline bottom border, bubbles over the gray background, and a white composer bar with a hairline top border.
 
 ## 9. Interaction and accessibility
 

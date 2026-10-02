@@ -1,7 +1,8 @@
 import { Fragment, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Avatar, Divider, HeaderBlock, Icon, IconButton, Screen, ScreenHeader, SearchField, Section, Text } from '@/components/ui';
+import { AppHeader } from '@/components/app-header';
+import { Avatar, Divider, Icon, IconButton, Screen, SearchField, Section, Text } from '@/components/ui';
 import { colors, layout, radius, spacing, typography } from '@/constants/theme';
 import { conversations, type Conversation, type Message } from '@/data/mock-data';
 import { useStore } from '@/data/store';
@@ -36,10 +37,7 @@ export default function MessagesScreen() {
   );
 
   return (
-    <Screen flush keyboardShouldPersistTaps="handled">
-      <HeaderBlock>
-        <ScreenHeader title="Chats" />
-      </HeaderBlock>
+    <Screen flush keyboardShouldPersistTaps="handled" header={<AppHeader />}>
       <Section>
         <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
       </Section>
@@ -117,16 +115,20 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
   };
 
   return (
-    <Screen flush scroll={false}>
-      <HeaderBlock>
-        <ScreenHeader
-         
-          title={user.name}
-          left={<IconButton icon="back" label="Back" onPress={onBack} />}
-          right={<Avatar user={user} size={40} />}
-        />
-      </HeaderBlock>
+    <Screen flush scroll={false} header={<AppHeader />}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
+        <View style={styles.threadBar}>
+          <IconButton icon="back" label="Back to chats" tone="muted" onPress={onBack} />
+          <Avatar user={user} size={36} />
+          <View style={styles.flex}>
+            <Text variant="headline" numberOfLines={1}>
+              {user.name}
+            </Text>
+            <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
+              {user.school}
+            </Text>
+          </View>
+        </View>
 
         <ScrollView style={styles.flex} contentContainerStyle={styles.messages} showsVerticalScrollIndicator={false}>
           {[...conversation.messages, ...extra].map((message) => (
@@ -163,6 +165,16 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  threadBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: layout.gutter,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.surface,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
   // Full-width white list like the feed; rows are separated by hairline dividers, not a card.
   list: { backgroundColor: colors.surface, paddingVertical: spacing.xs },
   empty: { paddingVertical: spacing.xxl },
