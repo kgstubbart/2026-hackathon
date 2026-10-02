@@ -10,26 +10,31 @@ import { useStore } from '@/data/store';
 import { updateKinds } from '@/data/update-kinds';
 
 const recentSearches = ['Stripe', 'Figma', 'Goldman Sachs'];
+const companySuggestions = ['Airbnb', 'Duolingo', 'Figma', 'Goldman Sachs', 'Microsoft', 'Notion', 'Ramp', 'Spotify', 'Stripe'];
+const jobTitleSuggestions = [
+  'Data Analyst Intern',
+  'Machine Learning Intern',
+  'Product Design Intern',
+  'Software Engineering Intern',
+  'Summer Analyst',
+  'UX Research Intern',
+];
 const postCount = (count: number) => `${count} ${count === 1 ? 'post' : 'posts'} from friends`;
 
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const { updates, friendIds, getUser, toggleCongrats } = useStore();
   const [company, setCompany] = useState('');
-  const [role, setRole] = useState('');
-  const [place, setPlace] = useState('');
-  const [showRole, setShowRole] = useState(false);
+  const [jobTitle, setJobTitle] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
 
   const friendPosts = updates.filter((update) => friendIds.includes(update.userId) && update.visibility === 'friends');
-  const terms = { company: company.trim().toLowerCase(), role: role.trim().toLowerCase(), place: place.trim().toLowerCase() };
-  const searching = Boolean(terms.company || terms.role || terms.place);
+  const terms = { company: company.trim().toLowerCase(), jobTitle: jobTitle.trim().toLowerCase() };
+  const searching = Boolean(terms.company || terms.jobTitle);
   const results = friendPosts.filter((update) => {
-    const where = `${update.location ?? ''} ${getUser(update.userId).location}`.toLowerCase();
     return (
       update.company.toLowerCase().includes(terms.company) &&
-      update.role.toLowerCase().includes(terms.role) &&
-      where.includes(terms.place)
+      update.role.toLowerCase().includes(terms.jobTitle)
     );
   });
 
@@ -42,38 +47,16 @@ export default function SearchScreen() {
               <View style={styles.dotInner} />
             </View>
             <View style={styles.railLine} />
-            {showRole ? (
-              <>
-                <View style={styles.midDot} />
-                <View style={styles.railLine} />
-              </>
-            ) : null}
             <View style={styles.square}>
               <View style={styles.squareInner} />
             </View>
           </View>
           <View style={styles.inputs}>
-            <SearchInput value={company} onChange={setCompany} placeholder="Company" autoFocus />
-            {showRole ? (
-              <>
-                <Divider />
-                <SearchInput value={role} onChange={setRole} placeholder="Role" />
-              </>
-            ) : null}
+            <SearchInput value={company} onChange={setCompany} placeholder="Company" suggestions={companySuggestions} autoFocus />
             <Divider />
-            <SearchInput value={place} onChange={setPlace} placeholder="Where to?" />
+            <SearchInput value={jobTitle} onChange={setJobTitle} placeholder="Job title" suggestions={jobTitleSuggestions} />
           </View>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={showRole ? 'Remove role filter' : 'Add role filter'}
-          onPress={() => {
-            if (showRole) setRole('');
-            setShowRole(!showRole);
-          }}
-          style={({ pressed }) => [styles.add, pressed && styles.pressed]}>
-          <Icon name={showRole ? 'close' : 'plus'} size={22} />
-        </Pressable>
       </View>
 
       <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" showsVerticalScrollIndicator={false}>
@@ -127,28 +110,61 @@ export default function SearchScreen() {
   );
 }
 
-type SearchInputProps = { value: string; onChange: (value: string) => void; placeholder: string; autoFocus?: boolean };
+type SearchInputProps = {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  suggestions: string[];
+  autoFocus?: boolean;
+};
 
-function SearchInput({ value, onChange, placeholder, autoFocus }: SearchInputProps) {
+function SearchInput({ value, onChange, placeholder, suggestions, autoFocus }: SearchInputProps) {
   const [focused, setFocused] = useState(false);
+  const query = value.trim().toLowerCase();
+  const matches = query
+    ? suggestions
+        .filter((suggestion) => suggestion.toLowerCase().includes(query))
+        .sort((a, b) => Number(b.toLowerCase().startsWith(query)) - Number(a.toLowerCase().startsWith(query)))
+        .slice(0, 5)
+    : [];
+
   return (
-    <View style={styles.inputRow}>
-      <TextInput
-        value={value}
-        onChangeText={onChange}
-        placeholder={placeholder}
-        placeholderTextColor={colors.textFaint}
-        autoFocus={autoFocus}
-        autoCorrect={false}
-        returnKeyType="search"
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        style={styles.input}
-      />
-      {focused && value ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={`Clear ${placeholder}`} hitSlop={10} onPress={() => onChange('')}>
-          <Icon name="clear" size={20} color={colors.text} />
-        </Pressable>
+    <View style={styles.inputGroup}>
+      <View style={styles.inputRow}>
+        <TextInput
+          value={value}
+          onChangeText={onChange}
+          placeholder={placeholder}
+          placeholderTextColor={colors.textFaint}
+          autoFocus={autoFocus}
+          autoCorrect={false}
+          returnKeyType="search"
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={styles.input}
+        />
+        {focused && value ? (
+          <Pressable accessibilityRole="button" accessibilityLabel={`Clear ${placeholder}`} hitSlop={10} onPress={() => onChange('')}>
+            <Icon name="clear" size={20} color={colors.text} />
+          </Pressable>
+        ) : null}
+      </View>
+      {focused && matches.length > 0 ? (
+        <View style={styles.suggestions}>
+          {matches.map((suggestion) => (
+            <Pressable
+              key={suggestion}
+              accessibilityRole="button"
+              accessibilityLabel={`Use ${suggestion}`}
+              onPressIn={() => {
+                onChange(suggestion);
+                setFocused(false);
+              }}
+              style={({ pressed }) => [styles.suggestion, pressed && styles.pressed]}>
+              <Text variant="callout">{suggestion}</Text>
+            </Pressable>
+          ))}
+        </View>
       ) : null}
     </View>
   );
@@ -204,7 +220,7 @@ const MARKER = 18;
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   column: { width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center', paddingHorizontal: layout.gutter },
-  top: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingBottom: spacing.md },
+  top: { paddingBottom: spacing.md },
   fields: {
     flex: 1,
     flexDirection: 'row',
@@ -216,14 +232,13 @@ const styles = StyleSheet.create({
   rail: { alignItems: 'center', paddingVertical: 18, width: MARKER },
   dot: { width: MARKER, height: MARKER, borderRadius: MARKER / 2, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
   dotInner: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.surface },
-  midDot: { width: 10, height: 10, borderRadius: 5, borderWidth: 2, borderColor: colors.text },
   railLine: { flex: 1, width: 2, minHeight: 12, backgroundColor: colors.text },
   square: { width: MARKER, height: MARKER, borderRadius: 4, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
   squareInner: { width: 6, height: 6, backgroundColor: colors.surface },
   inputs: { flex: 1, marginLeft: spacing.lg },
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 54, paddingRight: spacing.lg },
   input: { ...typography.headline, fontWeight: '400', flex: 1, height: '100%', color: colors.text, outlineColor: 'transparent' },
-  add: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' },
+  inputGroup: { position: 'relative' },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
   rowIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   rowIconCircle: { borderRadius: 22, backgroundColor: colors.background },
@@ -237,6 +252,16 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   regular: { fontWeight: '400' },
+  suggestions: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+    paddingVertical: spacing.xs,
+  },
+  suggestion: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+  },
   expanded: {
     marginVertical: spacing.sm,
     borderRadius: radius.lg,
