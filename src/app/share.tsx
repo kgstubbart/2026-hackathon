@@ -141,19 +141,21 @@ export default function ShareScreen() {
       </View>
 
       <SectionHeader title="Preview" />
-      <UpdateCard
-        preview
-        author={currentUser}
-        update={{
-          ...draft,
-          id: 'preview',
-          userId: currentUser.id,
-          company: draft.company || 'Company',
-          createdAt: 0,
-          congrats: 0,
-          comments: 0,
-        }}
-      />
+      <View style={styles.preview}>
+        <UpdateCard
+          preview
+          author={currentUser}
+          update={{
+            ...draft,
+            id: 'preview',
+            userId: currentUser.id,
+            company: draft.company || 'Company',
+            createdAt: 0,
+            congrats: 0,
+            comments: 0,
+          }}
+        />
+      </View>
 
       <View style={styles.submit}>
         <Button
@@ -239,6 +241,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioSelected: { borderColor: colors.primary, backgroundColor: colors.primary },
+  preview: {
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+  },
   submit: { gap: spacing.sm, marginTop: spacing.lg },
   pressed: { opacity: 0.75 },
 });

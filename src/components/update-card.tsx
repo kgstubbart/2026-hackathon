@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar, Card, CompanyMark, Icon, Text } from '@/components/ui';
-import { colors, radius, spacing, tones } from '@/constants/theme';
+import { Avatar, CompanyMark, Icon, Text, type IconName } from '@/components/ui';
+import { colors, layout, radius, spacing, tones } from '@/constants/theme';
 import type { Update, User } from '@/data/mock-data';
 import { headlineFor, isCelebration, timeAgo, updateKinds } from '@/data/update-kinds';
 
@@ -25,91 +25,113 @@ type UpdateCardProps = {
   preview?: boolean;
 };
 
+// Full-width feed post: LinkedIn-style author header and attachment, Threads-style action row.
 export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardProps) {
-  const celebrate = isCelebration(update.kind);
   const tone = tones[updateKinds[update.kind].tone];
+  const celebrate = isCelebration(update.kind);
 
   return (
-    <Card style={[styles.card, celebrate && { borderColor: tone.fg + '33' }]}>
-      {celebrate ? <View style={[styles.celebrateBar, { backgroundColor: tone.fg }]} /> : null}
-
+    <View style={styles.post}>
       <View style={styles.header}>
-        <Avatar user={author} size={40} />
-        <View style={styles.headerText}>
+        <Avatar user={author} size={44} />
+        <View style={styles.author}>
           <Text variant="headline" numberOfLines={1}>
             {author.name}
           </Text>
-          <Text variant="caption" color={colors.textFaint} numberOfLines={1}>
-            {author.school} · {preview ? 'Now' : timeAgo(update.createdAt)}
+          <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
+            {author.major} · {author.school}
+          </Text>
+          <View style={styles.meta}>
+            <Text variant="caption" color={colors.textFaint}>
+              {preview ? 'Now' : timeAgo(update.createdAt)} ·
+            </Text>
+            <Icon name={update.visibility === 'private' ? 'lock' : 'friends'} size={11} color={colors.textFaint} />
+          </View>
+        </View>
+        <Icon name="more" size={18} color={colors.textFaint} />
+      </View>
+
+      <View style={styles.content}>
+        <Text variant="headline">{headlineFor(update)}</Text>
+        {update.note ? <Text variant="body">{update.note}</Text> : null}
+      </View>
+
+      <View style={[styles.attachment, celebrate && { backgroundColor: tone.bg, borderColor: tone.bg }]}>
+        <CompanyMark company={update.company || '?'} size={40} />
+        <View style={styles.attachmentText}>
+          <Text variant="callout" style={styles.role} numberOfLines={1}>
+            {update.role || 'Internship role'}
+          </Text>
+          <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
+            {[update.company, update.term, update.location].filter(Boolean).join(' · ')}
           </Text>
         </View>
         <KindBadge kind={update.kind} />
       </View>
 
-      <Text variant="title" style={styles.headline}>
-        {headlineFor(update)}
-      </Text>
-
-      <View style={[styles.role, celebrate && { backgroundColor: tone.bg }]}>
-        <CompanyMark company={update.company || '?'} size={38} />
-        <View style={styles.roleText}>
-          <Text variant="callout" numberOfLines={1}>
-            {update.role || 'Internship role'}
-          </Text>
-          <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
-            {[update.term, update.location].filter(Boolean).join(' · ')}
-          </Text>
-        </View>
-      </View>
-
-      {update.note ? (
-        <Text variant="body" color={colors.textMuted} style={styles.note}>
-          {update.note}
-        </Text>
-      ) : null}
-
       {preview ? null : (
-        <View style={styles.footer}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ selected: update.congratulated }}
+        <View style={styles.actions}>
+          <Action
+            icon="party"
+            count={update.congrats}
+            active={update.congratulated}
+            label={update.congratulated ? 'Remove congrats' : 'Send congrats'}
             onPress={onCongrats}
-            hitSlop={8}
-            style={({ pressed }) => [
-              styles.congrats,
-              update.congratulated && { backgroundColor: colors.primarySoft },
-              pressed && styles.pressed,
-            ]}>
-            <Icon name="party" size={16} color={update.congratulated ? colors.primary : colors.textMuted} />
-            <Text variant="callout" color={update.congratulated ? colors.primary : colors.textMuted}>
-              {update.congratulated ? 'Congrats sent' : 'Congrats'} · {update.congrats}
-            </Text>
-          </Pressable>
-          <View style={styles.comments}>
-            <Icon name="comment" size={16} color={colors.textFaint} />
-            <Text variant="callout" color={colors.textFaint}>
-              {update.comments}
-            </Text>
-          </View>
-          {update.visibility === 'private' ? (
-            <View style={styles.comments}>
-              <Icon name="lock" size={13} color={colors.textFaint} />
-              <Text variant="caption" color={colors.textFaint}>
-                Only you
-              </Text>
-            </View>
-          ) : null}
+          />
+          <Action icon="comment" count={update.comments} label="Comment" />
+          <Action icon="send" label="Send" />
         </View>
       )}
-    </Card>
+    </View>
+  );
+}
+
+type ActionProps = { icon: IconName; label: string; count?: number; active?: boolean; onPress?: () => void };
+
+function Action({ icon, label, count, active, onPress }: ActionProps) {
+  const color = active ? colors.primary : colors.textMuted;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active }}
+      onPress={onPress}
+      hitSlop={10}
+      style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
+      <Icon name={icon} size={19} color={color} />
+      {count ? (
+        <Text variant="callout" color={color}>
+          {count}
+        </Text>
+      ) : null}
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { overflow: 'hidden', marginBottom: spacing.md },
-  celebrateBar: { position: 'absolute', top: 0, left: 0, right: 0, height: 3 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  headerText: { flex: 1, gap: 1 },
+  post: {
+    backgroundColor: colors.surface,
+    paddingHorizontal: layout.gutter,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    gap: spacing.md,
+  },
+  header: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  author: { flex: 1 },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  content: { gap: spacing.xs },
+  attachment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+  },
+  attachmentText: { flex: 1, gap: 1 },
+  role: { fontWeight: '700' },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -119,28 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   badgeText: { fontWeight: '700' },
-  headline: { marginTop: spacing.lg },
-  role: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    marginTop: spacing.md,
-    padding: spacing.sm + 2,
-    borderRadius: radius.md,
-    backgroundColor: colors.background,
-  },
-  roleText: { flex: 1, gap: 1 },
-  note: { marginTop: spacing.md },
-  footer: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, marginTop: spacing.lg },
-  congrats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs + 2,
-    paddingHorizontal: spacing.md,
-    height: 34,
-    borderRadius: radius.pill,
-    backgroundColor: colors.background,
-  },
-  comments: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  pressed: { opacity: 0.7 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xxl, paddingTop: spacing.xs },
+  action: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 2, minHeight: 32 },
+  pressed: { opacity: 0.6 },
 });
