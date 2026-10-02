@@ -5,9 +5,9 @@
 - **StrJava** — "Strava for internships." Students share internship progress with friends (applied, interviewing, offer, accepted, milestones) and friends cheer them on with congrats.
 - Wordmark: "StrJava" with only "Str" struck through by a single horizontal line (`src/components/wordmark.tsx`). Always render the name through this component in UI.
 - Tabs: Feed (`/`), Search (`/search`), Share (`/share`, center + button), Chats (`/messages`), Profile (`/profile`).
-- Friends (`/friends`) is a route but not a tab: it has a hidden `TabTrigger` and is reached from Search's "Find people to follow" row.
+- Friends (`/friends`) is a route but not a tab: it has a hidden `TabTrigger` and is reached from the feed header's friends button and Search's "Find people to follow" row.
 - Search is modeled on Uber's "Where to?" search: a bordered box of stacked fields (Company, optional Role via the + button, "Where to?" location) joined by a dot–line–square rail, and a flat list of results (icon, matched text in bold, subtitle, hairline dividers). It only searches friends' posts; tapping a result expands it into the full post.
-- Feed: StrJava header bar (+ / search (goes to `/search`) on the left, chats / notifications on the right), a Strava-style weekly streak card on top, then a plain chronological feed. No filters, summary boxes, or "recent wins" strips.
+- Feed: StrJava header bar (centered wordmark, a single friends button on the right that opens `/friends`, nothing on the left), a Strava-style weekly streak card on top, then a plain chronological feed. No filters, summary boxes, or "recent wins" strips.
 - Feed posts are full-width white sections separated by thin gaps, LinkedIn/Threads style: author header (avatar, name, major · school, time · audience), headline + note, a company/role attachment, and an icon action row (congrats, comment, send). Not floating rounded cards.
 - Streak: flame with consecutive-week count (Strava orange `colors.streak`) and Mon–Sun circles; a day is filled when the user logged an update that day.
 - Data is mock and in-memory (`src/data/mock-data.ts`, `src/data/store.tsx`); there is no backend yet.

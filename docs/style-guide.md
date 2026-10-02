@@ -158,7 +158,7 @@ Import from `@/components/ui`.
 | `SectionHeader` | Titles inside a screen | Optional `action` (usually a small `Button`) |
 | `Text` | All text | See Typography |
 | `Button` | Actions | `variant`: `primary` (one main action per screen), `secondary`, `outline`, `ghost`. `size`: `sm`, `md`, `lg`. Optional `icon`. |
-| `IconButton` | Icon-only actions | Always pass `label` for accessibility. `tone`: `surface` (bordered white), `muted` (gray fill, used in the feed header), `plain`. |
+| `IconButton` | Icon-only actions | Always pass `label` for accessibility. `tone`: `surface` (bordered white), `muted` (gray fill, used for the feed header's friends button), `plain`. |
 | `Chip` / `ChipGroup` | Single-choice pickers (term, stage) | Selected chip = dark fill. Not for filtering the feed; the feed has no filters. |
 | `Card` / `Divider` | Grouped content | `flush` for lists of rows separated by `Divider` |
 | `Avatar` | People | Initials on the user's color. Optional `ring` color. |
@@ -178,7 +178,7 @@ App-level components:
 
 These are deliberate. Keep new work consistent with them.
 
-- **Feed:** a fixed white header bar (+ and search on the left, the centered `Wordmark`, chats and notifications on the right), then the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
+- **Feed:** a fixed white header bar (the centered `Wordmark` and one friends `IconButton` on the right that opens `/friends`; keep the left side empty and don't add more header buttons), then the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
 - **Feed posts** (LinkedIn and Threads style): full-width white sections, not floating rounded cards. From top to bottom:
   1. Author header: avatar, name, "major · school", "time · audience icon", and a `more` icon on the right.
   2. Headline (`headline` variant) and an optional note (`body`).
