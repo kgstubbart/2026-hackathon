@@ -175,6 +175,9 @@ App-level components:
 | Component | Where |
 | --- | --- |
 | `UpdateCard`, `KindBadge` | [`src/components/update-card.tsx`](../src/components/update-card.tsx): the feed post and the kind pill. Reuse `KindBadge` anywhere you label an update kind. |
+| `ProfileIdentity` | [`src/components/profile-identity.tsx`](../src/components/profile-identity.tsx): avatar, name, school, location and counts block shared by Profile and `/user/[id]`. |
+| `PostMenu`, `SendSheet` | [`src/components/post-menu.tsx`](../src/components/post-menu.tsx), [`src/components/send-sheet.tsx`](../src/components/send-sheet.tsx): the post's `more` menu and the "Send to" friend picker, both built on `Sheet`. |
+| `SharedPostBubble` | [`src/components/shared-post-bubble.tsx`](../src/components/shared-post-bubble.tsx): a message that carries an `updateId`, rendered as a compact post preview inside the chat bubble. |
 | `StreakCard` | [`src/components/streak-card.tsx`](../src/components/streak-card.tsx) |
 | `Wordmark` | [`src/components/wordmark.tsx`](../src/components/wordmark.tsx) |
 
@@ -204,7 +207,7 @@ These are deliberate. Keep new work consistent with them.
 
 - Every `Pressable` gives pressed feedback: `opacity: 0.6`–`0.75` (buttons also scale to `0.98`).
 - Icon-only controls need an `accessibilityLabel`. Toggles need `accessibilityState={{ selected }}`.
-- Empty states are one muted, centered `body` line that says what to do next ("Nothing here yet. Check back soon.").
+- Empty states are one muted, centered `body` line that says what to do next ("Nothing here yet. Check back soon."). The feed is the exception: a white block with a headline, a muted line and "Find friends" / "Share an update" buttons.
 - Timestamps use `timeAgo()` (`18m`, `2h`, `3d`), and headlines use `headlineFor()`. Both are in `update-kinds.ts`. Don't hand-format these.
 - Join meta fields with ` · ` (a middle dot with spaces).
 
