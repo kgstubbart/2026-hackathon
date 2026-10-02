@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, Icon, Text, type IconName } from '@/components/ui';
@@ -26,9 +27,12 @@ type UpdateCardProps = {
 };
 
 // Full-width feed post: LinkedIn-style author header, one-sentence post with optional comment, Threads-style action row.
+// Round/type/format and questions stay hidden until the post is tapped.
 export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardProps) {
+  const [expanded, setExpanded] = useState(false);
   const [before, keyword, after] = postSentence(update);
   const details = [update.round, update.interviewType, update.assessmentFormat].filter(Boolean).join(' · ');
+  const hasDetails = Boolean(details || update.questions?.length);
 
   return (
     <View style={styles.post}>
@@ -51,7 +55,12 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
         <Icon name="more" size={18} color={colors.textFaint} />
       </View>
 
-      <View style={styles.content}>
+      <Pressable
+        accessibilityRole={hasDetails ? 'button' : undefined}
+        accessibilityState={hasDetails ? { expanded } : undefined}
+        disabled={!hasDetails}
+        onPress={() => setExpanded((value) => !value)}
+        style={({ pressed }) => [styles.content, pressed && styles.pressed]}>
         <Text variant="headline" style={styles.sentence}>
           {before}
           <Text variant="headline" style={styles.keyword}>
@@ -59,29 +68,38 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
           </Text>
           {after}
         </Text>
-        {details ? (
-          <Text variant="callout" color={colors.textMuted}>
-            {details}
-          </Text>
-        ) : null}
-        {update.questions?.map((question, index) => (
-          <View key={index} style={styles.question}>
-            <Text variant="body" style={styles.questionText}>
-              {question.text || `${question.difficulty} question`}
-            </Text>
-            {question.text && question.difficulty ? (
-              <Text variant="caption" color={colors.textMuted}>
-                {question.difficulty}
-              </Text>
-            ) : null}
-          </View>
-        ))}
         {update.note ? (
           <Text variant="body" color={colors.textMuted}>
             {update.note}
           </Text>
         ) : null}
-      </View>
+        {expanded ? (
+          <View style={styles.details}>
+            {details ? (
+              <Text variant="callout" color={colors.textMuted}>
+                {details}
+              </Text>
+            ) : null}
+            {update.questions?.map((question, index) => (
+              <View key={index} style={styles.question}>
+                <Text variant="body" style={styles.questionText}>
+                  {question.text || `${question.difficulty} question`}
+                </Text>
+                {question.text && question.difficulty ? (
+                  <Text variant="caption" color={colors.textMuted}>
+                    {question.difficulty}
+                  </Text>
+                ) : null}
+              </View>
+            ))}
+          </View>
+        ) : null}
+        {hasDetails ? (
+          <Text variant="caption" color={colors.primary}>
+            {expanded ? 'Hide details' : 'Show details'}
+          </Text>
+        ) : null}
+      </Pressable>
 
       {preview ? null : (
         <View style={styles.actions}>
@@ -136,6 +154,7 @@ const styles = StyleSheet.create({
   author: { flex: 1 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   content: { gap: spacing.xs },
+  details: { gap: spacing.xs, paddingTop: spacing.xs },
   sentence: { fontWeight: '400' },
   keyword: { fontWeight: '700' },
   badge: {

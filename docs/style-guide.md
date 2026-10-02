@@ -189,7 +189,8 @@ These are deliberate. Keep new work consistent with them.
   1. Author header: avatar, name, "major · school", "time · audience icon", and a `more` icon on the right.
   2. One sentence from `postSentence()`, in the `headline` variant at regular weight with only the kind in bold: "Got an **Interview** at {company} for the {role} position!", "Got an **Offer** from …", "**Accepted** an offer at …".
   3. The poster's optional comment (`body`, `textMuted`).
-  4. Action row: icons with counts (congrats, comment, send), with no text labels.
+  4. For interviews and takehomes/OAs, a "Show details" caption in `primary`. Tapping the post body expands the round, type or format line and the question list in place; it says "Hide details" while open. Nothing from the details shows while collapsed.
+  5. Action row: icons with counts (congrats, comment, send), with no text labels.
 
   No colored box, company mark or kind badge inside posts; the bold keyword carries the kind.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
