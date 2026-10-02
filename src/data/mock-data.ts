@@ -64,10 +64,10 @@ const minutesAgo = (minutes: number) => Date.now() - minutes * 60_000;
 
 export const initialUpdates: Update[] = [
   { id: 'u1', userId: 'priya', kind: 'offer', company: 'Goldman Sachs', role: 'Summer Analyst', term: 'Summer 2027', location: 'New York, NY', note: 'Superday paid off. Still processing this one!', createdAt: minutesAgo(18), visibility: 'friends', congrats: 42 },
-  { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: 'Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14 },
+  { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: '56. Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14 },
   { id: 'u3', userId: 'maya', kind: 'accepted', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', location: 'San Francisco, CA', note: 'Signed! Who else is going to be in SF this summer?', createdAt: minutesAgo(130), visibility: 'friends', congrats: 67 },
   { id: 'u4', userId: 'theo', kind: 'applied', company: 'Spotify', role: 'Data Analyst Intern', term: 'Summer 2027', note: 'Number 14 this week. Keeping the streak alive.', createdAt: minutesAgo(240), visibility: 'private', congrats: 0 },
-  { id: 'u12', userId: 'sam', kind: 'takehome', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'OA', questions: [{ text: 'LRU Cache' }, { text: 'Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7 },
+  { id: 'u12', userId: 'sam', kind: 'takehome', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'OA', questions: [{ text: '146. LRU Cache' }, { text: '200. Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7 },
   { id: 'u5', userId: 'lena', kind: 'milestone', company: 'Microsoft', role: 'UX Research Intern', term: 'Fall 2026', title: 'Wrapped my first research study', note: 'Presented findings to the Teams org. Terrified and thrilled.', createdAt: minutesAgo(410), visibility: 'friends', congrats: 29 },
   { id: 'u6', userId: 'sam', kind: 'interview', company: 'Duolingo', role: 'Machine Learning Intern', term: 'Summer 2027', stage: 'Phone screen', createdAt: minutesAgo(600), visibility: 'friends', congrats: 11 },
   { id: 'u7', userId: 'alex', kind: 'interview', company: 'Airbnb', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Technical interview', note: 'Graph problem went well. Fingers crossed.', createdAt: minutesAgo(900), visibility: 'friends', congrats: 16 },
@@ -131,5 +131,24 @@ export const interviewRounds = ['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Rou
 export const interviewTypes = ['Behavioral', 'Technical', 'Mixed'];
 export const assessmentFormats = ['OA', 'Take-home'];
 export const difficulties = ['Easy', 'Medium', 'Hard'];
+// Real LeetCode titles, used as rotating placeholders for question fields.
+export const leetcodeExamples = [
+  '1. Two Sum',
+  '146. LRU Cache',
+  '200. Number of Islands',
+  '56. Merge Intervals',
+  '3. Longest Substring Without Repeating Characters',
+  '207. Course Schedule',
+  '20. Valid Parentheses',
+  '238. Product of Array Except Self',
+  '295. Find Median from Data Stream',
+  '981. Time Based Key-Value Store',
+];
+export const behavioralExamples = [
+  'Tell me about a time you failed',
+  'Tell me about a time you disagreed with a teammate',
+  'Why do you want to work here?',
+  'Describe a project you are proud of',
+];
 export const companySuggestions = ['Airbnb', 'Amazon', 'Apple', 'Datadog', 'Duolingo', 'Figma', 'Goldman Sachs', 'Google', 'Meta', 'Microsoft', 'Notion', 'Ramp', 'Spotify', 'Stripe'];
 export const positionSuggestions = ['Software Engineering Intern', 'Machine Learning Intern', 'Data Science Intern', 'Data Analyst Intern', 'Product Design Intern', 'Product Management Intern', 'UX Research Intern', 'Summer Analyst'];

@@ -19,11 +19,13 @@ import {
 import { colors, spacing, tones } from "@/constants/theme";
 import {
   assessmentFormats,
+  behavioralExamples,
   companySuggestions,
   difficulties,
   finalRound,
   interviewRounds,
   interviewTypes,
+  leetcodeExamples,
   positionSuggestions,
   type Question,
 } from "@/data/mock-data";
@@ -236,13 +238,11 @@ export default function ShareScreen() {
                   <TextField
                     value={item.text}
                     onChangeText={(text) => editQuestion(index, { text })}
-                    placeholder={
-                      kind === "takehome"
-                        ? "e.g. LRU Cache, or build a rate limiter"
-                        : behavioral
-                          ? "e.g. Tell me about a time you failed"
-                          : "e.g. Two Sum, or a question they asked"
-                    }
+                    placeholder={`e.g. ${
+                      behavioral
+                        ? behavioralExamples[index % behavioralExamples.length]
+                        : leetcodeExamples[index % leetcodeExamples.length]
+                    }`}
                     accessibilityLabel={`Question ${index + 1}`}
                   />
                 </View>
