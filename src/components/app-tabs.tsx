@@ -1,3 +1,4 @@
+import { usePathname } from 'expo-router';
 import { TabList, TabSlot, TabTrigger, Tabs, type TabTriggerSlotProps } from 'expo-router/ui';
 import type { PropsWithChildren } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -8,6 +9,7 @@ import { pages } from '@/constants/pages';
 import { colors, radius, shadow, spacing } from '@/constants/theme';
 
 const tabs = pages.filter((page) => page.tab);
+const hiddenPages = pages.filter((page) => !page.tab);
 
 export default function AppTabs() {
   return (
@@ -20,8 +22,10 @@ export default function AppTabs() {
               <TabButton icon={tab.icon} label={tab.label} primary={tab.name === 'share'} />
             </TabTrigger>
           ))}
-          {/* Friends is a route but not a tab; reachable from Search. */}
-          <TabTrigger name="friends" href="/friends" style={styles.hidden} />
+          {/* Routes that aren't tabs still need a (hidden) trigger; they're reached from the menu. */}
+          {hiddenPages.map((page) => (
+            <TabTrigger key={page.name} name={page.name} href={page.href} style={styles.hidden} />
+          ))}
         </TabBar>
       </TabList>
     </Tabs>
@@ -30,7 +34,13 @@ export default function AppTabs() {
 
 function TabBar({ children }: PropsWithChildren) {
   const insets = useSafeAreaInsets();
-  return <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>{children}</View>;
+  const pathname = usePathname();
+  const fullscreen = pages.some((page) => page.fullscreen && page.href === pathname);
+  return (
+    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, spacing.md) }, fullscreen && styles.hidden]}>
+      {children}
+    </View>
+  );
 }
 
 type TabButtonProps = TabTriggerSlotProps & { icon: IconName; label: string; primary?: boolean };
