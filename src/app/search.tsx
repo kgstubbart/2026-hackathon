@@ -1,4 +1,4 @@
-import { Fragment, useState, type ReactNode } from 'react';
+import { Fragment, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { KindBadge, UpdateCard } from '@/components/update-card';
@@ -276,13 +276,25 @@ type SearchInputProps = {
 
 function SearchInput({ icon, value, onChange, placeholder, suggestions, autoFocus }: SearchInputProps) {
   const [focused, setFocused] = useState(false);
+  const blurTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const query = value.trim().toLowerCase();
   const matches = query
     ? suggestions
         .filter((suggestion) => suggestion.toLowerCase().includes(query))
         .sort((a, b) => Number(b.toLowerCase().startsWith(query)) - Number(a.toLowerCase().startsWith(query)))
-        .slice(0, 5)
+    .slice(0, 5)
     : [];
+
+  const clearBlurTimeout = () => {
+    if (blurTimeout.current) clearTimeout(blurTimeout.current);
+    blurTimeout.current = null;
+  };
+
+  const selectSuggestion = (suggestion: string) => {
+    clearBlurTimeout();
+    onChange(suggestion);
+    setFocused(false);
+  };
 
   return (
     <View style={[styles.inputGroup, focused && styles.focusedInputGroup]}>
@@ -296,8 +308,17 @@ function SearchInput({ icon, value, onChange, placeholder, suggestions, autoFocu
           autoFocus={autoFocus}
           autoCorrect={false}
           returnKeyType="search"
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onFocus={() => {
+            clearBlurTimeout();
+            setFocused(true);
+          }}
+          onBlur={() => {
+            clearBlurTimeout();
+            blurTimeout.current = setTimeout(() => {
+              setFocused(false);
+              blurTimeout.current = null;
+            }, 150);
+          }}
           style={styles.input}
         />
         {focused && value ? (
@@ -313,10 +334,7 @@ function SearchInput({ icon, value, onChange, placeholder, suggestions, autoFocu
               key={suggestion}
               accessibilityRole="button"
               accessibilityLabel={`Use ${suggestion}`}
-              onPressIn={() => {
-                onChange(suggestion);
-                setFocused(false);
-              }}
+              onPress={() => selectSuggestion(suggestion)}
               style={({ pressed }) => [styles.suggestion, pressed && styles.pressed]}>
               <Text variant="callout">{suggestion}</Text>
             </Pressable>
