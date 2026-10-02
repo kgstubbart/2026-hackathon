@@ -101,7 +101,7 @@ export default function ProfileScreen() {
               <View style={[styles.stepText, !last && styles.stepGap]}>
                 <Text variant="headline">{headlineFor(update)}</Text>
                 <Text variant="caption" color={colors.textMuted}>
-                  {update.role} · {update.term}
+                  {[update.role, update.term].filter(Boolean).join(' · ')}
                 </Text>
                 <View style={styles.meta}>
                   <Icon name={update.visibility === 'private' ? 'lock' : 'friends'} size={12} color={colors.textFaint} />

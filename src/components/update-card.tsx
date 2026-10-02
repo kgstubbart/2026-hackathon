@@ -28,6 +28,7 @@ type UpdateCardProps = {
 // Full-width feed post: LinkedIn-style author header, one-sentence post with optional comment, Threads-style action row.
 export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardProps) {
   const [before, keyword, after] = postSentence(update);
+  const details = [update.round, update.interviewType, update.assessmentFormat].filter(Boolean).join(' · ');
 
   return (
     <View style={styles.post}>
@@ -58,6 +59,23 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
           </Text>
           {after}
         </Text>
+        {details ? (
+          <Text variant="callout" color={colors.textMuted}>
+            {details}
+          </Text>
+        ) : null}
+        {update.questions?.map((question, index) => (
+          <View key={index} style={styles.question}>
+            <Text variant="body" style={styles.questionText}>
+              {question.text || `${question.difficulty} question`}
+            </Text>
+            {question.text && question.difficulty ? (
+              <Text variant="caption" color={colors.textMuted}>
+                {question.difficulty}
+              </Text>
+            ) : null}
+          </View>
+        ))}
         {update.note ? (
           <Text variant="body" color={colors.textMuted}>
             {update.note}
@@ -105,6 +123,8 @@ function Action({ icon, label, count, active, onPress }: ActionProps) {
 }
 
 const styles = StyleSheet.create({
+  question: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
+  questionText: { flexShrink: 1 },
   post: {
     backgroundColor: colors.surface,
     paddingHorizontal: layout.gutter,

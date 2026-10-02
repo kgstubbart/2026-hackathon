@@ -2,257 +2,267 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { UpdateCard } from '@/components/update-card';
 import {
   Button,
-  Card,
   ChipGroup,
+  ComboField,
   FieldLabel,
   Icon,
   IconButton,
   Screen,
-  ScreenHeader,
-  SectionHeader,
+  Section,
   Text,
   TextField,
-  type IconName,
+  TopBar,
 } from '@/components/ui';
-import { colors, radius, spacing, tones } from '@/constants/theme';
-import { interviewStages, terms, type UpdateKind, type Visibility } from '@/data/mock-data';
-import { useStore } from '@/data/store';
-import { updateKindOrder, updateKinds } from '@/data/update-kinds';
+import { colors, spacing, tones } from '@/constants/theme';
+import {
+  assessmentFormats,
+  companySuggestions,
+  difficulties,
+  finalRound,
+  interviewRounds,
+  interviewTypes,
+  positionSuggestions,
+  type Question,
+} from '@/data/mock-data';
+import { useStore, type NewUpdate } from '@/data/store';
+import { isPrivateKind, shareKinds, updateKinds } from '@/data/update-kinds';
+
+type ShareKind = (typeof shareKinds)[number];
+type DraftQuestion = { text: string; difficulty: string };
+
+const blankQuestion: DraftQuestion = { text: '', difficulty: '' };
+
+// Tapping the selected option again clears it.
+const toggle = (current: string, set: (value: string) => void) => (next: string) => set(next === current ? '' : next);
+
+const unique = (items: string[]) => [...new Set(items.filter(Boolean))];
+
+// Nobody knows how many rounds there will be: typing a number offers that round, and Final is always there.
+function roundOptions(value: string) {
+  const number = value.trim().match(/^(?:round\s*)?(\d+)$/i)?.[1];
+  return number ? [`Round ${Number(number)}`, finalRound] : interviewRounds;
+}
 
 export default function ShareScreen() {
-  const { addUpdate, currentUser } = useStore();
-  const [kind, setKind] = useState<UpdateKind>('offer');
+  const { addUpdate, updates } = useStore();
+  const [kind, setKind] = useState<ShareKind>('interview');
   const [company, setCompany] = useState('');
-  const [role, setRole] = useState('');
-  const [term, setTerm] = useState(terms[0]);
-  const [stage, setStage] = useState(interviewStages[0]);
-  const [title, setTitle] = useState('');
-  const [location, setLocation] = useState('');
-  const [note, setNote] = useState('');
-  const [visibility, setVisibility] = useState<Visibility>('friends');
+  const [position, setPosition] = useState('');
+  const [round, setRound] = useState('');
+  const [interviewType, setInterviewType] = useState('');
+  const [format, setFormat] = useState('');
+  const [questions, setQuestions] = useState<DraftQuestion[]>([blankQuestion]);
 
-  const draft = {
-    kind,
-    company: company.trim(),
-    role: role.trim(),
-    term,
-    stage: kind === 'interview' ? stage : undefined,
-    title: kind === 'milestone' ? title.trim() : undefined,
-    location: location.trim() || undefined,
-    note: note.trim() || undefined,
-    visibility,
-  };
-  const canShare = draft.company.length > 0 && draft.role.length > 0;
+  const isPrivate = isPrivateKind(kind);
+  const hasQuestions = kind === 'interview' || kind === 'assessment';
+  const typeKey = interviewType.trim().toLowerCase();
+  const behavioral = typeKey === 'behavioral';
+  // Difficulty is a coding-question thing: only technical or mixed interviews ask for it, never behavioral.
+  const hasDifficulty = kind === 'interview' && (typeKey === 'technical' || typeKey === 'mixed');
+
+  const companies = unique([...updates.map((update) => update.company), ...companySuggestions]);
+  const positions = unique([...updates.map((update) => update.role), ...positionSuggestions]);
+  const canShare = company.trim().length > 0 && position.trim().length > 0;
+
+  const editQuestion = (index: number, patch: Partial<DraftQuestion>) =>
+    setQuestions((items) => items.map((item, i) => (i === index ? { ...item, ...patch } : item)));
 
   const share = () => {
     if (!canShare) return;
-    addUpdate(draft);
+    // A question can be just the text, just the difficulty, or both.
+    const filled: Question[] = questions
+      .map((question) => ({
+        text: question.text.trim() || undefined,
+        difficulty: (hasDifficulty && question.difficulty.trim()) || undefined,
+      }))
+      .filter((question) => question.text || question.difficulty);
+    const update: NewUpdate = { kind, company: company.trim(), role: position.trim() };
+    if (kind === 'interview') {
+      // A bare number typed without picking the suggestion still reads as a round.
+      update.round = (/^\d+$/.test(round.trim()) ? `Round ${Number(round)}` : round.trim()) || undefined;
+      update.interviewType = interviewType.trim() || undefined;
+    }
+    if (kind === 'assessment') update.assessmentFormat = format.trim() || undefined;
+    if (hasQuestions && filled.length) update.questions = filled;
+    addUpdate(update);
     setCompany('');
-    setRole('');
-    setTitle('');
-    setLocation('');
-    setNote('');
-    router.navigate('/');
+    setPosition('');
+    setRound('');
+    setInterviewType('');
+    setFormat('');
+    setQuestions([blankQuestion]);
+    router.navigate(isPrivate ? '/profile' : '/');
   };
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
-      <ScreenHeader
-        eyebrow="New update"
-        title="Share your news"
-        right={<IconButton icon="close" label="Close" onPress={() => router.navigate('/')} />}
-      />
-
-      <Text variant="headline" style={styles.question}>
-        What happened?
-      </Text>
-      <View style={styles.kinds}>
-        {updateKindOrder.map((item) => {
-          const meta = updateKinds[item];
-          const tone = tones[meta.tone];
-          const selected = item === kind;
-          return (
-            <Pressable
-              key={item}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              onPress={() => setKind(item)}
-              style={({ pressed }) => [
-                styles.kind,
-                selected && { borderColor: tone.fg, backgroundColor: tone.bg },
-                pressed && styles.pressed,
-              ]}>
-              <View style={[styles.kindIcon, { backgroundColor: selected ? tone.fg : tone.bg }]}>
-                <Icon name={meta.icon} size={16} color={selected ? colors.onPrimary : tone.fg} />
-              </View>
-              <View style={styles.kindText}>
-                <Text variant="callout" style={styles.kindLabel}>
+    <Screen
+      flush
+      keyboardShouldPersistTaps="handled"
+      header={
+        <TopBar
+          title="New update"
+          left={<IconButton icon="close" label="Close" tone="muted" onPress={() => router.navigate('/')} />}
+        />
+      }>
+      <Section title="What happened?">
+        <View style={styles.kinds}>
+          {shareKinds.map((item) => {
+            const meta = updateKinds[item];
+            const tone = tones[meta.tone];
+            const selected = item === kind;
+            return (
+              <Pressable
+                key={item}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                onPress={() => setKind(item)}
+                style={({ pressed }) => [styles.kind, pressed && styles.pressed]}>
+                <Icon name={meta.icon} size={22} color={selected ? tone.fg : colors.textFaint} />
+                <Text variant="caption" color={selected ? colors.text : colors.textMuted} style={selected && styles.kindSelected}>
                   {meta.label}
                 </Text>
-                <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
-                  {meta.description}
-                </Text>
-              </View>
-            </Pressable>
-          );
-        })}
-      </View>
+                <View style={[styles.kindLine, selected && { backgroundColor: tone.fg }]} />
+              </Pressable>
+            );
+          })}
+        </View>
+      </Section>
 
-      <SectionHeader title="Details" />
-      <Card style={styles.form}>
-        <TextField label="Company" value={company} onChangeText={setCompany} placeholder="e.g. Stripe" />
-        <TextField label="Role" value={role} onChangeText={setRole} placeholder="e.g. Software Engineering Intern" />
-        {kind === 'milestone' ? (
-          <TextField label="Milestone" value={title} onChangeText={setTitle} placeholder="e.g. Shipped my first feature" />
-        ) : null}
+      <Section title="Details">
         {kind === 'interview' ? (
           <View style={styles.group}>
-            <FieldLabel>Stage</FieldLabel>
-            <ChipGroup options={interviewStages} value={stage} onChange={setStage} />
+            <FieldLabel>Type</FieldLabel>
+            <ChipGroup options={interviewTypes} value={interviewType} onChange={toggle(interviewType, setInterviewType)} />
           </View>
         ) : null}
-        <View style={styles.group}>
-          <FieldLabel>Term</FieldLabel>
-          <ChipGroup options={terms} value={term} onChange={setTerm} />
+        <View style={styles.pair}>
+          <View style={styles.grow}>
+            <ComboField
+              label="Company"
+              value={company}
+              onChangeText={setCompany}
+              options={companies}
+              placeholder="e.g. Stripe"
+            />
+          </View>
+          {kind === 'interview' ? (
+            <View style={styles.round}>
+              <ComboField
+                compact
+                label="Round"
+                value={round}
+                onChangeText={setRound}
+                options={roundOptions(round)}
+                placeholder="2, Final"
+              />
+            </View>
+          ) : null}
         </View>
-        <TextField label="Location (optional)" value={location} onChangeText={setLocation} placeholder="e.g. San Francisco, CA" />
-        <TextField
-          label="Comment (optional)"
-          value={note}
-          onChangeText={setNote}
-          placeholder="Anything your friends should know?"
-          multiline
+        <ComboField
+          label="Position"
+          value={position}
+          onChangeText={setPosition}
+          options={positions}
+          placeholder="e.g. Software Engineering Intern"
         />
-      </Card>
+        {kind === 'assessment' ? (
+          <View style={styles.group}>
+            <FieldLabel>Format</FieldLabel>
+            <ChipGroup options={assessmentFormats} value={format} onChange={toggle(format, setFormat)} />
+          </View>
+        ) : null}
+      </Section>
 
-      <SectionHeader title="Who can see this" />
-      <View style={styles.audience}>
-        <AudienceOption
-          icon="friends"
-          label="Friends"
-          caption="Your circle gets notified"
-          selected={visibility === 'friends'}
-          onPress={() => setVisibility('friends')}
-        />
-        <AudienceOption
-          icon="lock"
-          label="Only me"
-          caption="Track it privately"
-          selected={visibility === 'private'}
-          onPress={() => setVisibility('private')}
-        />
-      </View>
+      {hasQuestions ? (
+        <Section title={kind === 'interview' ? 'Questions' : 'Questions or task'}>
+          {questions.map((item, index) => (
+            <View key={index} style={styles.group}>
+              <View style={styles.questionRow}>
+                <View style={styles.questionInput}>
+                  <TextField
+                    value={item.text}
+                    onChangeText={(text) => editQuestion(index, { text })}
+                    placeholder={
+                      kind === 'assessment'
+                        ? 'e.g. LRU Cache, or build a rate limiter'
+                        : behavioral
+                          ? 'e.g. Tell me about a time you failed'
+                          : 'e.g. Two Sum, or a question they asked'
+                    }
+                    accessibilityLabel={`Question ${index + 1}`}
+                  />
+                </View>
+                {questions.length > 1 ? (
+                  <IconButton
+                    icon="trash"
+                    label={`Remove question ${index + 1}`}
+                    tone="plain"
+                    onPress={() => setQuestions((items) => items.filter((_, i) => i !== index))}
+                  />
+                ) : null}
+              </View>
+              {hasDifficulty ? (
+                <ChipGroup
+                  options={difficulties}
+                  value={item.difficulty}
+                  onChange={toggle(item.difficulty, (difficulty) => editQuestion(index, { difficulty }))}
+                />
+              ) : null}
+            </View>
+          ))}
+          <View style={styles.addRow}>
+            <Button
+              label="Add another"
+              icon="plus"
+              variant="ghost"
+              size="sm"
+              onPress={() => setQuestions((items) => [...items, blankQuestion])}
+            />
+          </View>
+          {hasDifficulty ? (
+            <Text variant="caption" color={colors.textFaint}>
+              Can&apos;t share the question? Just pick a difficulty.
+            </Text>
+          ) : null}
+        </Section>
+      ) : null}
 
-      <SectionHeader title="Preview" />
-      <View style={styles.preview}>
-        <UpdateCard
-          preview
-          author={currentUser}
-          update={{
-            ...draft,
-            id: 'preview',
-            userId: currentUser.id,
-            company: draft.company || 'Company',
-            createdAt: 0,
-            congrats: 0,
-            comments: 0,
-          }}
-        />
-      </View>
-
-      <View style={styles.submit}>
+      <Section>
         <Button
-          label={visibility === 'friends' ? 'Share with friends' : 'Save privately'}
-          icon={visibility === 'friends' ? 'send' : 'lock'}
+          label={isPrivate ? 'Log application' : 'Post to feed'}
+          icon={isPrivate ? 'lock' : 'send'}
           size="lg"
           fullWidth
           disabled={!canShare}
           onPress={share}
         />
-        {!canShare ? (
-          <Text variant="caption" color={colors.textFaint} align="center">
-            Add a company and role to share
-          </Text>
-        ) : null}
-      </View>
+        <Text variant="caption" color={colors.textFaint} align="center">
+          {!canShare
+            ? 'Add a company and position to continue'
+            : isPrivate
+              ? 'Applications stay private and count toward your streak'
+              : 'Your friends will see this on their feed'}
+        </Text>
+      </Section>
     </Screen>
   );
 }
 
-type AudienceOptionProps = { icon: IconName; label: string; caption: string; selected: boolean; onPress: () => void };
-
-function AudienceOption({ icon, label, caption, selected, onPress }: AudienceOptionProps) {
-  return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={({ pressed }) => [styles.option, selected && styles.optionSelected, pressed && styles.pressed]}>
-      <View style={styles.optionTop}>
-        <Icon name={icon} size={18} color={selected ? colors.primary : colors.textMuted} />
-        <View style={[styles.radio, selected && styles.radioSelected]}>
-          {selected ? <Icon name="check" size={10} color={colors.onPrimary} /> : null}
-        </View>
-      </View>
-      <Text variant="headline">{label}</Text>
-      <Text variant="caption" color={colors.textMuted}>
-        {caption}
-      </Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  question: { marginBottom: spacing.md },
-  kinds: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  kind: {
-    flexGrow: 1,
-    flexBasis: '45%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm + 2,
-    padding: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  kindIcon: { width: 32, height: 32, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  kindText: { flex: 1 },
-  kindLabel: { fontWeight: '700' },
-  form: { gap: spacing.lg },
+  // Flat, tab-like kind picker: icon over label, selected one underlined in its tone.
+  kinds: { flexDirection: 'row', marginHorizontal: -spacing.sm },
+  kind: { flex: 1, alignItems: 'center', gap: spacing.xs + 2, paddingTop: spacing.xs },
+  kindSelected: { fontWeight: '700' },
+  kindLine: { alignSelf: 'stretch', height: 2, marginTop: spacing.xs, backgroundColor: 'transparent' },
   group: { gap: spacing.sm },
-  audience: { flexDirection: 'row', gap: spacing.sm },
-  option: {
-    flex: 1,
-    gap: spacing.xs,
-    padding: spacing.md + 2,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  optionSelected: { borderColor: colors.primary, backgroundColor: colors.primarySoft },
-  optionTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xs },
-  radio: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioSelected: { borderColor: colors.primary, backgroundColor: colors.primary },
-  preview: {
-    borderRadius: radius.lg,
-    overflow: 'hidden',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
-  },
-  submit: { gap: spacing.sm, marginTop: spacing.lg },
-  pressed: { opacity: 0.75 },
+  pair: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  grow: { flex: 1 },
+  // Just wide enough for "Round 12"; company takes the rest of the row.
+  round: { width: 92 },
+  questionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  questionInput: { flex: 1 },
+  addRow: { flexDirection: 'row' },
+  pressed: { opacity: 0.6 },
 });
