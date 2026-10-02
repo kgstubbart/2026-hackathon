@@ -26,6 +26,7 @@ const icons = {
   personAdd: ['person.badge.plus', 'person_add'],
   bell: ['bell', 'notifications'],
   settings: ['gearshape', 'settings'],
+  edit: ['pencil', 'edit'],
   lock: ['lock.fill', 'lock'],
   arrowUp: ['arrow.up', 'arrow_upward'],
   flame: ['flame.fill', 'local_fire_department'],
