@@ -1,16 +1,13 @@
-import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
-import { JobHuntProvider } from '@/data/job-hunt-store';
+import { StoreProvider } from '@/data/store';
 
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
+export default function RootLayout() {
   return (
-    <JobHuntProvider>
-      <AnimatedSplashOverlay />
+    <StoreProvider>
+      <StatusBar style="dark" />
       <AppTabs />
-    </JobHuntProvider>
+    </StoreProvider>
   );
 }
