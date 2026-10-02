@@ -91,9 +91,11 @@ export default function SearchScreen() {
             accessibilityLabel="Search by company and position"
             onPress={() => setActive(true)}
             style={({ pressed }) => [styles.bar, pressed && styles.pressed]}>
-            <PreviewRow icon="briefcase" label="Company" />
-            <Divider />
-            <PreviewRow icon="profile" label="Position" />
+            <View style={styles.box}>
+              <PreviewRow icon="briefcase" label="Company" />
+              <Divider />
+              <PreviewRow icon="profile" label="Position" />
+            </View>
           </Pressable>
         </View>
       </Screen>
@@ -109,9 +111,11 @@ export default function SearchScreen() {
         </Text>
       </HeaderBlock>
       <View style={styles.fields}>
-        <SearchInput icon="briefcase" value={company} onChange={setCompany} placeholder="Company" suggestions={companies.map((item) => item.company)} autoFocus />
-        <Divider />
-        <SearchInput icon="profile" value={position} onChange={setPosition} placeholder="Position" suggestions={positions} />
+        <View style={styles.box}>
+          <SearchInput icon="briefcase" value={company} onChange={setCompany} placeholder="Company" suggestions={companies.map((item) => item.company)} autoFocus />
+          <Divider />
+          <SearchInput icon="profile" value={position} onChange={setPosition} placeholder="Position" suggestions={positions} />
+        </View>
       </View>
 
       {searching ? (
@@ -302,6 +306,15 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   fields: { backgroundColor: colors.surface, paddingHorizontal: layout.gutter, zIndex: 2 },
+  // Rounded search container holding both fields, like a map app's "Where to?" box.
+  box: {
+    marginVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+  },
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: spacing.xxxl + spacing.xl },
   input: { ...typography.headline, fontWeight: '400', flex: 1, height: '100%', color: colors.text },
   inputGroup: { position: 'relative' },
@@ -315,8 +328,11 @@ const styles = StyleSheet.create({
     zIndex: 20,
     elevation: 4,
     backgroundColor: colors.surface,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    borderBottomLeftRadius: radius.md,
+    borderBottomRightRadius: radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    overflow: 'hidden',
   },
   suggestion: { minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing.sm, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
   list: { marginTop: -spacing.sm },
