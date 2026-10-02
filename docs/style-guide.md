@@ -48,8 +48,9 @@ Each kind of update has one tone. A tone is a pair: `fg` for icons and text, `bg
 
 | Kind | Tone | `fg` | `bg` | Icon |
 | --- | --- | --- | --- | --- |
-| Applied | `sky` | `#2563EB` | `#E5EDFF` | `send` |
+| Application | `sky` | `#2563EB` | `#E5EDFF` | `send` |
 | Interview | `amber` | `#B45309` | `#FDF0D5` | `calendar` |
+| Assessment | `teal` | `#0E7490` | `#DDF3F7` | `code` |
 | Offer | `mint` | `#0F8A5F` | `#DCF4E8` | `trophy` |
 | Accepted | `primary` | `#4F46E5` | `#ECEBFE` | `briefcase` |
 | Milestone | `rose` | `#D6336C` | `#FDE4EE` | `star` |
@@ -186,7 +187,7 @@ These are deliberate. Keep new work consistent with them.
   4. Action row: icons with counts (congrats, comment, send), with no text labels.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
 - **Search** (Uber "Where to?" style): a bordered `lg` box of stacked fields linked by a dot, line and square rail. A round "+" beside the box adds a field. Results are flat rows: an icon on the left, the title with the **matched text in bold**, a muted subtitle, and hairline dividers that start at the text column.
-- **Forms** (Share): question → option tiles → `Card` of fields → audience options → live preview → one large primary button. Disable the button until required fields are filled, and say why underneath.
+- **Forms** (Share): question → option tiles → `Card` of fields (and a second `Card` for a repeatable list, like interview questions) → one large primary button with a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
 - **Lists** (Friends, Chats): rows inside a `flush` `Card`, separated by `Divider`s, with the avatar on the left and a single action or meta element on the right.
 
 ## 9. Interaction and accessibility

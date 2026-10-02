@@ -10,6 +10,7 @@
 - Feed: StrJava header bar (+ / search (goes to `/search`) on the left, chats / notifications on the right), a Strava-style weekly streak card on top, then a plain chronological feed. No filters, summary boxes, or "recent wins" strips.
 - Feed posts are full-width white sections separated by thin gaps, LinkedIn/Threads style: author header (avatar, name, major · school, time · audience), headline + note, a company/role attachment, and an icon action row (congrats, comment, send). Not floating rounded cards.
 - Streak: flame with consecutive-week count (Strava orange `colors.streak`) and Mon–Sun circles; a day is filled when the user logged an update that day.
+- Share lets the user log four things: application (company, position), interview (company, position, round, type: behavioral / technical / mixed, questions each with a difficulty), assessment (company, position, timed or take-home, questions or task) and offer (company, position). Applications are never posted to the feed; they are private tracking that counts toward the streak. The other three always post to the feed. No audience picker and no preview on this page.
 - Data is mock and in-memory (`src/data/mock-data.ts`, `src/data/store.tsx`); there is no backend yet.
 
 ## Design system
@@ -20,7 +21,7 @@ Full rules live in `docs/style-guide.md`. Follow it for any UI work and update i
 - Build screens from the kit in `src/components/ui/` (`Text`, `Button`, `IconButton`, `Chip`, `Card`, `Avatar`, `CompanyMark`, `TextField`, `SearchField`, `Screen`, `ScreenHeader`, `SectionHeader`).
 - Icons only via `<Icon name=… />` (`src/components/ui/icon.tsx`), which maps a name to SF Symbols (iOS) and Material Symbols (Android/web). Add new icons to that map; never use unicode glyphs or emoji as icons.
 - Update kinds (label, icon, tone color) are defined once in `src/data/update-kinds.ts`; reuse `KindBadge` for kind labels.
-- Primary color is indigo; each update kind has its own tone (sky, amber, mint, primary, rose). Light mode only for now.
+- Primary color is indigo; each update kind has its own tone (sky, amber, teal, mint, primary, rose). Light mode only for now.
 
 ## Commits
 
