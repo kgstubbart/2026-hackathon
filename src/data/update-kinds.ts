@@ -91,3 +91,9 @@ export function timeAgo(timestamp: number) {
   const days = Math.round(hours / 24);
   return days < 7 ? `${days}d` : `${Math.round(days / 7)}w`;
 }
+
+// The post sentence as plain text, e.g. for sharing a post in a chat.
+export const sentenceText = (update: Parameters<typeof postSentence>[0]) =>
+  postSentence(update)
+    .map((segment) => segment.text)
+    .join('');

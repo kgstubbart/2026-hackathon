@@ -1,9 +1,13 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { PostMenu } from '@/components/post-menu';
+import { SendSheet } from '@/components/send-sheet';
 import { Avatar, Icon, Text, type IconName } from '@/components/ui';
 import { colors, layout, radius, spacing, tones } from '@/constants/theme';
 import type { Update, User } from '@/data/mock-data';
+import { useStore } from '@/data/store';
 import { postSentence, timeAgo, updateKinds } from '@/data/update-kinds';
 
 export function KindBadge({ kind }: { kind: Update['kind'] }) {
@@ -27,35 +31,62 @@ type UpdateCardProps = {
   preview?: boolean;
   /** On the post's own page: show round/type/format and questions, and don't link to itself. */
   detail?: boolean;
+  /** Called after the post was deleted from its menu (e.g. to leave the post page). */
+  onDeleted?: () => void;
 };
 
 // Full-width feed post: LinkedIn-style author header, one-sentence post with optional comment, Threads-style action row.
 // In the feed it only shows the sentence; tapping it opens the post page with details and comments.
-export function UpdateCard({ update, author, commentCount, onCongrats, preview, detail }: UpdateCardProps) {
+export function UpdateCard({ update, author, commentCount, onCongrats, preview, detail, onDeleted }: UpdateCardProps) {
+  const { currentUser } = useStore();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
   const sentence = postSentence(update);
   const details = [update.round, update.interviewType, update.assessmentFormat].filter(Boolean).join(' · ');
   const open = () => router.navigate({ pathname: '/post/[id]', params: { id: update.id } });
   const canOpen = !preview && !detail;
+  const openProfile = () =>
+    author.id === currentUser.id
+      ? router.navigate('/profile')
+      : router.navigate({ pathname: '/user/[id]', params: { id: author.id } });
 
   return (
     <View style={styles.post}>
       <View style={styles.header}>
-        <Avatar user={author} size={44} />
-        <View style={styles.author}>
-          <Text variant="headline" numberOfLines={1}>
-            {author.name}
-          </Text>
-          <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
-            {author.major} · {author.school}
-          </Text>
-          <View style={styles.meta}>
-            <Text variant="caption" color={colors.textFaint}>
-              {preview ? 'Now' : timeAgo(update.createdAt)} ·
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="View profile"
+          disabled={preview}
+          onPress={openProfile}
+          style={({ pressed }) => [styles.authorPress, pressed && styles.pressed]}>
+          <Avatar user={author} size={44} />
+          <View style={styles.author}>
+            <Text variant="headline" numberOfLines={1}>
+              {author.name}
             </Text>
-            <Icon name={update.visibility === 'private' ? 'lock' : 'friends'} size={11} color={colors.textFaint} />
+            <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
+              {author.major} · {author.school}
+            </Text>
+            <View style={styles.meta}>
+              <Text variant="caption" color={colors.textFaint}>
+                {preview ? 'Now' : timeAgo(update.createdAt)} ·
+              </Text>
+              <Icon name={update.visibility === 'private' ? 'lock' : 'friends'} size={11} color={colors.textFaint} />
+            </View>
           </View>
-        </View>
-        <Icon name="more" size={18} color={colors.textFaint} />
+        </Pressable>
+        {preview ? (
+          <Icon name="more" size={18} color={colors.textFaint} />
+        ) : (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="More options"
+            hitSlop={12}
+            onPress={() => setMenuOpen(true)}
+            style={({ pressed }) => [styles.more, pressed && styles.pressed]}>
+            <Icon name="more" size={18} color={colors.textFaint} />
+          </Pressable>
+        )}
       </View>
 
       <Pressable
@@ -100,17 +131,28 @@ export function UpdateCard({ update, author, commentCount, onCongrats, preview, 
       </Pressable>
 
       {preview ? null : (
-        <View style={styles.actions}>
-          <Action
-            icon="party"
-            count={update.congrats}
-            active={update.congratulated}
-            label={update.congratulated ? 'Remove congrats' : 'Send congrats'}
-            onPress={onCongrats}
+        <>
+          <View style={styles.actions}>
+            <Action
+              icon="party"
+              count={update.congrats}
+              active={update.congratulated}
+              label={update.congratulated ? 'Remove congrats' : 'Send congrats'}
+              onPress={onCongrats}
+            />
+            <Action icon="comment" count={commentCount} label="Comment" onPress={detail ? undefined : open} />
+            <Action icon="send" label="Send" onPress={() => setSendOpen(true)} />
+          </View>
+          <PostMenu
+            visible={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            update={update}
+            author={author}
+            onSend={() => setSendOpen(true)}
+            onDeleted={onDeleted}
           />
-          <Action icon="comment" count={commentCount} label="Comment" onPress={detail ? undefined : open} />
-          <Action icon="send" label="Send" />
-        </View>
+          <SendSheet visible={sendOpen} onClose={() => setSendOpen(false)} update={update} />
+        </>
       )}
     </View>
   );
@@ -149,8 +191,10 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   header: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  authorPress: { flex: 1, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
   author: { flex: 1 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  more: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
   content: { gap: spacing.xs },
   details: { gap: spacing.xs, paddingTop: spacing.xs },
   sentence: { fontWeight: '400' },
