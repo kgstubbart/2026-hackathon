@@ -11,5 +11,6 @@ export const pages: { name: string; href: Href; icon: IconName; label: string; t
   { name: 'messages', href: '/messages', icon: 'chat', label: 'Chats', tab: true },
   { name: 'profile', href: '/profile', icon: 'profile', label: 'Profile', tab: true },
   { name: 'friends', href: '/friends', icon: 'friends', label: 'Friends', tab: false },
+  { name: 'resume-review', href: '/resume-review', icon: 'sparkles', label: 'Resume review', tab: false },
   { name: 'wrapped', href: '/wrapped', icon: 'sparkles', label: 'StrJava Wrapped', tab: false, fullscreen: true },
 ];

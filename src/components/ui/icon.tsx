@@ -40,6 +40,9 @@ const icons = {
   code: ['chevron.left.forwardslash.chevron.right', 'code'],
   trash: ['trash', 'delete'],
   menu: ['line.3.horizontal', 'menu'],
+  document: ['doc.text', 'description'],
+  upload: ['arrow.up.doc', 'upload_file'],
+  warning: ['exclamationmark.triangle', 'warning'],
 } satisfies Record<string, [SFSymbol, AndroidSymbol]>;
 
 export type IconName = keyof typeof icons;
