@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Fragment, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Divider, Icon, IconButton, Screen, ScreenHeader, SectionHeader, Text, type IconName } from '@/components/ui';
+import { Divider, HeaderBlock, Icon, IconButton, Screen, ScreenHeader, Section, Text, type IconName } from '@/components/ui';
 import { colors, layout, radius, spacing, tones, typography } from '@/constants/theme';
 import { companyStats, experienceLabel, findQuestions, isExperience, summarizeCompanies } from '@/data/repository';
 import { useStore } from '@/data/store';
@@ -48,26 +48,33 @@ export default function SearchScreen() {
       ).filter((hit) => terms.company || hit.text.toLowerCase().includes(terms.position))
     : [];
 
+  const companyList = (items: typeof companies, highlight = '') => (
+    <Section title="Companies">
+      <List>
+        {items.map((item) => (
+          <Row
+            key={item.company}
+            title={highlight ? <Highlight text={item.company} query={highlight} /> : <Text variant="headline">{item.company}</Text>}
+            subtitle={highlight && terms.position ? item.positions.join(' · ') : companyStats(item)}
+            onPress={() => openCompany(item.company)}
+          />
+        ))}
+      </List>
+    </Section>
+  );
+
   if (!active) {
     return (
-      <Screen scroll={false}>
-        <ScreenHeader title="Search" />
-        <Text variant="caption" color={colors.textMuted} style={styles.note}>
-          {scopeNote}
-        </Text>
+      <Screen flush scroll={false}>
+        <HeaderBlock>
+          <ScreenHeader title="Search" />
+          <Text variant="caption" color={colors.textMuted} style={styles.note}>
+            {scopeNote}
+          </Text>
+        </HeaderBlock>
         <View style={styles.idle}>
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.idleList}>
-            <SectionHeader title="Companies" />
-            <List>
-              {companies.map((item) => (
-                <Row
-                  key={item.company}
-                  title={<Text variant="headline">{item.company}</Text>}
-                  subtitle={companyStats(item)}
-                  onPress={() => openCompany(item.company)}
-                />
-              ))}
-            </List>
+            {companyList(companies)}
             <Pressable
               accessibilityRole="link"
               onPress={() => router.navigate('/friends')}
@@ -78,16 +85,15 @@ export default function SearchScreen() {
               </Text>
             </Pressable>
           </ScrollView>
+          {/* The two-field bar, pinned to the bottom like a composer. */}
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Search by company and position"
             onPress={() => setActive(true)}
             style={({ pressed }) => [styles.bar, pressed && styles.pressed]}>
-            <View style={styles.fields}>
-              <PreviewRow icon="briefcase" label="Company" />
-              <Divider />
-              <PreviewRow icon="profile" label="Position" />
-            </View>
+            <PreviewRow icon="briefcase" label="Company" />
+            <Divider />
+            <PreviewRow icon="profile" label="Position" />
           </Pressable>
         </View>
       </Screen>
@@ -95,11 +101,13 @@ export default function SearchScreen() {
   }
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
-      <ScreenHeader title="Search" right={<IconButton icon="close" label="Close search" onPress={close} />} />
-      <Text variant="caption" color={colors.textMuted} style={styles.note}>
-        {scopeNote}
-      </Text>
+    <Screen flush keyboardShouldPersistTaps="handled">
+      <HeaderBlock>
+        <ScreenHeader title="Search" right={<IconButton icon="close" label="Close search" onPress={close} />} />
+        <Text variant="caption" color={colors.textMuted} style={styles.note}>
+          {scopeNote}
+        </Text>
+      </HeaderBlock>
       <View style={styles.fields}>
         <SearchInput icon="briefcase" value={company} onChange={setCompany} placeholder="Company" suggestions={companies.map((item) => item.company)} autoFocus />
         <Divider />
@@ -108,24 +116,9 @@ export default function SearchScreen() {
 
       {searching ? (
         <>
-          {companyHits.length ? (
-            <>
-              <SectionHeader title="Companies" />
-              <List>
-                {companyHits.map((item) => (
-                  <Row
-                    key={item.company}
-                    title={<Highlight text={item.company} query={terms.company} />}
-                    subtitle={terms.position ? item.positions.join(' · ') : companyStats(item)}
-                    onPress={() => openCompany(item.company)}
-                  />
-                ))}
-              </List>
-            </>
-          ) : null}
+          {companyHits.length ? companyList(companyHits, terms.company) : null}
           {questionHits.length ? (
-            <>
-              <SectionHeader title="Questions" />
+            <Section title="Questions">
               <List>
                 {questionHits.map((hit, index) => {
                   const meta = updateKinds[hit.update.kind];
@@ -140,7 +133,7 @@ export default function SearchScreen() {
                   );
                 })}
               </List>
-            </>
+            </Section>
           ) : null}
           {!companyHits.length && !questionHits.length ? (
             <Text variant="body" color={colors.textMuted} align="center" style={styles.empty}>
@@ -149,19 +142,7 @@ export default function SearchScreen() {
           ) : null}
         </>
       ) : (
-        <>
-          <SectionHeader title="Companies" />
-          <List>
-            {companies.map((item) => (
-              <Row
-                key={item.company}
-                title={<Text variant="headline">{item.company}</Text>}
-                subtitle={companyStats(item)}
-                onPress={() => openCompany(item.company)}
-              />
-            ))}
-          </List>
-        </>
+        companyList(companies)
       )}
     </Screen>
   );
@@ -254,7 +235,7 @@ function SearchInput({ icon, value, onChange, placeholder, suggestions, autoFocu
   );
 }
 
-// Full-width white list with hairline dividers, like the feed.
+// Rows with hairline dividers inside a Section, like the company page.
 function List({ children }: { children: ReactNode[] }) {
   return (
     <View style={styles.list}>
@@ -312,14 +293,20 @@ function Highlight({ text, query }: { text: string; query: string }) {
 const styles = StyleSheet.create({
   note: { marginTop: -spacing.md, marginBottom: spacing.sm },
   idle: { flex: 1, minHeight: 0 },
-  idleList: { paddingBottom: spacing.md },
-  // The two-field bar: white block, one field per line, hairline divider between.
-  bar: { paddingVertical: spacing.md, backgroundColor: colors.background },
-  fields: { backgroundColor: colors.surface, paddingHorizontal: spacing.lg, zIndex: 2 },
+  idleList: { gap: spacing.sm, paddingBottom: spacing.md },
+  // The two-field bar: a white block like the chat composer, one field per line.
+  bar: {
+    paddingHorizontal: layout.gutter,
+    backgroundColor: colors.surface,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
+  fields: { backgroundColor: colors.surface, paddingHorizontal: layout.gutter, zIndex: 2 },
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: spacing.xxxl + spacing.xl },
   input: { ...typography.headline, fontWeight: '400', flex: 1, height: '100%', color: colors.text },
   inputGroup: { position: 'relative' },
   focusedInputGroup: { zIndex: 10 },
+  // Suggestions drop in under the field as a flat list, like ComboField.
   suggestions: {
     position: 'absolute',
     top: '100%',
@@ -328,18 +315,16 @@ const styles = StyleSheet.create({
     zIndex: 20,
     elevation: 4,
     backgroundColor: colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
-    paddingVertical: spacing.xs,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  suggestion: { minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing.sm },
-  // Bleed past the gutter so the white list runs edge to edge like the feed.
-  list: { backgroundColor: colors.surface, marginHorizontal: -layout.gutter, paddingHorizontal: layout.gutter },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, minHeight: 60 },
+  suggestion: { minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing.sm, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+  list: { marginTop: -spacing.sm },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
   rowText: { flex: 1, gap: spacing.xxs },
   tile: { width: 40, height: 40, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   regular: { fontWeight: '400' },
-  empty: { marginTop: spacing.xxl },
-  people: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, marginTop: spacing.lg, minHeight: 44 },
+  empty: { paddingVertical: spacing.xxl },
+  people: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, paddingVertical: spacing.sm, minHeight: 44 },
   pressed: { opacity: 0.6 },
 });
