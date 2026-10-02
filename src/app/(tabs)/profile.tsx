@@ -10,12 +10,12 @@ import { colors, layout, spacing } from '@/constants/theme';
 import { useStore } from '@/data/store';
 
 const profileTabs = [
-  { label: 'History', value: 'history' },
   { label: 'Stats', value: 'stats' },
+  { label: 'History', value: 'history' },
 ] as const;
 
 export default function ProfileScreen() {
-  const [selectedTab, setSelectedTab] = useState<(typeof profileTabs)[number]['value']>('history');
+  const [selectedTab, setSelectedTab] = useState<(typeof profileTabs)[number]['value']>('stats');
   const { currentUser, updates, friendIds, toggleCongrats, commentsFor } = useStore();
   const mine = updates.filter((update) => update.userId === currentUser.id);
 
