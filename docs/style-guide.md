@@ -154,7 +154,9 @@ Import from `@/components/ui`.
 
 | Component | Use it for | Notes |
 | --- | --- | --- |
-| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. |
+| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style); pass a `TopBar` as `header`. |
+| `TopBar` | Fixed white header on a flush screen | Left and right slots and a centered `headline` title, like the feed header |
+| `Section` | Full-width white block on a flush screen | Optional `title`; the gray background shows between sections. No radius, border or shadow. |
 | `ScreenHeader` | Screen title | Optional `eyebrow` (label above the title) and a `right` slot for `IconButton`s |
 | `SectionHeader` | Titles inside a screen | Optional `action` (usually a small `Button`) |
 | `Text` | All text | See Typography |
@@ -192,7 +194,7 @@ These are deliberate. Keep new work consistent with them.
   No colored box, company mark or kind badge inside posts; the bold keyword carries the kind.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
 - **Search** (Uber "Where to?" style): a bordered `lg` box of stacked fields linked by a dot, line and square rail. A round "+" beside the box adds a field. Results are flat rows: an icon on the left, the title with the **matched text in bold**, a muted subtitle, and hairline dividers that start at the text column.
-- **Forms** (Share): question → option tiles → `Card` of fields (`ComboField` for open answers, `ChipGroup` for fixed options; and a second `Card` for a repeatable list, like interview questions) → one large primary button with a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
+- **Forms** (Share): feed style, not cards. A `TopBar` (close on the left, title centered), then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
 - **Lists** (Friends, Chats): rows inside a `flush` `Card`, separated by `Divider`s, with the avatar on the left and a single action or meta element on the right.
 
 ## 9. Interaction and accessibility
