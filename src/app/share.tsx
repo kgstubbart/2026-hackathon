@@ -119,7 +119,13 @@ export default function ShareScreen() {
           <ChipGroup options={terms} value={term} onChange={setTerm} />
         </View>
         <TextField label="Location (optional)" value={location} onChangeText={setLocation} placeholder="e.g. San Francisco, CA" />
-        <TextField label="Note (optional)" value={note} onChangeText={setNote} placeholder="Anything your friends should know?" multiline />
+        <TextField
+          label="Comment (optional)"
+          value={note}
+          onChangeText={setNote}
+          placeholder="Anything your friends should know?"
+          multiline
+        />
       </Card>
 
       <SectionHeader title="Who can see this" />

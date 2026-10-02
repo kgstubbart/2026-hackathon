@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar, CompanyMark, Icon, Text, type IconName } from '@/components/ui';
+import { Avatar, Icon, Text, type IconName } from '@/components/ui';
 import { colors, layout, radius, spacing, tones } from '@/constants/theme';
 import type { Update, User } from '@/data/mock-data';
-import { headlineFor, isCelebration, timeAgo, updateKinds } from '@/data/update-kinds';
+import { postSentence, timeAgo, updateKinds } from '@/data/update-kinds';
 
 export function KindBadge({ kind }: { kind: Update['kind'] }) {
   const meta = updateKinds[kind];
@@ -25,10 +25,9 @@ type UpdateCardProps = {
   preview?: boolean;
 };
 
-// Full-width feed post: LinkedIn-style author header and attachment, Threads-style action row.
+// Full-width feed post: LinkedIn-style author header, one-sentence post with optional comment, Threads-style action row.
 export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardProps) {
-  const tone = tones[updateKinds[update.kind].tone];
-  const celebrate = isCelebration(update.kind);
+  const [before, keyword, after] = postSentence(update);
 
   return (
     <View style={styles.post}>
@@ -52,21 +51,18 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
       </View>
 
       <View style={styles.content}>
-        <Text variant="headline">{headlineFor(update)}</Text>
-        {update.note ? <Text variant="body">{update.note}</Text> : null}
-      </View>
-
-      <View style={[styles.attachment, celebrate && { backgroundColor: tone.bg, borderColor: tone.bg }]}>
-        <CompanyMark company={update.company || '?'} size={40} />
-        <View style={styles.attachmentText}>
-          <Text variant="callout" style={styles.role} numberOfLines={1}>
-            {update.role || 'Internship role'}
+        <Text variant="headline" style={styles.sentence}>
+          {before}
+          <Text variant="headline" style={styles.keyword}>
+            {keyword}
           </Text>
-          <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
-            {[update.company, update.term, update.location].filter(Boolean).join(' · ')}
+          {after}
+        </Text>
+        {update.note ? (
+          <Text variant="body" color={colors.textMuted}>
+            {update.note}
           </Text>
-        </View>
-        <KindBadge kind={update.kind} />
+        ) : null}
       </View>
 
       {preview ? null : (
@@ -120,18 +116,8 @@ const styles = StyleSheet.create({
   author: { flex: 1 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   content: { gap: spacing.xs },
-  attachment: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-  },
-  attachmentText: { flex: 1, gap: 1 },
-  role: { fontWeight: '700' },
+  sentence: { fontWeight: '400' },
+  keyword: { fontWeight: '700' },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
