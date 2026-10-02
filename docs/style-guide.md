@@ -86,7 +86,7 @@ Always use `<Text variant="…">` from `@/components/ui`. It sets the size, line
 
 | Variant | Size / line | Weight | Use for |
 | --- | --- | --- | --- |
-| `display` | 32 / 38 | 800 | Screen titles (via `ScreenHeader`) and big stat numbers. One per screen. |
+| `display` | 32 / 38 | 800 | Big stat numbers only. Screen titles live in the `TopBar` as `headline`. |
 | `title` | 22 / 28 | 700 | Profile name, large card titles |
 | `headline` | 17 / 23 | 600 | Names, post headlines, section headers, list-row titles, button labels |
 | `body` | 15 / 21 | 400 | Notes, messages, paragraphs. This is the default. |
@@ -154,10 +154,9 @@ Import from `@/components/ui`.
 
 | Component | Use it for | Notes |
 | --- | --- | --- |
-| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style); pass a `TopBar` as `header`. |
-| `TopBar` | Fixed white header on a flush screen | Left and right slots and a centered `headline` title, like the feed header |
+| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style). Every screen except the feed passes a `TopBar` as `header`. |
+| `TopBar` | The header of every page except the feed | Left and right slots (`IconButton`s with `tone="muted"`, or an `Avatar`) and a centered `headline` title, matching the feed's bar. Counts go in the title after a middle dot ("Friends · 6"). |
 | `Section` | Full-width white block on a flush screen | Optional `title`; the gray background shows between sections. No radius, border or shadow. |
-| `ScreenHeader` | Screen title | Optional `eyebrow` (label above the title) and a `right` slot for `IconButton`s |
 | `SectionHeader` | Titles inside a screen | Optional `action` (usually a small `Button`) |
 | `Text` | All text | See Typography |
 | `Button` | Actions | `variant`: `primary` (one main action per screen), `secondary`, `outline`, `ghost`. `size`: `sm`, `md`, `lg`. Optional `icon`. |

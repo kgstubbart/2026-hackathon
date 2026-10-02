@@ -13,6 +13,7 @@
 - Streak: flame with consecutive-week count (Strava orange `colors.streak`) and Mon–Sun circles; a day is filled when the user logged an update that day.
 - Share lets the user log four things: application (company, position), interview (company, position, round, type: behavioral / technical / mixed, questions each with an optional difficulty; a question may be difficulty-only; difficulty only appears for technical or mixed interviews, never behavioral), takehome/OA (kind key `takehome`; company, position, OA or take-home, questions or task) and offer (company, position). Applications are never posted to the feed; they are private tracking that counts toward the streak. The other three always post to the feed. Company, position and round are `ComboField`s (suggestions appear only while typing, no dropdown arrow, any typed answer is accepted); the round count is open-ended (type any number) with a Final option. Type, format and difficulty are chip options; questions are plain text. For interviews the type chips come first, then company with a narrow round field beside it, then position. The page is laid out like the feed: a `TopBar`, then full-width white `Section`s with thin gaps, no rounded cards or bordered tiles; the kind picker is a flat tab-like row (icon over label, selected underlined in its tone). No audience picker and no preview on this page.
 - Chats (`/messages`) follows the feed layout: `TopBar` titled "Chats", a `Section` with the search field, and a full-width white conversation list with hairline dividers. Opening a chat swaps in a thread view: `TopBar` (back, name, avatar), message bubbles, and a white composer bar pinned to the bottom. No rounded cards.
+- Every page except the feed (which has the wordmark banner) uses the same fixed white `TopBar` header: centered `headline` title, muted `IconButton`s in the side slots (back, close, edit), counts in the title after a middle dot. No large display titles or eyebrows on pages.
 - Data is mock and in-memory (`src/data/mock-data.ts`, `src/data/store.tsx`); there is no backend yet.
 
 ## Design system
@@ -20,7 +21,7 @@
 Full rules live in `docs/style-guide.md`. Follow it for any UI work and update it when you add tokens, components or patterns.
 
 - All colors, type, spacing, radii and shadows come from `src/constants/theme.ts`. Never hardcode hex values, font sizes or spacing in screens; add a token instead.
-- Build screens from the kit in `src/components/ui/` (`Text`, `Button`, `IconButton`, `Chip`, `Card`, `Avatar`, `CompanyMark`, `TextField`, `ComboField`, `SearchField`, `Screen`, `ScreenHeader`, `SectionHeader`, `TopBar`, `Section`).
+- Build screens from the kit in `src/components/ui/` (`Text`, `Button`, `IconButton`, `Chip`, `Card`, `Avatar`, `CompanyMark`, `TextField`, `ComboField`, `SearchField`, `Screen`, `SectionHeader`, `TopBar`, `Section`).
 - Icons only via `<Icon name=… />` (`src/components/ui/icon.tsx`), which maps a name to SF Symbols (iOS) and Material Symbols (Android/web). Add new icons to that map; never use unicode glyphs or emoji as icons.
 - Update kinds (label, icon, tone color) are defined once in `src/data/update-kinds.ts`; reuse `KindBadge` for kind labels.
 - Primary color is indigo; each update kind has its own tone (sky, amber, teal, mint, primary, rose). Light mode only for now.
