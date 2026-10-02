@@ -29,7 +29,7 @@ type UpdateCardProps = {
   commentCount?: number;
   onCongrats?: () => void;
   preview?: boolean;
-  /** On the post's own page: show round/type/format and questions, and don't link to itself. */
+  /** On the post's own page: don't link to itself (the page shows details and questions in their own section). */
   detail?: boolean;
   /** Called after the post was deleted from its menu (e.g. to leave the post page). */
   onDeleted?: () => void;
@@ -42,7 +42,6 @@ export function UpdateCard({ update, author, commentCount, onCongrats, preview, 
   const [menuOpen, setMenuOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const sentence = postSentence(update);
-  const details = [update.round, update.interviewType, update.assessmentFormat].filter(Boolean).join(' · ');
   const open = () => router.navigate({ pathname: '/post/[id]', params: { id: update.id } });
   const canOpen = !preview && !detail;
   const openProfile = () =>
@@ -107,27 +106,6 @@ export function UpdateCard({ update, author, commentCount, onCongrats, preview, 
             {update.note}
           </Text>
         ) : null}
-        {detail ? (
-          <View style={styles.details}>
-            {details ? (
-              <Text variant="callout" color={colors.textMuted}>
-                {details}
-              </Text>
-            ) : null}
-            {update.questions?.map((question, index) => (
-              <View key={index} style={styles.question}>
-                <Text variant="body" style={styles.questionText}>
-                  {question.text || `${question.difficulty} question`}
-                </Text>
-                {question.text && question.difficulty ? (
-                  <Text variant="caption" color={colors.textMuted}>
-                    {question.difficulty}
-                  </Text>
-                ) : null}
-              </View>
-            ))}
-          </View>
-        ) : null}
       </Pressable>
 
       {preview ? null : (
@@ -181,8 +159,6 @@ function Action({ icon, label, count, active, onPress }: ActionProps) {
 }
 
 const styles = StyleSheet.create({
-  question: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
-  questionText: { flexShrink: 1 },
   post: {
     backgroundColor: colors.surface,
     paddingHorizontal: layout.gutter,
@@ -196,7 +172,6 @@ const styles = StyleSheet.create({
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   more: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
   content: { gap: spacing.xs },
-  details: { gap: spacing.xs, paddingTop: spacing.xs },
   sentence: { fontWeight: '400' },
   keyword: { fontWeight: '700' },
   badge: {

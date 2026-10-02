@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { Avatar, Button, Icon, IconButton, Screen, Section, Text, TopBar } from '@/components/ui';
+import { QuestionList } from '@/components/question-list';
 import { UpdateCard } from '@/components/update-card';
 import { colors, layout, radius, spacing, typography } from '@/constants/theme';
 import { useStore } from '@/data/store';
@@ -66,6 +67,7 @@ export default function PostScreen() {
             onCongrats={() => toggleCongrats(update.id)}
             onDeleted={back}
           />
+          {update.kind === 'interview' || update.kind === 'takehome' ? <QuestionList update={update} /> : null}
           {ownOffer ? (
             <Section title="Did you accept?">
               {accepted ? (
