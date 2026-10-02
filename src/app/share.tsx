@@ -4,19 +4,18 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
   Button,
-  Card,
   ChipGroup,
   ComboField,
   FieldLabel,
   Icon,
   IconButton,
   Screen,
-  ScreenHeader,
-  SectionHeader,
+  Section,
   Text,
   TextField,
+  TopBar,
 } from '@/components/ui';
-import { colors, radius, spacing, tones } from '@/constants/theme';
+import { colors, spacing, tones } from '@/constants/theme';
 import {
   assessmentFormats,
   companySuggestions,
@@ -97,45 +96,40 @@ export default function ShareScreen() {
   };
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
-      <ScreenHeader
-        eyebrow="New update"
-        title="Share your news"
-        right={<IconButton icon="close" label="Close" onPress={() => router.navigate('/')} />}
-      />
+    <Screen
+      flush
+      keyboardShouldPersistTaps="handled"
+      header={
+        <TopBar
+          title="New update"
+          left={<IconButton icon="close" label="Close" tone="muted" onPress={() => router.navigate('/')} />}
+        />
+      }>
+      <Section title="What happened?">
+        <View style={styles.kinds}>
+          {shareKinds.map((item) => {
+            const meta = updateKinds[item];
+            const tone = tones[meta.tone];
+            const selected = item === kind;
+            return (
+              <Pressable
+                key={item}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                onPress={() => setKind(item)}
+                style={({ pressed }) => [styles.kind, pressed && styles.pressed]}>
+                <Icon name={meta.icon} size={22} color={selected ? tone.fg : colors.textFaint} />
+                <Text variant="caption" color={selected ? colors.text : colors.textMuted} style={selected && styles.kindSelected}>
+                  {meta.label}
+                </Text>
+                <View style={[styles.kindLine, selected && { backgroundColor: tone.fg }]} />
+              </Pressable>
+            );
+          })}
+        </View>
+      </Section>
 
-      <Text variant="headline" style={styles.question}>
-        What happened?
-      </Text>
-      <View style={styles.kinds}>
-        {shareKinds.map((item) => {
-          const meta = updateKinds[item];
-          const tone = tones[meta.tone];
-          const selected = item === kind;
-          return (
-            <Pressable
-              key={item}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              onPress={() => setKind(item)}
-              style={({ pressed }) => [
-                styles.kind,
-                selected && { borderColor: tone.fg, backgroundColor: tone.bg },
-                pressed && styles.pressed,
-              ]}>
-              <View style={[styles.kindIcon, { backgroundColor: selected ? tone.fg : tone.bg }]}>
-                <Icon name={meta.icon} size={16} color={selected ? colors.onPrimary : tone.fg} />
-              </View>
-              <Text variant="callout" style={styles.kindLabel}>
-                {meta.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      <SectionHeader title="Details" />
-      <Card style={styles.form}>
+      <Section title="Details">
         <ComboField label="Company" value={company} onChangeText={setCompany} options={companies} placeholder="e.g. Stripe" />
         <ComboField
           label="Position"
@@ -168,64 +162,63 @@ export default function ShareScreen() {
             <ChipGroup options={assessmentFormats} value={format} onChange={toggle(format, setFormat)} />
           </View>
         ) : null}
-      </Card>
+      </Section>
 
       {hasQuestions ? (
-        <>
-          <SectionHeader title={kind === 'interview' ? 'Questions' : 'Questions or task'} />
-          <Card style={styles.form}>
-            {questions.map((item, index) => (
-              <View key={index} style={styles.group}>
-                <View style={styles.questionRow}>
-                  <View style={styles.questionInput}>
-                    <TextField
-                      value={item.text}
-                      onChangeText={(text) => editQuestion(index, { text })}
-                      placeholder={
-                        kind === 'assessment'
-                          ? 'e.g. LRU Cache, or build a rate limiter'
-                          : behavioral
-                            ? 'e.g. Tell me about a time you failed'
-                            : 'e.g. Two Sum, or a question they asked'
-                      }
-                      accessibilityLabel={`Question ${index + 1}`}
-                    />
-                  </View>
-                  {questions.length > 1 ? (
-                    <IconButton
-                      icon="trash"
-                      label={`Remove question ${index + 1}`}
-                      tone="plain"
-                      onPress={() => setQuestions((items) => items.filter((_, i) => i !== index))}
-                    />
-                  ) : null}
+        <Section title={kind === 'interview' ? 'Questions' : 'Questions or task'}>
+          {questions.map((item, index) => (
+            <View key={index} style={styles.group}>
+              <View style={styles.questionRow}>
+                <View style={styles.questionInput}>
+                  <TextField
+                    value={item.text}
+                    onChangeText={(text) => editQuestion(index, { text })}
+                    placeholder={
+                      kind === 'assessment'
+                        ? 'e.g. LRU Cache, or build a rate limiter'
+                        : behavioral
+                          ? 'e.g. Tell me about a time you failed'
+                          : 'e.g. Two Sum, or a question they asked'
+                    }
+                    accessibilityLabel={`Question ${index + 1}`}
+                  />
                 </View>
-                {hasDifficulty ? (
-                  <ChipGroup
-                    options={difficulties}
-                    value={item.difficulty}
-                    onChange={toggle(item.difficulty, (difficulty) => editQuestion(index, { difficulty }))}
+                {questions.length > 1 ? (
+                  <IconButton
+                    icon="trash"
+                    label={`Remove question ${index + 1}`}
+                    tone="plain"
+                    onPress={() => setQuestions((items) => items.filter((_, i) => i !== index))}
                   />
                 ) : null}
               </View>
-            ))}
+              {hasDifficulty ? (
+                <ChipGroup
+                  options={difficulties}
+                  value={item.difficulty}
+                  onChange={toggle(item.difficulty, (difficulty) => editQuestion(index, { difficulty }))}
+                />
+              ) : null}
+            </View>
+          ))}
+          <View style={styles.addRow}>
             <Button
               label="Add another"
               icon="plus"
-              variant="secondary"
+              variant="ghost"
               size="sm"
               onPress={() => setQuestions((items) => [...items, blankQuestion])}
             />
-            {hasDifficulty ? (
-              <Text variant="caption" color={colors.textFaint}>
-                Can&apos;t share the question? Just pick a difficulty.
-              </Text>
-            ) : null}
-          </Card>
-        </>
+          </View>
+          {hasDifficulty ? (
+            <Text variant="caption" color={colors.textFaint}>
+              Can&apos;t share the question? Just pick a difficulty.
+            </Text>
+          ) : null}
+        </Section>
       ) : null}
 
-      <View style={styles.submit}>
+      <Section>
         <Button
           label={isPrivate ? 'Log application' : 'Post to feed'}
           icon={isPrivate ? 'lock' : 'send'}
@@ -241,29 +234,17 @@ export default function ShareScreen() {
               ? 'Applications stay private and count toward your streak'
               : 'Your friends will see this on their feed'}
         </Text>
-      </View>
+      </Section>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  question: { marginBottom: spacing.md },
-  kinds: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  kind: {
-    flexGrow: 1,
-    flexBasis: '45%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm + 2,
-    padding: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  kindIcon: { width: 32, height: 32, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  kindLabel: { fontWeight: '700' },
-  form: { gap: spacing.lg },
+  // Flat, tab-like kind picker: icon over label, selected one underlined in its tone.
+  kinds: { flexDirection: 'row', marginHorizontal: -spacing.sm },
+  kind: { flex: 1, alignItems: 'center', gap: spacing.xs + 2, paddingTop: spacing.xs },
+  kindSelected: { fontWeight: '700' },
+  kindLine: { alignSelf: 'stretch', height: 2, marginTop: spacing.xs, backgroundColor: 'transparent' },
   group: { gap: spacing.sm },
   pair: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
   // Just wide enough for "Round 12"; the type chips take the rest of the row.
@@ -271,6 +252,6 @@ const styles = StyleSheet.create({
   type: { flex: 1 },
   questionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   questionInput: { flex: 1 },
-  submit: { gap: spacing.sm, marginTop: spacing.xxl },
-  pressed: { opacity: 0.75 },
+  addRow: { flexDirection: 'row' },
+  pressed: { opacity: 0.6 },
 });
