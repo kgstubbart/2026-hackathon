@@ -17,7 +17,7 @@ export function NavMenu() {
       <IconButton icon="menu" label="Menu" tone="muted" onPress={() => setOpen(true)} />
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable accessibilityLabel="Close menu" style={styles.backdrop} onPress={() => setOpen(false)}>
-          <View style={[styles.column, { paddingTop: topInset + spacing.sm + 48 }]}>
+          <View style={[styles.column, { paddingTop: topInset + spacing.md + 48 }]}>
             {/* Inner Pressable swallows taps so they don't close the menu. */}
             <Pressable style={styles.panel}>
               {pages.map((page) => {

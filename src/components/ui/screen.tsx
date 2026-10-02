@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Platform, ScrollView, StatusBar, StyleSheet, View, type ScrollViewProps } from 'react-native';
 import { initialWindowMetrics, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,13 +16,14 @@ type ScreenProps = PropsWithChildren<
   } & Pick<ScrollViewProps, 'keyboardShouldPersistTaps'>
 >;
 
-// Top inset that is never 0 on a phone: the live inset first, then the window's initial metrics (the first
-// frame can render before the provider measures), then a platform floor so a header never sits under the
-// status bar or the Dynamic Island.
+// Top inset that is never 0 on a phone: the largest of the live inset, the window's initial metrics (the
+// first frame can render before the provider measures), the status bar height expo-constants reports
+// (59pt on Dynamic Island phones) and a platform floor, so a header never sits under the status bar or
+// the Dynamic Island.
 export function useTopInset() {
   const insets = useSafeAreaInsets();
-  const fallback = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : Platform.OS === 'ios' ? 20 : 0;
-  return Math.max(insets.top, initialWindowMetrics?.insets.top ?? 0, fallback);
+  const floor = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : Platform.OS === 'ios' ? 20 : 0;
+  return Math.max(insets.top, initialWindowMetrics?.insets.top ?? 0, Constants.statusBarHeight ?? 0, floor);
 }
 
 export function Screen({ children, scroll = true, flush, header, keyboardShouldPersistTaps }: ScreenProps) {
@@ -60,7 +62,7 @@ export function Screen({ children, scroll = true, flush, header, keyboardShouldP
 export function TopBar({ title, left, right }: { title: ReactNode; left?: ReactNode; right?: ReactNode }) {
   const topInset = useTopInset();
   return (
-    <View style={[styles.topBar, { paddingTop: topInset + spacing.sm }]}>
+    <View style={[styles.topBar, { paddingTop: topInset + spacing.md }]}>
       <View style={[styles.column, styles.topRow]}>
         <View style={styles.topSide}>{left}</View>
         {typeof title === 'string' ? <Text variant="headline">{title}</Text> : title}
