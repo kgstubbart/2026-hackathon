@@ -24,6 +24,8 @@ const palette = {
   mintSoft: '#DCF4E8',
   rose: '#D6336C',
   roseSoft: '#FDE4EE',
+  teal: '#0E7490',
+  tealSoft: '#DDF3F7',
 
   // Streak
   flame: '#FC5200',
@@ -42,19 +44,21 @@ export const colors = {
   primaryDeep: palette.indigoDeep,
   primarySoft: palette.indigoSoft,
   onPrimary: palette.white,
+  scrim: 'rgba(21,20,26,0.18)',
   success: palette.mint,
   streak: palette.flame,
   streakSoft: palette.flameLight,
   ...palette,
 } as const;
 
-export type Tone = 'primary' | 'sky' | 'amber' | 'mint' | 'rose';
+export type Tone = 'primary' | 'sky' | 'amber' | 'mint' | 'rose' | 'teal';
 export const tones: Record<Tone, { fg: string; bg: string }> = {
   primary: { fg: palette.indigo, bg: palette.indigoSoft },
   sky: { fg: palette.sky, bg: palette.skySoft },
   amber: { fg: palette.amber, bg: palette.amberSoft },
   mint: { fg: palette.mint, bg: palette.mintSoft },
   rose: { fg: palette.rose, bg: palette.roseSoft },
+  teal: { fg: palette.teal, bg: palette.tealSoft },
 };
 
 export const spacing = { xxs: 2, xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, xxxl: 32 } as const;

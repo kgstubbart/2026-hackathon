@@ -25,7 +25,7 @@ Import colors with `import { colors, tones } from '@/constants/theme'`. Use the 
 
 | Token | Hex | Use for |
 | --- | --- | --- |
-| `colors.background` | `#F6F5F1` | Screen background (warm paper). Also the fill inside quiet containers on white, such as post attachments and muted icon buttons. |
+| `colors.background` | `#F6F5F1` | Screen background (warm paper). Also the fill inside quiet containers on white, such as muted icon buttons and the Search icon circle. |
 | `colors.surface` | `#FFFFFF` | Cards, posts, inputs, top and bottom bars |
 | `colors.surfaceMuted` | `#EEECE6` | Disabled or "missed" states (for example a missed streak day) |
 | `colors.border` | `#E6E3DC` | Every hairline border and divider |
@@ -48,8 +48,9 @@ Each kind of update has one tone. A tone is a pair: `fg` for icons and text, `bg
 
 | Kind | Tone | `fg` | `bg` | Icon |
 | --- | --- | --- | --- | --- |
-| Applied | `sky` | `#2563EB` | `#E5EDFF` | `send` |
+| Application | `sky` | `#2563EB` | `#E5EDFF` | `send` |
 | Interview | `amber` | `#B45309` | `#FDF0D5` | `calendar` |
+| Assessment | `teal` | `#0E7490` | `#DDF3F7` | `code` |
 | Offer | `mint` | `#0F8A5F` | `#DCF4E8` | `trophy` |
 | Accepted | `primary` | `#4F46E5` | `#ECEBFE` | `briefcase` |
 | Milestone | `rose` | `#D6336C` | `#FDE4EE` | `star` |
@@ -76,7 +77,7 @@ Orange means *streak*. Don't use it anywhere else.
 ### Rules
 
 - Text on white is `text`, `textMuted` or `textFaint`. Don't invent grays.
-- To tint the background on a highlighted state, use a tone's `bg`, never the `fg` at low opacity. (Offers and acceptances tint their post attachment with the tone's `bg`.)
+- To tint the background on a highlighted state, use a tone's `bg`, never the `fg` at low opacity.
 - Light mode only for now (`userInterfaceStyle: "light"` in `app.json`). Because everything goes through tokens, dark mode later only requires changing `theme.ts`.
 
 ## 3. Typography
@@ -129,11 +130,11 @@ Always use `<Text variant="…">` from `@/components/ui`. It sets the size, line
 | Element | Radius |
 | --- | --- |
 | Buttons, chips, search pill, badges | `pill` |
-| Inputs, attachments, option tiles, small icon tiles | `md` |
-| Cards, the Search field box, stat tiles | `lg` |
+| Inputs, option tiles, small icon tiles, menu items | `md` |
+| Cards, the Search field box, stat tiles, the feed menu | `lg` |
 
 - Borders are `StyleSheet.hairlineWidth` in `colors.border`. Use `1.5` only for selected or outlined states.
-- Shadows: `shadow.card` for floating cards, and `shadow.raised` for the main call to action (the large primary button and the center Share tab). Nothing else gets a shadow; feed posts and list rows are flat.
+- Shadows: `shadow.card` for floating cards and the feed menu, and `shadow.raised` for the main call to action (the large primary button and the center Share tab). Nothing else gets a shadow; feed posts and list rows are flat.
 
 ## 6. Icons
 
@@ -153,17 +154,20 @@ Import from `@/components/ui`.
 
 | Component | Use it for | Notes |
 | --- | --- | --- |
-| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. |
+| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style); pass a `TopBar` as `header`. |
+| `TopBar` | Fixed white header on a flush screen | Left and right slots and a centered `headline` title, like the feed header |
+| `Section` | Full-width white block on a flush screen | Optional `title`; the gray background shows between sections. No radius, border or shadow. |
 | `ScreenHeader` | Screen title | Optional `eyebrow` (label above the title) and a `right` slot for `IconButton`s |
 | `SectionHeader` | Titles inside a screen | Optional `action` (usually a small `Button`) |
 | `Text` | All text | See Typography |
 | `Button` | Actions | `variant`: `primary` (one main action per screen), `secondary`, `outline`, `ghost`. `size`: `sm`, `md`, `lg`. Optional `icon`. |
-| `IconButton` | Icon-only actions | Always pass `label` for accessibility. `tone`: `surface` (bordered white), `muted` (gray fill, used in the feed header), `plain`. |
-| `Chip` / `ChipGroup` | Single-choice pickers (term, stage) | Selected chip = dark fill. Not for filtering the feed; the feed has no filters. |
+| `IconButton` | Icon-only actions | Always pass `label` for accessibility. `tone`: `surface` (bordered white), `muted` (gray fill, used for the feed header's friends button), `plain`. |
+| `Chip` / `ChipGroup` | Single-choice pickers with a few fixed options (interview type, assessment format, difficulty) | Selected chip = dark fill. `wrap` for narrow columns, `compact` to squeeze a few options beside another field. Not for filtering the feed; the feed has no filters. |
 | `Card` / `Divider` | Grouped content | `flush` for lists of rows separated by `Divider` |
 | `Avatar` | People | Initials on the user's color. Optional `ring` color. |
 | `CompanyMark` | Companies | First letter on white, colored from the tones |
 | `TextField` / `FieldLabel` | Forms | `label` renders in the `label` variant above the input |
+| `ComboField` | Share form fields with many possible answers (company, position, round) | A text field that suggests matches under it while you type. No dropdown arrow, nothing shown until you type; a typed answer that matches nothing is kept as is. |
 | `SearchField` | Simple pill search | The Search tab uses its own Uber-style field box instead |
 
 App-level components:
@@ -178,15 +182,19 @@ App-level components:
 
 These are deliberate. Keep new work consistent with them.
 
-- **Feed:** a fixed white header bar (+ and search on the left, the centered `Wordmark`, chats and notifications on the right), then the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
+- **Feed:** a fixed white header bar with exactly three things: the menu (`NavMenu`) on the left, the centered `Wordmark`, and one friends `IconButton` on the right that opens `/friends`. Don't add more header buttons. Below it, the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
+- **Feed content:** only interviews, offers and accepted offers (`feedKinds` in `update-kinds.ts`). Applications and milestones never appear in the feed.
+- **Menu** (`src/components/nav-menu.tsx`): a dropdown below the header listing every page in `src/constants/pages.ts`, with the current page highlighted in `primarySoft`. When you add a page, add it to `pages.ts`; set `tab: true` only if it belongs in the tab bar.
 - **Feed posts** (LinkedIn and Threads style): full-width white sections, not floating rounded cards. From top to bottom:
   1. Author header: avatar, name, "major · school", "time · audience icon", and a `more` icon on the right.
-  2. Headline (`headline` variant) and an optional note (`body`).
-  3. Attachment box: `CompanyMark`, role, "company · term · location", and a `KindBadge`.
+  2. One sentence from `postSentence()`, in the `headline` variant at regular weight with only the kind in bold: "Got an **Interview** at {company} for the {role} position!", "Got an **Offer** from …", "**Accepted** an offer at …".
+  3. The poster's optional comment (`body`, `textMuted`).
   4. Action row: icons with counts (congrats, comment, send), with no text labels.
+
+  No colored box, company mark or kind badge inside posts; the bold keyword carries the kind.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
 - **Search** (Uber "Where to?" style): a bordered `lg` box of stacked fields linked by a dot, line and square rail. A round "+" beside the box adds a field. Results are flat rows: an icon on the left, the title with the **matched text in bold**, a muted subtitle, and hairline dividers that start at the text column.
-- **Forms** (Share): question → option tiles → `Card` of fields → audience options → live preview → one large primary button. Disable the button until required fields are filled, and say why underneath.
+- **Forms** (Share): feed style, not cards. A `TopBar` (close on the left, title centered), then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
 - **Lists** (Friends, Chats): rows inside a `flush` `Card`, separated by `Divider`s, with the avatar on the left and a single action or meta element on the right.
 
 ## 9. Interaction and accessibility
