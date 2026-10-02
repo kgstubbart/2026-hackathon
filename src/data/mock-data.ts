@@ -63,7 +63,7 @@ export const seasonStats = {
 };
 
 export const users: User[] = [
-  { id: 'alex', name: 'Alex Morgan', initials: 'AM', color: '#6C63FF', school: 'Brigham Young University', major: 'Computer Science', gradYear: 2028, location: 'Ann Arbor, MI' },
+  { id: 'alex', name: 'Alex Morgan', initials: 'AM', color: '#6C63FF', school: 'Brigham Young University', major: 'Computer Science', gradYear: 2028, location: 'Provo, UT' },
   { id: 'maya', name: 'Maya Chen', initials: 'MC', color: '#F28C6B', school: 'UC Berkeley', major: 'Cognitive Science', gradYear: 2028, location: 'Berkeley, CA' },
   { id: 'jordan', name: 'Jordan Ellis', initials: 'JE', color: '#3FA98C', school: 'Georgia Tech', major: 'Computer Engineering', gradYear: 2027, location: 'Atlanta, GA' },
   { id: 'priya', name: 'Priya Shah', initials: 'PS', color: '#9B7BE0', school: 'NYU Stern', major: 'Finance', gradYear: 2027, location: 'New York, NY' },
