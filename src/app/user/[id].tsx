@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { CardCollection } from '@/components/card-collection';
 import { ProfileIdentity } from '@/components/profile-identity';
 import { Button, IconButton, Screen, Text, TopBar } from '@/components/ui';
 import { UpdateCard } from '@/components/update-card';
@@ -97,7 +98,12 @@ export default function UserScreen() {
       </View>
 
       {isFriend ? (
-        <View style={styles.history}>
+        <>
+          <CardCollection
+            updates={updates.filter((update) => update.userId === user.id)}
+            emptyText={`${firstName} hasn't collected any cards yet.`}
+          />
+          <View style={styles.history}>
           {shared.length ? (
             shared.map((update) => (
               <UpdateCard
@@ -113,7 +119,8 @@ export default function UserScreen() {
               {firstName} hasn&apos;t shared anything yet.
             </Text>
           )}
-        </View>
+          </View>
+        </>
       ) : (
         <Text variant="body" color={colors.textMuted} align="center" style={styles.empty}>
           Add {firstName} as a friend to see their updates.

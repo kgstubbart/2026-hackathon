@@ -175,6 +175,7 @@ App-level components:
 | Component | Where |
 | --- | --- |
 | `UpdateCard`, `KindBadge` | [`src/components/update-card.tsx`](../src/components/update-card.tsx): the feed post and the kind pill. Reuse `KindBadge` anywhere you label an update kind. |
+| `CardCollection` | [`src/components/card-collection.tsx`](../src/components/card-collection.tsx): "Card collection" header and the grid of company trading cards (one per company applied to, tap opens the company page). Used by Profile's Stats tab and friends' profiles. |
 | `ProfileIdentity` | [`src/components/profile-identity.tsx`](../src/components/profile-identity.tsx): avatar, name, school, location and counts block shared by Profile and `/user/[id]`. |
 | `PostMenu`, `SendSheet` | [`src/components/post-menu.tsx`](../src/components/post-menu.tsx), [`src/components/send-sheet.tsx`](../src/components/send-sheet.tsx): the post's `more` menu and the "Send to" friend picker, both built on `Sheet`. |
 | `SharedPostBubble` | [`src/components/shared-post-bubble.tsx`](../src/components/shared-post-bubble.tsx): a message that carries an `updateId`, rendered as a compact post preview inside the chat bubble. |
