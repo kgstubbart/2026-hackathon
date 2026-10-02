@@ -8,3 +8,4 @@ export { Icon, type IconName } from './icon';
 export { Screen, Section, SectionHeader, TopBar } from './screen';
 export { SegmentedControl } from './segmented-control';
 export { Text } from './text';
+export { Sheet } from './sheet';

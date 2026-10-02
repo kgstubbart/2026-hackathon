@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Fragment } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { CompanyMark, Divider, Icon, IconButton, Screen, Section, Text, TopBar } from '@/components/ui';
+import { Divider, Icon, IconButton, Screen, Section, Text, TopBar } from '@/components/ui';
 import { colors, radius, spacing, tones } from '@/constants/theme';
 import type { Update } from '@/data/mock-data';
 import { companyStats, experienceLabel, groupByPosition, isExperience, summarizeCompanies } from '@/data/repository';
@@ -14,20 +14,15 @@ const back = () => (router.canGoBack() ? router.back() : router.navigate('/searc
 // One company in the repository: its positions, and under each the shared interviews, OAs and offers.
 export default function CompanyScreen() {
   const { company } = useLocalSearchParams<{ company: string }>();
-  const { updates, getUser } = useStore();
-  const experiences = updates.filter((update) => isExperience(update) && update.company === company);
+  const { updates, getUser, friendIds, currentUser } = useStore();
+  const circle = [...friendIds, currentUser.id];
+  const experiences = updates.filter((update) => isExperience(update, circle) && update.company === company);
   const summary = summarizeCompanies(experiences)[0];
 
   return (
     <Screen
       flush
-      header={
-        <TopBar
-          title={company ?? 'Company'}
-          left={<IconButton icon="back" label="Back" tone="muted" onPress={back} />}
-          right={<CompanyMark company={company ?? '?'} size={36} />}
-        />
-      }>
+      header={<TopBar title={company ?? 'Company'} left={<IconButton icon="back" label="Back" tone="muted" onPress={back} />} />}>
 
       {summary ? (
         groupByPosition(experiences).map((group) => (
