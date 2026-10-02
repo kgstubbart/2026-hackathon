@@ -1,4 +1,5 @@
-import { Fragment, useRef, useState, type ReactNode } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { Fragment, useCallback, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { KindBadge, UpdateCard } from '@/components/update-card';
@@ -28,6 +29,16 @@ export default function SearchScreen() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<SearchMode>('posts');
   const [searchActive, setSearchActive] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      setCompany('');
+      setJobTitle('');
+      setOpenId(null);
+      setMode('posts');
+      setSearchActive(false);
+    }, []),
+  );
 
   const friendPosts = updates.filter((update) => friendIds.includes(update.userId) && update.visibility === 'friends');
   const terms = { company: company.trim().toLowerCase(), jobTitle: jobTitle.trim().toLowerCase() };
