@@ -14,6 +14,8 @@
 
 ## Design system
 
+Full rules live in `docs/style-guide.md`. Follow it for any UI work and update it when you add tokens, components or patterns.
+
 - All colors, type, spacing, radii and shadows come from `src/constants/theme.ts`. Never hardcode hex values, font sizes or spacing in screens; add a token instead.
 - Build screens from the kit in `src/components/ui/` (`Text`, `Button`, `IconButton`, `Chip`, `Card`, `Avatar`, `CompanyMark`, `TextField`, `SearchField`, `Screen`, `ScreenHeader`, `SectionHeader`).
 - Icons only via `<Icon name=… />` (`src/components/ui/icon.tsx`), which maps a name to SF Symbols (iOS) and Material Symbols (Android/web). Add new icons to that map; never use unicode glyphs or emoji as icons.

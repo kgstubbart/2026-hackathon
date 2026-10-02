@@ -13,6 +13,10 @@ npx expo start
 
 From the dev server, press `i` for the iOS simulator, `a` for the Android emulator, `w` for web, or scan the QR code with [Expo Go](https://expo.dev/go).
 
+## Style guide
+
+UI conventions (colors, type, spacing, icons, components, screen patterns) are in [docs/style-guide.md](docs/style-guide.md).
+
 ## Scripts
 
 - `npm run ios` / `npm run android` / `npm run web` — start on a specific platform
