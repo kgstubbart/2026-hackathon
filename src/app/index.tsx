@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { NavMenu } from '@/components/nav-menu';
 import { StreakCard } from '@/components/streak-card';
 import { IconButton } from '@/components/ui';
 import { UpdateCard } from '@/components/update-card';
@@ -9,7 +10,7 @@ import { Wordmark } from '@/components/wordmark';
 import { colors, layout, spacing } from '@/constants/theme';
 import { currentStreakWeeks } from '@/data/mock-data';
 import { useStore } from '@/data/store';
-import { isPrivateKind } from '@/data/update-kinds';
+import { feedKinds } from '@/data/update-kinds';
 
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
@@ -18,7 +19,7 @@ export default function FeedScreen() {
   const mine = updates.filter((update) => update.userId === currentUser.id);
   const feed = updates.filter(
     (update) =>
-      !isPrivateKind(update.kind) &&
+      feedKinds.includes(update.kind) &&
       (update.userId === currentUser.id || (friendIds.includes(update.userId) && update.visibility === 'friends')),
   );
 
@@ -27,13 +28,11 @@ export default function FeedScreen() {
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
         <View style={[styles.column, styles.topRow]}>
           <View style={styles.side}>
-            <IconButton icon="plus" label="Share an update" tone="muted" onPress={() => router.navigate('/share')} />
-            <IconButton icon="search" label="Search" tone="muted" onPress={() => router.navigate('/search')} />
+            <NavMenu />
           </View>
           <Wordmark />
           <View style={[styles.side, styles.sideRight]}>
-            <IconButton icon="chat" label="Chats" tone="muted" onPress={() => router.navigate('/messages')} />
-            <IconButton icon="bell" label="Notifications" tone="muted" badge />
+            <IconButton icon="friends" label="Friends" tone="muted" onPress={() => router.navigate('/friends')} />
           </View>
         </View>
       </View>
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg },
-  side: { flexDirection: 'row', gap: spacing.sm, flex: 1 },
+  side: { flexDirection: 'row', flex: 1 },
   sideRight: { justifyContent: 'flex-end' },
   content: { paddingBottom: spacing.xxl },
   stack: { gap: spacing.sm },

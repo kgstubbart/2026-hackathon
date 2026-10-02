@@ -18,7 +18,28 @@ export const shareKinds = ['applied', 'interview', 'assessment', 'offer'] as con
 // Applications never reach the feed; they only feed personal tracking and the streak.
 export const isPrivateKind = (kind: UpdateKind) => kind === 'applied';
 
-export const isCelebration = (kind: UpdateKind) => kind === 'offer' || kind === 'accepted';
+// Only these kinds appear in the feed; applications and milestones stay on the poster's profile.
+export const feedKinds: UpdateKind[] = ['interview', 'assessment', 'offer', 'accepted'];
+
+// Feed post sentence split around the bolded keyword, e.g. "Got an **Interview** at Stripe for the SWE Intern position!"
+export function postSentence(update: Pick<Update, 'kind' | 'company' | 'role' | 'title'>): [string, string, string] {
+  const company = update.company || 'a company';
+  const role = update.role || 'intern';
+  switch (update.kind) {
+    case 'interview':
+      return ['Got an ', 'Interview', ` at ${company} for the ${role} position!`];
+    case 'assessment':
+      return ['Got an ', 'Assessment', ` from ${company} for the ${role} position!`];
+    case 'offer':
+      return ['Got an ', 'Offer', ` from ${company} for the ${role} position!`];
+    case 'accepted':
+      return ['', 'Accepted', ` an offer at ${company} for the ${role} position!`];
+    case 'applied':
+      return ['', 'Applied', ` to ${company} for the ${role} position!`];
+    case 'milestone':
+      return ['Hit a ', 'Milestone', ` at ${company}${update.title ? `: ${update.title}` : '!'}`];
+  }
+}
 
 export function headlineFor(update: Pick<Update, 'kind' | 'company' | 'stage' | 'round' | 'assessmentFormat' | 'title'>) {
   const company = update.company || 'a company';

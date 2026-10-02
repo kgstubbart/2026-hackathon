@@ -1,19 +1,13 @@
-import type { Href } from 'expo-router';
 import { TabList, TabSlot, TabTrigger, Tabs, type TabTriggerSlotProps } from 'expo-router/ui';
 import type { PropsWithChildren } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, Text, type IconName } from '@/components/ui';
+import { pages } from '@/constants/pages';
 import { colors, radius, shadow, spacing } from '@/constants/theme';
 
-const tabs: { name: string; href: Href; icon: IconName; label: string }[] = [
-  { name: 'index', href: '/', icon: 'home', label: 'Feed' },
-  { name: 'search', href: '/search', icon: 'search', label: 'Search' },
-  { name: 'share', href: '/share', icon: 'plus', label: 'Share' },
-  { name: 'messages', href: '/messages', icon: 'chat', label: 'Chats' },
-  { name: 'profile', href: '/profile', icon: 'profile', label: 'Profile' },
-];
+const tabs = pages.filter((page) => page.tab);
 
 export default function AppTabs() {
   return (

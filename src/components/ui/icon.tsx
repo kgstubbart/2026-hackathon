@@ -38,6 +38,7 @@ const icons = {
   code: ['chevron.left.forwardslash.chevron.right', 'code'],
   trash: ['trash', 'delete'],
   chevronDown: ['chevron.down', 'expand_more'],
+  menu: ['line.3.horizontal', 'menu'],
 } satisfies Record<string, [SFSymbol, AndroidSymbol]>;
 
 export type IconName = keyof typeof icons;
