@@ -209,7 +209,7 @@ function SearchInput({ value, onChange, placeholder, suggestions, autoFocus }: S
     : [];
 
   return (
-    <View style={styles.inputGroup}>
+    <View style={[styles.inputGroup, focused && styles.focusedInputGroup]}>
       <View style={styles.inputRow}>
         <TextInput
           value={value}
@@ -304,6 +304,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
     paddingLeft: spacing.lg,
+    zIndex: 2,
   },
   rail: { alignItems: 'center', paddingVertical: spacing.lg, width: MARKER },
   dot: { width: MARKER, height: MARKER, borderRadius: MARKER / 2, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
@@ -315,7 +316,8 @@ const styles = StyleSheet.create({
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: spacing.xxxl + spacing.xl, paddingRight: spacing.lg },
   input: { ...typography.headline, fontWeight: '400', flex: 1, height: '100%', color: colors.text, outlineColor: 'transparent' },
   inputGroup: { position: 'relative' },
-  results: { marginTop: spacing.lg },
+  focusedInputGroup: { zIndex: 10 },
+  results: { marginTop: spacing.lg, zIndex: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
   rowIcon: { width: spacing.xxxl + spacing.md, height: spacing.xxxl + spacing.md, alignItems: 'center', justifyContent: 'center' },
   rowIconCircle: { borderRadius: radius.pill, backgroundColor: colors.background },
@@ -330,8 +332,17 @@ const styles = StyleSheet.create({
   },
   regular: { fontWeight: '400' },
   suggestions: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: spacing.lg,
+    zIndex: 20,
+    elevation: 4,
+    backgroundColor: colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    borderRadius: radius.md,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
     paddingVertical: spacing.xs,
   },
   suggestion: {
