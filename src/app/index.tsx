@@ -1,98 +1,11 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityCard, Heading, Screen } from '@/components/job-hunt-ui';
+import { theme } from '@/constants/theme';
+import { useJobHunt } from '@/data/job-hunt-store';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
+export default function FeedScreen() {
+  const { activities } = useJobHunt();
+  return <Screen><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}><Heading eyebrow="Friday, October 2" title="Momentum" action="♧" /><View style={styles.goal}><View style={styles.ring}><Text style={styles.ringNumber}>72%</Text><Text style={styles.ringText}>weekly</Text></View><View style={{ flex: 1 }}><Text style={styles.streak}>♨  8 day streak</Text><Text style={styles.goalTitle}>Two more moves to hit your weekly goal.</Text><View style={styles.metrics}><Metric value="5" label="Applications" /><Metric value="2" label="Interviews" /><Metric value="3" label="Connections" /></View></View></View><View style={styles.feedTitle}><Text style={styles.sectionTitle}>Your network is moving</Text><Text style={styles.following}>Following</Text></View>{activities.filter((item) => item.visibility === 'friends').slice(0, 9).map((activity) => <ActivityCard key={activity.id} activity={activity} />)}</ScrollView></Screen>;
 }
-
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-});
+function Metric({ value, label }: { value: string; label: string }) { return <View><Text style={styles.metricValue}>{value}</Text><Text style={styles.metricLabel}>{label}</Text></View>; }
+const styles = StyleSheet.create({ content: { paddingBottom: 26 }, goal: { backgroundColor: theme.colors.navy, marginHorizontal: theme.spacing.xl, padding: theme.spacing.xl, borderRadius: 40, flexDirection: 'row', gap: 24, marginBottom: 24 }, ring: { width: 112, height: 112, borderRadius: 56, borderWidth: 13, borderColor: '#fff', alignItems: 'center', justifyContent: 'center' }, ringNumber: { color: '#fff', fontSize: 28, fontWeight: '800' }, ringText: { color: '#BEC9EB', fontSize: 16, fontWeight: '600' }, streak: { color: '#fff', fontSize: 17, marginBottom: 14 }, goalTitle: { color: '#fff', fontSize: 25, lineHeight: 30, letterSpacing: -0.4 }, metrics: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }, metricValue: { color: '#fff', fontSize: 25, fontWeight: '800' }, metricLabel: { color: '#BEC9EB', fontSize: 13 }, feedTitle: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: theme.spacing.xl, marginBottom: 16, alignItems: 'center' }, sectionTitle: { color: theme.colors.ink, fontSize: 25, letterSpacing: -0.5 }, following: { color: theme.colors.blue, fontSize: 17 } });
