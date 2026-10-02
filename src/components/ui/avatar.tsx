@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { colors, radius } from '@/constants/theme';
+import { colors, radius, tones } from '@/constants/theme';
 import type { User } from '@/data/mock-data';
 import { Text } from './text';
 
@@ -16,7 +16,7 @@ export function Avatar({ user, size = 44, ring }: { user: User; size?: number; r
   return <View style={[styles.center, styles.ring, { borderRadius: size, borderColor: ring }]}>{circle}</View>;
 }
 
-const markColors = ['#4F46E5', '#0F8A5F', '#B45309', '#D6336C', '#2563EB', '#7C3AED', '#0E7490'];
+const markColors = Object.values(tones).map((tone) => tone.fg);
 
 export function CompanyMark({ company, size = 40 }: { company: string; size?: number }) {
   const hash = [...company].reduce((sum, char) => sum + char.charCodeAt(0), 0);
