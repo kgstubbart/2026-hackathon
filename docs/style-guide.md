@@ -182,7 +182,8 @@ App-level components:
 
 These are deliberate. Keep new work consistent with them.
 
-- **Feed:** a fixed white header bar with exactly three things: the menu (`NavMenu`) on the left, the centered `Wordmark`, and one friends `IconButton` on the right that opens `/friends`. Don't add more header buttons. Below it, the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
+- **App header** (`AppHeader`): a fixed white bar with exactly three things: the menu (`NavMenu`) on the left, the centered `Wordmark`, and one friends `IconButton` on the right that opens `/friends`. Don't add more header buttons. Every main page uses it: pass `header={<AppHeader />}` to `Screen`, and keep the page's own `ScreenHeader` title below it. The only exception is Share, a task flow that uses a plain `TopBar` with a close button.
+- **Feed:** the `AppHeader`, then the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
 - **Feed content:** only interviews, offers and accepted offers (`feedKinds` in `update-kinds.ts`). Applications and milestones never appear in the feed.
 - **Menu** (`src/components/nav-menu.tsx`): a dropdown below the header listing every page in `src/constants/pages.ts`, with the current page highlighted in `primarySoft`. When you add a page, add it to `pages.ts`; set `tab: true` only if it belongs in the tab bar.
 - **Feed posts** (LinkedIn and Threads style): full-width white sections, not floating rounded cards. From top to bottom:
