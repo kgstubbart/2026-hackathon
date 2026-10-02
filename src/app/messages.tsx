@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Avatar, Divider, Icon, IconButton, Screen, SearchField, Section, Text, TopBar } from '@/components/ui';
+import { Avatar, Divider, HeaderBlock, Icon, IconButton, Screen, ScreenHeader, SearchField, Section, Text } from '@/components/ui';
 import { colors, layout, radius, spacing, typography } from '@/constants/theme';
 import { conversations, type Conversation, type Message } from '@/data/mock-data';
 import { useStore } from '@/data/store';
@@ -37,7 +37,10 @@ export default function MessagesScreen() {
   );
 
   return (
-    <Screen flush keyboardShouldPersistTaps="handled" header={<TopBar title={unread ? `Chats · ${unread} unread` : 'Chats'} />}>
+    <Screen flush keyboardShouldPersistTaps="handled">
+      <HeaderBlock>
+        <ScreenHeader eyebrow={unread ? `${unread} unread` : 'All caught up'} title="Chats" />
+      </HeaderBlock>
       <Section>
         <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
       </Section>
@@ -115,16 +118,15 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
   };
 
   return (
-    <Screen
-      flush
-      scroll={false}
-      header={
-        <TopBar
+    <Screen flush scroll={false}>
+      <HeaderBlock>
+        <ScreenHeader
+          eyebrow={user.school}
           title={user.name}
-          left={<IconButton icon="back" label="Back" tone="muted" onPress={onBack} />}
-          right={<Avatar user={user} size={36} />}
+          left={<IconButton icon="back" label="Back" onPress={onBack} />}
+          right={<Avatar user={user} size={40} />}
         />
-      }>
+      </HeaderBlock>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
 
         <ScrollView style={styles.flex} contentContainerStyle={styles.messages} showsVerticalScrollIndicator={false}>

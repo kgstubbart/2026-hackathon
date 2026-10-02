@@ -13,7 +13,8 @@ import {
   Section,
   Text,
   TextField,
-  TopBar,
+  HeaderBlock,
+  ScreenHeader,
 } from "@/components/ui";
 import { colors, spacing, tones } from "@/constants/theme";
 import {
@@ -116,23 +117,20 @@ export default function ShareScreen() {
   };
 
   return (
-    <Screen
-      flush
-      keyboardShouldPersistTaps="handled"
-      header={
-        <TopBar
-          title="New update"
-          left={
+    <Screen flush keyboardShouldPersistTaps="handled">
+      <HeaderBlock>
+        <ScreenHeader
+          eyebrow="New update"
+          title="Share"
+          right={
             <IconButton
               icon="close"
               label="Close"
-              tone="muted"
               onPress={() => router.navigate("/")}
             />
           }
         />
-      }
-    >
+      </HeaderBlock>
       <Section title="What happened?">
         <View style={styles.kinds}>
           {shareKinds.map((item) => {

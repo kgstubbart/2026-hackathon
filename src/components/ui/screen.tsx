@@ -10,54 +10,37 @@ type ScreenProps = PropsWithChildren<
     scroll?: boolean;
     /** Feed-style: no side gutter, children are full-width `Section`s separated by thin gaps. */
     flush?: boolean;
-    /** Rendered above the scrolling content, pinned to the top (use `TopBar`). */
-    header?: ReactNode;
   } & Pick<ScrollViewProps, 'keyboardShouldPersistTaps'>
 >;
 
-export function Screen({ children, scroll = true, flush, header, keyboardShouldPersistTaps }: ScreenProps) {
+export function Screen({ children, scroll = true, flush, keyboardShouldPersistTaps }: ScreenProps) {
   const insets = useSafeAreaInsets();
-  const top = header ? 0 : Math.max(insets.top, spacing.lg);
+  const top = Math.max(insets.top, spacing.lg);
   const column = [styles.column, flush ? styles.flush : styles.gutter];
 
   if (!scroll) {
     return (
-      <View style={styles.screen}>
-        {header}
-        <View style={[styles.screen, { paddingTop: top }]}>
-          <View style={column}>{children}</View>
-        </View>
+      <View style={[styles.screen, { paddingTop: top }]}>
+        <View style={column}>{children}</View>
       </View>
     );
   }
 
   return (
-    <View style={styles.screen}>
-      {header}
-      <ScrollView
-        style={styles.screen}
-        contentContainerStyle={[styles.content, { paddingTop: top }]}
-        keyboardShouldPersistTaps={keyboardShouldPersistTaps}
-        automaticallyAdjustKeyboardInsets
-        showsVerticalScrollIndicator={false}>
-        <View style={column}>{children}</View>
-      </ScrollView>
-    </View>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={[styles.content, { paddingTop: top }]}
+      keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+      automaticallyAdjustKeyboardInsets
+      showsVerticalScrollIndicator={false}>
+      <View style={column}>{children}</View>
+    </ScrollView>
   );
 }
 
-// Fixed white bar at the top of a flush screen, like the feed header: a slot on each side and a title in the middle.
-export function TopBar({ title, left, right }: { title: string; left?: ReactNode; right?: ReactNode }) {
-  const insets = useSafeAreaInsets();
-  return (
-    <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
-      <View style={[styles.column, styles.topRow]}>
-        <View style={styles.topSide}>{left}</View>
-        <Text variant="headline">{title}</Text>
-        <View style={[styles.topSide, styles.topSideRight]}>{right}</View>
-      </View>
-    </View>
-  );
+// Gutter-padded wrapper so a `ScreenHeader` can sit above the sections of a flush screen.
+export function HeaderBlock({ children }: PropsWithChildren) {
+  return <View style={styles.headerBlock}>{children}</View>;
 }
 
 // Full-width white block inside a flush screen; the gray background shows through the gaps between sections.
@@ -70,9 +53,20 @@ export function Section({ title, children }: PropsWithChildren<{ title?: string 
   );
 }
 
-export function ScreenHeader({ eyebrow, title, right }: { eyebrow?: string; title: string; right?: ReactNode }) {
+export function ScreenHeader({
+  eyebrow,
+  title,
+  left,
+  right,
+}: {
+  eyebrow?: string;
+  title: string;
+  left?: ReactNode;
+  right?: ReactNode;
+}) {
   return (
     <View style={styles.header}>
+      {left ? <View style={styles.headerLeft}>{left}</View> : null}
       <View style={styles.headerText}>
         {eyebrow ? (
           <Text variant="label" color={colors.textFaint}>
@@ -101,15 +95,7 @@ const styles = StyleSheet.create({
   column: { flex: 1, width: '100%', maxWidth: layout.maxContentWidth, alignSelf: 'center' },
   gutter: { paddingHorizontal: layout.gutter },
   flush: { gap: spacing.sm },
-  topBar: {
-    backgroundColor: colors.surface,
-    paddingBottom: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-  },
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg },
-  topSide: { flexDirection: 'row', gap: spacing.sm, flex: 1 },
-  topSideRight: { justifyContent: 'flex-end' },
+  headerBlock: { paddingHorizontal: layout.gutter },
   sectionBlock: {
     backgroundColor: colors.surface,
     paddingHorizontal: layout.gutter,
@@ -117,6 +103,7 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   header: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.md, paddingTop: spacing.sm, paddingBottom: spacing.xl },
+  headerLeft: { alignSelf: 'center' },
   headerText: { flex: 1, gap: spacing.xs },
   headerRight: { flexDirection: 'row', gap: spacing.sm },
   section: {

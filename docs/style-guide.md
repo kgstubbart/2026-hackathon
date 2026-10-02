@@ -154,10 +154,10 @@ Import from `@/components/ui`.
 
 | Component | Use it for | Notes |
 | --- | --- | --- |
-| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style); pass a `TopBar` as `header`. |
-| `TopBar` | Fixed white header on a flush screen | Left and right slots and a centered `headline` title, like the feed header |
+| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style); put the `ScreenHeader` in a `HeaderBlock` first. |
+| `HeaderBlock` | The header of a flush screen | Gutter-padded wrapper so the `ScreenHeader` lines up with the other pages |
 | `Section` | Full-width white block on a flush screen | Optional `title`; the gray background shows between sections. No radius, border or shadow. |
-| `ScreenHeader` | Screen title | Optional `eyebrow` (label above the title) and a `right` slot for `IconButton`s |
+| `ScreenHeader` | The header of every page except the feed | Optional `eyebrow` (label above the title), a `left` slot (back button) and a `right` slot for `IconButton`s or an `Avatar` |
 | `SectionHeader` | Titles inside a screen | Optional `action` (usually a small `Button`) |
 | `Text` | All text | See Typography |
 | `Button` | Actions | `variant`: `primary` (one main action per screen), `secondary`, `outline`, `ghost`. `size`: `sm`, `md`, `lg`. Optional `icon`. |
@@ -194,8 +194,8 @@ These are deliberate. Keep new work consistent with them.
   No colored box, company mark or kind badge inside posts; the bold keyword carries the kind.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
 - **Search** (Uber "Where to?" style): a bordered `lg` box of stacked fields linked by a dot, line and square rail. A round "+" beside the box adds a field. Results are flat rows: an icon on the left, the title with the **matched text in bold**, a muted subtitle, and hairline dividers that start at the text column.
-- **Forms** (Share): feed style, not cards. A `TopBar` (close on the left, title centered), then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
-- **Lists** (Friends, Chats): rows separated by `Divider`s, with the avatar on the left and a single action or meta element on the right. Chats is feed style: a `TopBar`, a `Section` holding the search field, then a full-width white list (no card). A chat thread has the person's name in the `TopBar` with back on the left, bubbles over the gray background, and a white composer bar with a hairline top border.
+- **Forms** (Share): feed style, not cards. The `ScreenHeader` (close on the right) in a `HeaderBlock`, then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
+- **Lists** (Friends, Chats): rows separated by `Divider`s, with the avatar on the left and a single action or meta element on the right. Chats is feed style: the `ScreenHeader` in a `HeaderBlock`, a `Section` holding the search field, then a full-width white list (no card). A chat thread's `ScreenHeader` has back on the left, the person's name and school, and their avatar on the right; bubbles over the gray background, and a white composer bar with a hairline top border.
 
 ## 9. Interaction and accessibility
 
