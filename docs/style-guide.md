@@ -29,7 +29,7 @@ Import colors with `import { colors, tones } from '@/constants/theme'`. Use the 
 | `colors.surface` | `#FFFFFF` | Cards, posts, inputs, top and bottom bars |
 | `colors.surfaceMuted` | `#EEECE6` | Disabled or "missed" states (for example a missed streak day) |
 | `colors.border` | `#E6E3DC` | Every hairline border and divider |
-| `colors.text` | `#15141A` | Primary text and icons. Also the selected-chip fill and the bold outlines in Search. |
+| `colors.text` | `#15141A` | Primary text and icons. Also the selected-chip fill. |
 | `colors.textMuted` | `#5D5B66` | Secondary text: subtitles, meta, notes |
 | `colors.textFaint` | `#9C9AA5` | Tertiary text: placeholders, timestamps, field labels, inactive tab icons |
 
@@ -167,7 +167,7 @@ Import from `@/components/ui`.
 | `CompanyMark` | Companies | First letter on white, colored from the tones |
 | `TextField` / `FieldLabel` | Forms | `label` renders in the `label` variant above the input |
 | `ComboField` | Share form fields with many possible answers (company, position, round) | A text field that suggests matches under it while you type. No dropdown arrow, nothing shown until you type; a typed answer that matches nothing is kept as is. |
-| `SearchField` | Simple pill search | The Search tab uses its own Uber-style field box instead |
+| `SearchField` | Pill search on Search, Chats and Friends | |
 
 App-level components:
 
@@ -194,7 +194,8 @@ These are deliberate. Keep new work consistent with them.
   No colored box, company mark or kind badge inside posts; the bold words carry the kind, company and role. Nothing else shows in the feed: tapping the post body or the comment icon opens the post page.
 - **Post page** (`/post/[id]`): a `TopBar` titled "Post" with back on the left, then the same post rendered with `detail` (adds the round, type or format line and the question list under the comment), then a "Comments · n" `Section` of rows (32pt avatar, bold name, time, body) and a white composer bar pinned to the bottom like the chat thread.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
-- **Search** (Uber "Where to?" style): a bordered `lg` box of stacked fields linked by a dot, line and square rail. A round "+" beside the box adds a field. Results are flat rows: an icon on the left, the title with the **matched text in bold**, a muted subtitle, and hairline dividers that start at the text column.
+- **Search** (repository): the `AppHeader`, then a `SearchField`, then flat full-width white lists with hairline dividers (40pt `CompanyMark` or tone icon tile on the left, `headline` title with the matched text in bold, muted `caption` subtitle, a `forward` chevron on the right). Idle shows every company; a query shows Companies, Positions and Questions sections.
+- **Company page**: a `TopBar` with back on the left, the company name as title and its `CompanyMark` on the right, then a `Section` per position whose rows show the experience label, its questions and "author · time".
 - **Forms** (Share): feed style, not cards. A `TopBar` (close on the left, title centered), then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
 - **Lists** (Friends, Chats): rows separated by `Divider`s, with the avatar on the left and a single action or meta element on the right. Chats is feed style: the `AppHeader`, a `Section` holding the search field, then a full-width white list (no card). A chat thread keeps the `AppHeader` and adds a white thread bar (back, avatar, name, school) with a hairline bottom border, bubbles over the gray background, and a white composer bar with a hairline top border.
 
