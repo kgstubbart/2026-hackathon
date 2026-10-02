@@ -66,9 +66,9 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
           {update.questions.map((question, index) => (
             <View key={index} style={styles.question}>
               <Text variant="body" style={styles.questionText}>
-                {question.text}
+                {question.text || `${question.difficulty} question`}
               </Text>
-              {question.difficulty ? (
+              {question.text && question.difficulty ? (
                 <Text variant="caption" color={colors.textMuted}>
                   {question.difficulty}
                 </Text>
