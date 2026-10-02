@@ -2,8 +2,7 @@ import { router } from 'expo-router';
 import { Fragment, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { AppHeader } from '@/components/app-header';
-import { Avatar, Button, Card, Divider, IconButton, Screen, SearchField, SectionHeader, Text } from '@/components/ui';
+import { Avatar, Button, Card, Divider, IconButton, Screen, ScreenHeader, SearchField, SectionHeader, Text } from '@/components/ui';
 import { colors, spacing } from '@/constants/theme';
 import type { User } from '@/data/mock-data';
 import { useStore } from '@/data/store';
@@ -24,7 +23,8 @@ export default function FriendsScreen() {
   const latestFor = (id: string) => updates.find((update) => update.userId === id && update.visibility === 'friends');
 
   return (
-    <Screen keyboardShouldPersistTaps="handled" header={<AppHeader />}>
+    <Screen keyboardShouldPersistTaps="handled">
+      <ScreenHeader title="Friends" />
       <SearchField value={query} onChangeText={setQuery} placeholder="Search by name or school" />
 
       {requests.length ? (

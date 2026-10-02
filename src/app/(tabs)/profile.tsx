@@ -2,10 +2,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AppHeader } from '@/components/app-header';
 import { ProfileIdentity } from '@/components/profile-identity';
 import { ProfileStats } from '@/components/profile-stats';
-import { IconButton, Screen, SegmentedControl, Text } from '@/components/ui';
+import { IconButton, Screen, ScreenHeader, SegmentedControl, Text } from '@/components/ui';
 import { UpdateCard } from '@/components/update-card';
 import { colors, layout, spacing } from '@/constants/theme';
 import { useStore } from '@/data/store';
@@ -21,7 +20,8 @@ export default function ProfileScreen() {
   const mine = updates.filter((update) => update.userId === currentUser.id);
 
   return (
-    <Screen header={<AppHeader />}>
+    <Screen>
+      <ScreenHeader title="Profile" />
       <ProfileIdentity
         user={currentUser}
         action={<IconButton icon="edit" label="Edit profile" onPress={() => router.navigate('/edit-profile')} />}
