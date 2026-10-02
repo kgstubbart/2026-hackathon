@@ -14,10 +14,12 @@ type ComboFieldProps = Omit<TextInputProps, 'value' | 'onChangeText'> & {
   value: string;
   onChangeText: (value: string) => void;
   options: readonly string[];
+  /** Tighter horizontal padding for a narrow field. */
+  compact?: boolean;
 };
 
 // Text field that suggests matches as you type: pick one, or keep whatever you typed.
-export function ComboField({ label, value, onChangeText, options, onFocus, onBlur, ...props }: ComboFieldProps) {
+export function ComboField({ label, value, onChangeText, options, compact, onFocus, onBlur, ...props }: ComboFieldProps) {
   const [open, setOpen] = useState(false);
   const input = useRef<TextInput>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -42,7 +44,7 @@ export function ComboField({ label, value, onChangeText, options, onFocus, onBlu
   return (
     <View style={styles.field}>
       {label ? <FieldLabel>{label}</FieldLabel> : null}
-      <View style={styles.box}>
+      <View style={[styles.box, compact && styles.boxCompact]}>
         <TextInput
           ref={input}
           placeholderTextColor={colors.textFaint}
@@ -95,6 +97,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
+  boxCompact: { paddingHorizontal: spacing.md },
   input: { ...typography.body, flex: 1, color: colors.text, minHeight: 48 },
   menu: {
     borderRadius: radius.md,
