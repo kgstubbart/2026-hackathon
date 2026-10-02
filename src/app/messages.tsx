@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Avatar, Divider, HeaderBlock, Icon, IconButton, Screen, ScreenHeader, SearchField, Text } from '@/components/ui';
+import { Avatar, Divider, HeaderBlock, Icon, IconButton, Screen, ScreenHeader, SearchField, Section, Text } from '@/components/ui';
 import { colors, layout, radius, spacing, typography } from '@/constants/theme';
 import { conversations, type Conversation, type Message } from '@/data/mock-data';
 import { useStore } from '@/data/store';
@@ -31,6 +31,7 @@ export default function MessagesScreen() {
     );
   }
 
+  const unread = conversations.reduce((sum, conversation) => sum + unreadFor(conversation), 0);
   const visible = conversations.filter((conversation) =>
     getUser(conversation.userId).name.toLowerCase().includes(query.trim().toLowerCase()),
   );
@@ -38,9 +39,11 @@ export default function MessagesScreen() {
   return (
     <Screen flush keyboardShouldPersistTaps="handled">
       <HeaderBlock>
-        <ScreenHeader title="Chats" />
-        <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
+        <ScreenHeader eyebrow={unread ? `${unread} unread` : 'All caught up'} title="Chats" />
       </HeaderBlock>
+      <Section>
+        <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
+      </Section>
       <View style={styles.list}>
         {visible.map((conversation, index) => {
           const user = getUser(conversation.userId);
@@ -118,6 +121,7 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
     <Screen flush scroll={false}>
       <HeaderBlock>
         <ScreenHeader
+          eyebrow={user.school}
           title={user.name}
           left={<IconButton icon="back" label="Back" onPress={onBack} />}
           right={<Avatar user={user} size={40} />}
