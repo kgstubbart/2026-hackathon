@@ -1,6 +1,6 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { router } from "expo-router";
+import { useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import {
   Button,
@@ -14,8 +14,8 @@ import {
   Text,
   TextField,
   TopBar,
-} from '@/components/ui';
-import { colors, spacing, tones } from '@/constants/theme';
+} from "@/components/ui";
+import { colors, spacing, tones } from "@/constants/theme";
 import {
   assessmentFormats,
   companySuggestions,
@@ -25,17 +25,19 @@ import {
   interviewTypes,
   positionSuggestions,
   type Question,
-} from '@/data/mock-data';
-import { useStore, type NewUpdate } from '@/data/store';
-import { isPrivateKind, shareKinds, updateKinds } from '@/data/update-kinds';
+} from "@/data/mock-data";
+import { useStore, type NewUpdate } from "@/data/store";
+import { isPrivateKind, shareKinds, updateKinds } from "@/data/update-kinds";
 
 type ShareKind = (typeof shareKinds)[number];
 type DraftQuestion = { text: string; difficulty: string };
 
-const blankQuestion: DraftQuestion = { text: '', difficulty: '' };
+const blankQuestion: DraftQuestion = { text: "", difficulty: "" };
 
 // Tapping the selected option again clears it.
-const toggle = (current: string, set: (value: string) => void) => (next: string) => set(next === current ? '' : next);
+const toggle =
+  (current: string, set: (value: string) => void) => (next: string) =>
+    set(next === current ? "" : next);
 
 const unique = (items: string[]) => [...new Set(items.filter(Boolean))];
 
@@ -47,27 +49,36 @@ function roundOptions(value: string) {
 
 export default function ShareScreen() {
   const { addUpdate, updates } = useStore();
-  const [kind, setKind] = useState<ShareKind>('interview');
-  const [company, setCompany] = useState('');
-  const [position, setPosition] = useState('');
-  const [round, setRound] = useState('');
-  const [interviewType, setInterviewType] = useState('');
-  const [format, setFormat] = useState('');
+  const [kind, setKind] = useState<ShareKind>("interview");
+  const [company, setCompany] = useState("");
+  const [position, setPosition] = useState("");
+  const [round, setRound] = useState("");
+  const [interviewType, setInterviewType] = useState("");
+  const [format, setFormat] = useState("");
   const [questions, setQuestions] = useState<DraftQuestion[]>([blankQuestion]);
 
   const isPrivate = isPrivateKind(kind);
-  const hasQuestions = kind === 'interview' || kind === 'assessment';
+  const hasQuestions = kind === "interview" || kind === "takehome";
   const typeKey = interviewType.trim().toLowerCase();
-  const behavioral = typeKey === 'behavioral';
+  const behavioral = typeKey === "behavioral";
   // Difficulty is a coding-question thing: only technical or mixed interviews ask for it, never behavioral.
-  const hasDifficulty = kind === 'interview' && (typeKey === 'technical' || typeKey === 'mixed');
+  const hasDifficulty =
+    kind === "interview" && (typeKey === "technical" || typeKey === "mixed");
 
-  const companies = unique([...updates.map((update) => update.company), ...companySuggestions]);
-  const positions = unique([...updates.map((update) => update.role), ...positionSuggestions]);
+  const companies = unique([
+    ...updates.map((update) => update.company),
+    ...companySuggestions,
+  ]);
+  const positions = unique([
+    ...updates.map((update) => update.role),
+    ...positionSuggestions,
+  ]);
   const canShare = company.trim().length > 0 && position.trim().length > 0;
 
   const editQuestion = (index: number, patch: Partial<DraftQuestion>) =>
-    setQuestions((items) => items.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+    setQuestions((items) =>
+      items.map((item, i) => (i === index ? { ...item, ...patch } : item)),
+    );
 
   const share = () => {
     if (!canShare) return;
@@ -78,22 +89,30 @@ export default function ShareScreen() {
         difficulty: (hasDifficulty && question.difficulty.trim()) || undefined,
       }))
       .filter((question) => question.text || question.difficulty);
-    const update: NewUpdate = { kind, company: company.trim(), role: position.trim() };
-    if (kind === 'interview') {
+    const update: NewUpdate = {
+      kind,
+      company: company.trim(),
+      role: position.trim(),
+    };
+    if (kind === "interview") {
       // A bare number typed without picking the suggestion still reads as a round.
-      update.round = (/^\d+$/.test(round.trim()) ? `Round ${Number(round)}` : round.trim()) || undefined;
+      update.round =
+        (/^\d+$/.test(round.trim())
+          ? `Round ${Number(round)}`
+          : round.trim()) || undefined;
       update.interviewType = interviewType.trim() || undefined;
     }
-    if (kind === 'assessment') update.assessmentFormat = format.trim() || undefined;
+    if (kind === "takehome")
+      update.assessmentFormat = format.trim() || undefined;
     if (hasQuestions && filled.length) update.questions = filled;
     addUpdate(update);
-    setCompany('');
-    setPosition('');
-    setRound('');
-    setInterviewType('');
-    setFormat('');
+    setCompany("");
+    setPosition("");
+    setRound("");
+    setInterviewType("");
+    setFormat("");
     setQuestions([blankQuestion]);
-    router.navigate(isPrivate ? '/profile' : '/');
+    router.navigate(isPrivate ? "/profile" : "/");
   };
 
   return (
@@ -103,9 +122,17 @@ export default function ShareScreen() {
       header={
         <TopBar
           title="New update"
-          left={<IconButton icon="close" label="Close" tone="muted" onPress={() => router.navigate('/')} />}
+          left={
+            <IconButton
+              icon="close"
+              label="Close"
+              tone="muted"
+              onPress={() => router.navigate("/")}
+            />
+          }
         />
-      }>
+      }
+    >
       <Section title="What happened?">
         <View style={styles.kinds}>
           {shareKinds.map((item) => {
@@ -118,12 +145,29 @@ export default function ShareScreen() {
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 onPress={() => setKind(item)}
-                style={({ pressed }) => [styles.kind, pressed && styles.pressed]}>
-                <Icon name={meta.icon} size={22} color={selected ? tone.fg : colors.textFaint} />
-                <Text variant="caption" color={selected ? colors.text : colors.textMuted} style={selected && styles.kindSelected}>
+                style={({ pressed }) => [
+                  styles.kind,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Icon
+                  name={meta.icon}
+                  size={22}
+                  color={selected ? tone.fg : colors.textFaint}
+                />
+                <Text
+                  variant="caption"
+                  color={selected ? colors.text : colors.textMuted}
+                  style={selected && styles.kindSelected}
+                >
                   {meta.label}
                 </Text>
-                <View style={[styles.kindLine, selected && { backgroundColor: tone.fg }]} />
+                <View
+                  style={[
+                    styles.kindLine,
+                    selected && { backgroundColor: tone.fg },
+                  ]}
+                />
               </Pressable>
             );
           })}
@@ -131,10 +175,14 @@ export default function ShareScreen() {
       </Section>
 
       <Section title="Details">
-        {kind === 'interview' ? (
+        {kind === "interview" ? (
           <View style={styles.group}>
             <FieldLabel>Type</FieldLabel>
-            <ChipGroup options={interviewTypes} value={interviewType} onChange={toggle(interviewType, setInterviewType)} />
+            <ChipGroup
+              options={interviewTypes}
+              value={interviewType}
+              onChange={toggle(interviewType, setInterviewType)}
+            />
           </View>
         ) : null}
         <View style={styles.pair}>
@@ -147,7 +195,7 @@ export default function ShareScreen() {
               placeholder="e.g. Stripe"
             />
           </View>
-          {kind === 'interview' ? (
+          {kind === "interview" ? (
             <View style={styles.round}>
               <ComboField
                 compact
@@ -167,16 +215,22 @@ export default function ShareScreen() {
           options={positions}
           placeholder="e.g. Software Engineering Intern"
         />
-        {kind === 'assessment' ? (
+        {kind === "takehome" ? (
           <View style={styles.group}>
             <FieldLabel>Format</FieldLabel>
-            <ChipGroup options={assessmentFormats} value={format} onChange={toggle(format, setFormat)} />
+            <ChipGroup
+              options={assessmentFormats}
+              value={format}
+              onChange={toggle(format, setFormat)}
+            />
           </View>
         ) : null}
       </Section>
 
       {hasQuestions ? (
-        <Section title={kind === 'interview' ? 'Questions' : 'Questions or task'}>
+        <Section
+          title={kind === "interview" ? "Questions" : "Questions or task"}
+        >
           {questions.map((item, index) => (
             <View key={index} style={styles.group}>
               <View style={styles.questionRow}>
@@ -185,11 +239,11 @@ export default function ShareScreen() {
                     value={item.text}
                     onChangeText={(text) => editQuestion(index, { text })}
                     placeholder={
-                      kind === 'assessment'
-                        ? 'e.g. LRU Cache, or build a rate limiter'
+                      kind === "takehome"
+                        ? "e.g. LRU Cache, or build a rate limiter"
                         : behavioral
-                          ? 'e.g. Tell me about a time you failed'
-                          : 'e.g. Two Sum, or a question they asked'
+                          ? "e.g. Tell me about a time you failed"
+                          : "e.g. Two Sum, or a question they asked"
                     }
                     accessibilityLabel={`Question ${index + 1}`}
                   />
@@ -199,7 +253,11 @@ export default function ShareScreen() {
                     icon="trash"
                     label={`Remove question ${index + 1}`}
                     tone="plain"
-                    onPress={() => setQuestions((items) => items.filter((_, i) => i !== index))}
+                    onPress={() =>
+                      setQuestions((items) =>
+                        items.filter((_, i) => i !== index),
+                      )
+                    }
                   />
                 ) : null}
               </View>
@@ -207,7 +265,9 @@ export default function ShareScreen() {
                 <ChipGroup
                   options={difficulties}
                   value={item.difficulty}
-                  onChange={toggle(item.difficulty, (difficulty) => editQuestion(index, { difficulty }))}
+                  onChange={toggle(item.difficulty, (difficulty) =>
+                    editQuestion(index, { difficulty }),
+                  )}
                 />
               ) : null}
             </View>
@@ -231,8 +291,8 @@ export default function ShareScreen() {
 
       <Section>
         <Button
-          label={isPrivate ? 'Log application' : 'Post to feed'}
-          icon={isPrivate ? 'lock' : 'send'}
+          label={isPrivate ? "Log application" : "Post to feed"}
+          icon={isPrivate ? "lock" : "send"}
           size="lg"
           fullWidth
           disabled={!canShare}
@@ -240,10 +300,10 @@ export default function ShareScreen() {
         />
         <Text variant="caption" color={colors.textFaint} align="center">
           {!canShare
-            ? 'Add a company and position to continue'
+            ? "Add a company and position to continue"
             : isPrivate
-              ? 'Applications stay private and count toward your streak'
-              : 'Your friends will see this on their feed'}
+              ? "Applications stay private and count toward your streak"
+              : "Your friends will see this on their feed"}
         </Text>
       </Section>
     </Screen>
@@ -252,17 +312,27 @@ export default function ShareScreen() {
 
 const styles = StyleSheet.create({
   // Flat, tab-like kind picker: icon over label, selected one underlined in its tone.
-  kinds: { flexDirection: 'row', marginHorizontal: -spacing.sm },
-  kind: { flex: 1, alignItems: 'center', gap: spacing.xs + 2, paddingTop: spacing.xs },
-  kindSelected: { fontWeight: '700' },
-  kindLine: { alignSelf: 'stretch', height: 2, marginTop: spacing.xs, backgroundColor: 'transparent' },
+  kinds: { flexDirection: "row", marginHorizontal: -spacing.sm },
+  kind: {
+    flex: 1,
+    alignItems: "center",
+    gap: spacing.xs + 2,
+    paddingTop: spacing.xs,
+  },
+  kindSelected: { fontWeight: "700" },
+  kindLine: {
+    alignSelf: "stretch",
+    height: 2,
+    marginTop: spacing.xs,
+    backgroundColor: "transparent",
+  },
   group: { gap: spacing.sm },
-  pair: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  pair: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
   grow: { flex: 1 },
   // Just wide enough for "Round 12"; company takes the rest of the row.
   round: { width: 92 },
-  questionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  questionRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   questionInput: { flex: 1 },
-  addRow: { flexDirection: 'row' },
+  addRow: { flexDirection: "row" },
   pressed: { opacity: 0.6 },
 });

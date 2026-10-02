@@ -50,7 +50,7 @@ Each kind of update has one tone. A tone is a pair: `fg` for icons and text, `bg
 | --- | --- | --- | --- | --- |
 | Application | `sky` | `#2563EB` | `#E5EDFF` | `send` |
 | Interview | `amber` | `#B45309` | `#FDF0D5` | `calendar` |
-| Assessment | `teal` | `#0E7490` | `#DDF3F7` | `code` |
+| Takehome/OA (`takehome`) | `teal` | `#0E7490` | `#DDF3F7` | `code` |
 | Offer | `mint` | `#0F8A5F` | `#DCF4E8` | `trophy` |
 | Accepted | `primary` | `#4F46E5` | `#ECEBFE` | `briefcase` |
 | Milestone | `rose` | `#D6336C` | `#FDE4EE` | `star` |
@@ -162,7 +162,7 @@ Import from `@/components/ui`.
 | `Text` | All text | See Typography |
 | `Button` | Actions | `variant`: `primary` (one main action per screen), `secondary`, `outline`, `ghost`. `size`: `sm`, `md`, `lg`. Optional `icon`. |
 | `IconButton` | Icon-only actions | Always pass `label` for accessibility. `tone`: `surface` (bordered white), `muted` (gray fill, used for the feed header's friends button), `plain`. |
-| `Chip` / `ChipGroup` | Single-choice pickers with a few fixed options (interview type, assessment format, difficulty) | Selected chip = dark fill. `wrap` for narrow columns, `compact` to squeeze a few options beside another field. Not for filtering the feed; the feed has no filters. |
+| `Chip` / `ChipGroup` | Single-choice pickers with a few fixed options (interview type, OA or take-home, difficulty) | Selected chip = dark fill. `wrap` for narrow columns, `compact` to squeeze a few options beside another field. Not for filtering the feed; the feed has no filters. |
 | `Card` / `Divider` | Grouped content | `flush` for lists of rows separated by `Divider` |
 | `Avatar` | People | Initials on the user's color. Optional `ring` color. |
 | `CompanyMark` | Companies | First letter on white, colored from the tones |

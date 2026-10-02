@@ -5,31 +5,38 @@ import type { Update, UpdateKind } from './mock-data';
 export const updateKinds: Record<UpdateKind, { label: string; icon: IconName; tone: Tone }> = {
   applied: { label: 'Application', icon: 'send', tone: 'sky' },
   interview: { label: 'Interview', icon: 'calendar', tone: 'amber' },
-  assessment: { label: 'Assessment', icon: 'code', tone: 'teal' },
+  takehome: { label: 'Takehome/OA', icon: 'code', tone: 'teal' },
   offer: { label: 'Offer', icon: 'trophy', tone: 'mint' },
   accepted: { label: 'Accepted', icon: 'briefcase', tone: 'primary' },
   milestone: { label: 'Milestone', icon: 'star', tone: 'rose' },
 };
 
-export const updateKindOrder: UpdateKind[] = ['applied', 'interview', 'assessment', 'offer', 'accepted', 'milestone'];
+export const updateKindOrder: UpdateKind[] = ['applied', 'interview', 'takehome', 'offer', 'accepted', 'milestone'];
 // Kinds a user can log from the Share tab.
-export const shareKinds = ['applied', 'interview', 'assessment', 'offer'] as const satisfies readonly UpdateKind[];
+export const shareKinds = ['applied', 'interview', 'takehome', 'offer'] as const satisfies readonly UpdateKind[];
 
 // Applications never reach the feed; they only feed personal tracking and the streak.
 export const isPrivateKind = (kind: UpdateKind) => kind === 'applied';
 
 // Only these kinds appear in the feed; applications and milestones stay on the poster's profile.
-export const feedKinds: UpdateKind[] = ['interview', 'assessment', 'offer', 'accepted'];
+export const feedKinds: UpdateKind[] = ['interview', 'takehome', 'offer', 'accepted'];
 
 // Feed post sentence split around the bolded keyword, e.g. "Got an **Interview** at Stripe for the SWE Intern position!"
-export function postSentence(update: Pick<Update, 'kind' | 'company' | 'role' | 'title'>): [string, string, string] {
+export function postSentence(
+  update: Pick<Update, 'kind' | 'company' | 'role' | 'title' | 'assessmentFormat'>,
+): [string, string, string] {
   const company = update.company || 'a company';
   const role = update.role || 'intern';
   switch (update.kind) {
     case 'interview':
       return ['Got an ', 'Interview', ` at ${company} for the ${role} position!`];
-    case 'assessment':
-      return ['Got an ', 'Assessment', ` from ${company} for the ${role} position!`];
+    case 'takehome':
+      // Use the format when known: "Got an OA…" / "Got a Take-home…".
+      return [
+        update.assessmentFormat === 'Take-home' ? 'Got a ' : 'Got an ',
+        update.assessmentFormat || 'OA',
+        ` from ${company} for the ${role} position!`,
+      ];
     case 'offer':
       return ['Got an ', 'Offer', ` from ${company} for the ${role} position!`];
     case 'accepted':
@@ -49,8 +56,8 @@ export function headlineFor(update: Pick<Update, 'kind' | 'company' | 'stage' | 
     case 'interview':
       if (update.stage) return `${update.stage} at ${company}`;
       return `${update.round ? `${update.round} interview` : 'Interview'} at ${company}`;
-    case 'assessment':
-      return `${update.assessmentFormat ? `${update.assessmentFormat} assessment` : 'Assessment'} for ${company}`;
+    case 'takehome':
+      return `${update.assessmentFormat || 'Takehome/OA'} from ${company}`;
     case 'offer':
       return `Got an offer from ${company}`;
     case 'accepted':

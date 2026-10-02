@@ -1,4 +1,4 @@
-export type UpdateKind = 'applied' | 'interview' | 'assessment' | 'offer' | 'accepted' | 'milestone';
+export type UpdateKind = 'applied' | 'interview' | 'takehome' | 'offer' | 'accepted' | 'milestone';
 export type Visibility = 'friends' | 'private';
 // Either part can be left out: someone may share only the difficulty, or only the question.
 export type Question = { text?: string; difficulty?: string };
@@ -66,7 +66,7 @@ export const initialUpdates: Update[] = [
   { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: 'Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14, comments: 4 },
   { id: 'u3', userId: 'maya', kind: 'accepted', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', location: 'San Francisco, CA', note: 'Signed! Who else is going to be in SF this summer?', createdAt: minutesAgo(130), visibility: 'friends', congrats: 67, comments: 19 },
   { id: 'u4', userId: 'theo', kind: 'applied', company: 'Spotify', role: 'Data Analyst Intern', term: 'Summer 2027', note: 'Number 14 this week. Keeping the streak alive.', createdAt: minutesAgo(240), visibility: 'private', congrats: 0, comments: 0 },
-  { id: 'u12', userId: 'sam', kind: 'assessment', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'Timed', questions: [{ text: 'LRU Cache' }, { text: 'Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7, comments: 1 },
+  { id: 'u12', userId: 'sam', kind: 'takehome', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'OA', questions: [{ text: 'LRU Cache' }, { text: 'Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7, comments: 1 },
   { id: 'u5', userId: 'lena', kind: 'milestone', company: 'Microsoft', role: 'UX Research Intern', term: 'Fall 2026', title: 'Wrapped my first research study', note: 'Presented findings to the Teams org. Terrified and thrilled.', createdAt: minutesAgo(410), visibility: 'friends', congrats: 29, comments: 6 },
   { id: 'u6', userId: 'sam', kind: 'interview', company: 'Duolingo', role: 'Machine Learning Intern', term: 'Summer 2027', stage: 'Phone screen', createdAt: minutesAgo(600), visibility: 'friends', congrats: 11, comments: 2 },
   { id: 'u7', userId: 'alex', kind: 'interview', company: 'Airbnb', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Technical interview', note: 'Graph problem went well. Fingers crossed.', createdAt: minutesAgo(900), visibility: 'friends', congrats: 16, comments: 3 },
@@ -114,7 +114,7 @@ export const conversations: Conversation[] = [
 export const finalRound = 'Final';
 export const interviewRounds = ['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Round 5', finalRound];
 export const interviewTypes = ['Behavioral', 'Technical', 'Mixed'];
-export const assessmentFormats = ['Timed', 'Take-home'];
+export const assessmentFormats = ['OA', 'Take-home'];
 export const difficulties = ['Easy', 'Medium', 'Hard'];
 export const companySuggestions = ['Airbnb', 'Amazon', 'Apple', 'Datadog', 'Duolingo', 'Figma', 'Goldman Sachs', 'Google', 'Meta', 'Microsoft', 'Notion', 'Ramp', 'Spotify', 'Stripe'];
 export const positionSuggestions = ['Software Engineering Intern', 'Machine Learning Intern', 'Data Science Intern', 'Data Analyst Intern', 'Product Design Intern', 'Product Management Intern', 'UX Research Intern', 'Summer Analyst'];
