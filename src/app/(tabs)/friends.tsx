@@ -1,15 +1,15 @@
+import { router } from 'expo-router';
 import { Fragment, useState, type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
-import { KindBadge } from '@/components/update-card';
-import { Avatar, Button, Card, Divider, Screen, SearchField, SectionHeader, Text } from '@/components/ui';
+import { Avatar, Button, Card, Divider, IconButton, Screen, SearchField, SectionHeader, Text } from '@/components/ui';
 import { colors, spacing } from '@/constants/theme';
 import type { User } from '@/data/mock-data';
 import { useStore } from '@/data/store';
 
 export default function FriendsScreen() {
-  const { users, currentUser, updates, friendIds, requestIds, toggleFriend, acceptRequest } = useStore();
+  const { users, currentUser, updates, friendIds, requestIds, toggleFriend, acceptRequest, declineRequest } = useStore();
   const [query, setQuery] = useState('');
 
   const others = users.filter((user) => user.id !== currentUser.id);
@@ -34,7 +34,12 @@ export default function FriendsScreen() {
               key={user.id}
               user={user}
               subtitle={user.school}
-              action={<Button label="Accept" size="sm" onPress={() => acceptRequest(user.id)} />}
+              action={
+                <>
+                  <IconButton icon="close" label="Decline" tone="muted" onPress={() => declineRequest(user.id)} />
+                  <Button label="Accept" size="sm" onPress={() => acceptRequest(user.id)} />
+                </>
+              }
             />
           ))}
         </PeopleSection>
@@ -49,7 +54,14 @@ export default function FriendsScreen() {
                 key={user.id}
                 user={user}
                 subtitle={latest ? [latest.company, latest.term].filter(Boolean).join(' · ') : user.school}
-                action={latest ? <KindBadge kind={latest.kind} /> : null}
+                action={
+                  <IconButton
+                    icon="chat"
+                    label="Message"
+                    tone="muted"
+                    onPress={() => router.navigate({ pathname: '/messages', params: { user: user.id } })}
+                  />
+                }
               />
             );
           })}
@@ -96,9 +108,14 @@ function PeopleSection({ title, children }: { title: string; children: ReactNode
   );
 }
 
+// The row opens the person's profile; its action buttons are their own Pressables, so they don't open it.
 function PersonRow({ user, subtitle, action }: { user: User; subtitle: string; action?: ReactNode }) {
   return (
-    <View style={styles.row}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${user.name}'s profile`}
+      onPress={() => router.navigate({ pathname: '/user/[id]', params: { id: user.id } })}
+      style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
       <Avatar user={user} size={44} />
       <View style={styles.rowText}>
         <Text variant="headline" numberOfLines={1}>
@@ -108,13 +125,15 @@ function PersonRow({ user, subtitle, action }: { user: User; subtitle: string; a
           {subtitle}
         </Text>
       </View>
-      {action}
-    </View>
+      {action ? <View style={styles.actions}>{action}</View> : null}
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
-  rowText: { flex: 1, gap: 2 },
+  rowText: { flex: 1, gap: spacing.xxs },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  pressed: { opacity: 0.7 },
   empty: { marginTop: spacing.xxxl },
 });
