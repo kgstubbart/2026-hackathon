@@ -5,6 +5,6 @@ export { Chip, ChipGroup } from './chip';
 export { ComboField } from './combo-field';
 export { FieldLabel, SearchField, TextField } from './field';
 export { Icon, type IconName } from './icon';
-export { Screen, ScreenHeader, Section, SectionHeader, TopBar } from './screen';
+export { Screen, Section, SectionHeader, TopBar } from './screen';
 export { SegmentedControl } from './segmented-control';
 export { Text } from './text';

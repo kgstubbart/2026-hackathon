@@ -2,8 +2,8 @@ import { Fragment, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
-import { Avatar, Card, Divider, Icon, IconButton, Screen, ScreenHeader, SearchField, Text } from '@/components/ui';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { Avatar, Divider, Icon, IconButton, Screen, SearchField, Section, Text } from '@/components/ui';
+import { colors, layout, radius, spacing, typography } from '@/constants/theme';
 import { conversations, type Conversation, type Message } from '@/data/mock-data';
 import { useStore } from '@/data/store';
 
@@ -32,16 +32,16 @@ export default function MessagesScreen() {
     );
   }
 
-  const unread = conversations.reduce((sum, conversation) => sum + unreadFor(conversation), 0);
   const visible = conversations.filter((conversation) =>
     getUser(conversation.userId).name.toLowerCase().includes(query.trim().toLowerCase()),
   );
 
   return (
-    <Screen keyboardShouldPersistTaps="handled" header={<AppHeader />}>
-      <ScreenHeader eyebrow={unread ? `${unread} unread` : 'All caught up'} title="Chats" />
-      <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
-      <Card flush style={styles.list}>
+    <Screen flush keyboardShouldPersistTaps="handled" header={<AppHeader />}>
+      <Section>
+        <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
+      </Section>
+      <View style={styles.list}>
         {visible.map((conversation, index) => {
           const user = getUser(conversation.userId);
           const all = [...conversation.messages, ...(sent[conversation.userId] ?? [])];
@@ -87,7 +87,12 @@ export default function MessagesScreen() {
             </Fragment>
           );
         })}
-      </Card>
+        {visible.length ? null : (
+          <Text variant="body" color={colors.textMuted} align="center" style={styles.empty}>
+            No chats match “{query}”.
+          </Text>
+        )}
+      </View>
     </Screen>
   );
 }
@@ -110,14 +115,16 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
   };
 
   return (
-    <Screen scroll={false} header={<AppHeader />}>
+    <Screen flush scroll={false} header={<AppHeader />}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
-        <View style={styles.threadHeader}>
-          <IconButton icon="back" label="Back" onPress={onBack} />
-          <Avatar user={user} size={40} />
+        <View style={styles.threadBar}>
+          <IconButton icon="back" label="Back to chats" tone="muted" onPress={onBack} />
+          <Avatar user={user} size={36} />
           <View style={styles.flex}>
-            <Text variant="headline">{user.name}</Text>
-            <Text variant="caption" color={colors.textMuted}>
+            <Text variant="headline" numberOfLines={1}>
+              {user.name}
+            </Text>
+            <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
               {user.school}
             </Text>
           </View>
@@ -158,8 +165,20 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  list: { marginTop: spacing.lg },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
+  threadBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: layout.gutter,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.surface,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  // Full-width white list like the feed; rows are separated by hairline dividers, not a card.
+  list: { backgroundColor: colors.surface, paddingVertical: spacing.xs },
+  empty: { paddingVertical: spacing.xxl },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, paddingHorizontal: layout.gutter },
   rowText: { flex: 1, gap: 3 },
   rowTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   unread: {
@@ -173,34 +192,34 @@ const styles = StyleSheet.create({
   },
   unreadText: { fontWeight: '700' },
   pressed: { opacity: 0.6 },
-  threadHeader: {
+  messages: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+    gap: spacing.sm,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: layout.gutter,
+  },
+  bubble: { maxWidth: '80%', paddingHorizontal: spacing.md + 2, paddingVertical: spacing.sm + 2, borderRadius: radius.lg },
+  incoming: { alignSelf: 'flex-start', backgroundColor: colors.surface, borderBottomLeftRadius: spacing.xs },
+  outgoing: { alignSelf: 'flex-end', backgroundColor: colors.primary, borderBottomRightRadius: spacing.xs },
+  // White bottom bar mirroring the top bar.
+  composer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    paddingBottom: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-  },
-  messages: { flexGrow: 1, justifyContent: 'flex-end', gap: spacing.sm, paddingVertical: spacing.lg },
-  bubble: { maxWidth: '80%', paddingHorizontal: spacing.md + 2, paddingVertical: spacing.sm + 2, borderRadius: radius.lg },
-  incoming: {
-    alignSelf: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: layout.gutter,
     backgroundColor: colors.surface,
-    borderBottomLeftRadius: spacing.xs,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
   },
-  outgoing: { alignSelf: 'flex-end', backgroundColor: colors.primary, borderBottomRightRadius: spacing.xs },
-  composer: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.md },
   input: {
     ...typography.body,
     flex: 1,
     height: 44,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    backgroundColor: colors.background,
     color: colors.text,
   },
   send: {
