@@ -1,12 +1,12 @@
 import { Fragment, useState, type ReactNode } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { UpdateCard } from '@/components/update-card';
+import { KindBadge, UpdateCard } from '@/components/update-card';
 import { Avatar, Button, Card, Chip, Divider, Icon, Screen, ScreenHeader, SearchField, SectionHeader, Text, type IconName } from '@/components/ui';
 import { colors, radius, spacing, typography } from '@/constants/theme';
-import type { User } from '@/data/mock-data';
+import type { Update, User } from '@/data/mock-data';
 import { useStore } from '@/data/store';
-import { updateKinds } from '@/data/update-kinds';
+import { headlineFor, timeAgo, updateKinds } from '@/data/update-kinds';
 
 const recentSearches = ['Stripe', 'Figma', 'Goldman Sachs'];
 const companySuggestions = ['Airbnb', 'Duolingo', 'Figma', 'Goldman Sachs', 'Microsoft', 'Notion', 'Ramp', 'Spotify', 'Stripe'];
@@ -27,6 +27,7 @@ export default function SearchScreen() {
   const [jobTitle, setJobTitle] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<SearchMode>('posts');
+  const [searchActive, setSearchActive] = useState(false);
 
   const friendPosts = updates.filter((update) => friendIds.includes(update.userId) && update.visibility === 'friends');
   const terms = { company: company.trim().toLowerCase(), jobTitle: jobTitle.trim().toLowerCase() };
@@ -38,30 +39,52 @@ export default function SearchScreen() {
     );
   });
 
+  const selectMode = (nextMode: SearchMode) => {
+    setMode(nextMode);
+    if (nextMode === 'people') setSearchActive(true);
+  };
+
+  if (!searchActive && mode === 'posts') {
+    return (
+      <Screen scroll={false}>
+        <ScreenHeader eyebrow="Find updates and people" title="Search" />
+        <ModeToggle mode={mode} onChange={selectMode} />
+        <View style={styles.idleLayout}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.idleList}>
+            <SectionHeader title="Your circle" />
+            <Card flush>
+              {friendIds.map((friendId, index) => (
+                <Fragment key={friendId}>
+                  {index > 0 ? <Divider /> : null}
+                  <IdleFriendRow user={getUser(friendId)} latest={updates.find((update) => update.userId === friendId)} />
+                </Fragment>
+              ))}
+            </Card>
+          </ScrollView>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Start searching posts"
+            onPress={() => setSearchActive(true)}
+            style={({ pressed }) => [styles.idleSearch, pressed && styles.pressed]}>
+            <SearchCriteriaPreview />
+          </Pressable>
+        </View>
+      </Screen>
+    );
+  }
+
   return (
     <Screen keyboardShouldPersistTaps="handled">
       <ScreenHeader eyebrow="Find updates and people" title="Search" />
-      <View style={styles.modeToggle}>
-        <Chip label="Posts" selected={mode === 'posts'} onPress={() => setMode('posts')} />
-        <Chip label="People" selected={mode === 'people'} onPress={() => setMode('people')} />
-      </View>
+      <ModeToggle mode={mode} onChange={selectMode} />
 
       {mode === 'posts' ? (
         <>
         <View style={styles.fields}>
-          <View style={styles.rail}>
-            <View style={styles.dot}>
-              <View style={styles.dotInner} />
-            </View>
-            <View style={styles.railLine} />
-            <View style={styles.square}>
-              <View style={styles.squareInner} />
-            </View>
-          </View>
           <View style={styles.inputs}>
-            <SearchInput value={company} onChange={setCompany} placeholder="Company" suggestions={companySuggestions} autoFocus />
+            <SearchInput icon="briefcase" value={company} onChange={setCompany} placeholder="Company" suggestions={companySuggestions} autoFocus />
             <Divider />
-            <SearchInput value={jobTitle} onChange={setJobTitle} placeholder="Job title" suggestions={jobTitleSuggestions} />
+            <SearchInput icon="profile" value={jobTitle} onChange={setJobTitle} placeholder="Job title" suggestions={jobTitleSuggestions} />
           </View>
         </View>
         <View style={styles.results}>
@@ -113,6 +136,58 @@ export default function SearchScreen() {
         <PeopleSearch />
       )}
     </Screen>
+  );
+}
+
+function ModeToggle({ mode, onChange }: { mode: SearchMode; onChange: (mode: SearchMode) => void }) {
+  return (
+    <View style={styles.modeToggle}>
+      <Chip label="Posts" selected={mode === 'posts'} onPress={() => onChange('posts')} />
+      <Chip label="People" selected={mode === 'people'} onPress={() => onChange('people')} />
+    </View>
+  );
+}
+
+function IdleFriendRow({ user, latest }: { user: User; latest?: Update }) {
+  return (
+    <View style={styles.friendRow}>
+      <Avatar user={user} size={44} />
+      <View style={styles.friendText}>
+        <Text variant="headline" numberOfLines={1}>
+          {user.name}
+        </Text>
+        <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
+          {user.major} · {user.school}
+        </Text>
+        {latest ? (
+          <Text variant="caption" color={colors.textFaint} numberOfLines={1}>
+            {headlineFor(latest)} · {timeAgo(latest.createdAt)}
+          </Text>
+        ) : null}
+      </View>
+      {latest ? <KindBadge kind={latest.kind} /> : null}
+    </View>
+  );
+}
+
+function SearchCriteriaPreview() {
+  return (
+    <View style={styles.fields}>
+      <CriteriaPreviewRow icon="briefcase" label="Company" />
+      <Divider />
+      <CriteriaPreviewRow icon="profile" label="Job title" />
+    </View>
+  );
+}
+
+function CriteriaPreviewRow({ icon, label }: { icon: IconName; label: string }) {
+  return (
+    <View style={styles.previewRow}>
+      <Icon name={icon} size={20} color={colors.textMuted} />
+      <Text variant="headline" color={colors.textFaint}>
+        {label}
+      </Text>
+    </View>
   );
 }
 
@@ -191,6 +266,7 @@ function PersonSearchRow({
 }
 
 type SearchInputProps = {
+  icon: IconName;
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
@@ -198,7 +274,7 @@ type SearchInputProps = {
   autoFocus?: boolean;
 };
 
-function SearchInput({ value, onChange, placeholder, suggestions, autoFocus }: SearchInputProps) {
+function SearchInput({ icon, value, onChange, placeholder, suggestions, autoFocus }: SearchInputProps) {
   const [focused, setFocused] = useState(false);
   const query = value.trim().toLowerCase();
   const matches = query
@@ -211,6 +287,7 @@ function SearchInput({ value, onChange, placeholder, suggestions, autoFocus }: S
   return (
     <View style={[styles.inputGroup, focused && styles.focusedInputGroup]}>
       <View style={styles.inputRow}>
+        <Icon name={icon} size={20} color={colors.textMuted} />
         <TextInput
           value={value}
           onChangeText={onChange}
@@ -284,8 +361,6 @@ function ResultRow({ icon, title, subtitle, circle, onPress }: ResultRowProps) {
   );
 }
 
-const MARKER = spacing.lg;
-
 const styles = StyleSheet.create({
   modeToggle: {
     alignSelf: 'flex-start',
@@ -296,28 +371,27 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceMuted,
   },
+  idleLayout: { flex: 1, minHeight: 0 },
+  idleList: { paddingBottom: spacing.md },
+  idleSearch: { paddingTop: spacing.md, paddingBottom: spacing.md, backgroundColor: colors.background },
   fields: {
     width: '100%',
-    flexDirection: 'row',
     borderWidth: 1.5,
     borderColor: colors.text,
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
-    paddingLeft: spacing.lg,
+    paddingHorizontal: spacing.lg,
     zIndex: 2,
   },
-  rail: { alignItems: 'center', paddingVertical: spacing.lg, width: MARKER },
-  dot: { width: MARKER, height: MARKER, borderRadius: MARKER / 2, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
-  dotInner: { width: spacing.sm - spacing.xxs, height: spacing.sm - spacing.xxs, borderRadius: spacing.xs + spacing.xxs, backgroundColor: colors.surface },
-  railLine: { flex: 1, width: spacing.xxs, minHeight: spacing.md, backgroundColor: colors.text },
-  square: { width: MARKER, height: MARKER, borderRadius: 4, backgroundColor: colors.text, alignItems: 'center', justifyContent: 'center' },
-  squareInner: { width: spacing.sm - spacing.xxs, height: spacing.sm - spacing.xxs, backgroundColor: colors.surface },
-  inputs: { flex: 1, marginLeft: spacing.lg },
+  inputs: { width: '100%' },
   inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: spacing.xxxl + spacing.xl, paddingRight: spacing.lg },
   input: { ...typography.headline, fontWeight: '400', flex: 1, height: '100%', color: colors.text, outlineColor: 'transparent' },
   inputGroup: { position: 'relative' },
   focusedInputGroup: { zIndex: 10 },
   results: { marginTop: spacing.lg, zIndex: 1 },
+  previewRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, height: spacing.xxxl + spacing.xl },
+  friendRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
+  friendText: { flex: 1, gap: spacing.xxs },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
   rowIcon: { width: spacing.xxxl + spacing.md, height: spacing.xxxl + spacing.md, alignItems: 'center', justifyContent: 'center' },
   rowIconCircle: { borderRadius: radius.pill, backgroundColor: colors.background },
