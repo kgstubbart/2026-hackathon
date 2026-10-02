@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from 'rea
 
 import { colors, radius, spacing, typography } from '@/constants/theme';
 import { FieldLabel } from './field';
-import { Icon } from './icon';
 import { Text } from './text';
 
 const MAX_OPTIONS = 6;
@@ -17,7 +16,7 @@ type ComboFieldProps = Omit<TextInputProps, 'value' | 'onChangeText'> & {
   options: readonly string[];
 };
 
-// Dropdown you can also type into: pick a matching option, or keep whatever you typed.
+// Text field that suggests matches as you type: pick one, or keep whatever you typed.
 export function ComboField({ label, value, onChangeText, options, onFocus, onBlur, ...props }: ComboFieldProps) {
   const [open, setOpen] = useState(false);
   const input = useRef<TextInput>(null);
@@ -26,12 +25,12 @@ export function ComboField({ label, value, onChangeText, options, onFocus, onBlu
   useEffect(() => () => clearTimeout(closeTimer.current ?? undefined), []);
 
   const query = value.trim().toLowerCase();
-  const picked = options.some((option) => option.toLowerCase() === query);
-  // After picking, show the whole list again so the choice is easy to change.
-  const matches = (picked ? options : options.filter((option) => option.toLowerCase().includes(query))).slice(
-    0,
-    MAX_OPTIONS,
-  );
+  // Suggestions only appear while typing, and go away once the text is exactly one of them.
+  const matches = query
+    ? options
+        .filter((option) => option.toLowerCase().includes(query) && option.toLowerCase() !== query)
+        .slice(0, MAX_OPTIONS)
+    : [];
 
   const choose = (option: string) => {
     clearTimeout(closeTimer.current ?? undefined);
@@ -43,7 +42,7 @@ export function ComboField({ label, value, onChangeText, options, onFocus, onBlu
   return (
     <View style={styles.field}>
       {label ? <FieldLabel>{label}</FieldLabel> : null}
-      <View style={[styles.box, open && styles.boxOpen]}>
+      <View style={styles.box}>
         <TextInput
           ref={input}
           placeholderTextColor={colors.textFaint}
@@ -56,7 +55,6 @@ export function ComboField({ label, value, onChangeText, options, onFocus, onBlu
           }}
           onFocus={(event) => {
             clearTimeout(closeTimer.current ?? undefined);
-            setOpen(true);
             onFocus?.(event);
           }}
           onBlur={(event) => {
@@ -65,13 +63,6 @@ export function ComboField({ label, value, onChangeText, options, onFocus, onBlu
           }}
           style={styles.input}
         />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Show ${label ?? 'options'}`}
-          hitSlop={10}
-          onPress={() => input.current?.focus()}>
-          <Icon name="chevronDown" size={16} color={colors.textFaint} />
-        </Pressable>
       </View>
       {open && matches.length ? (
         <View style={styles.menu}>
@@ -79,13 +70,11 @@ export function ComboField({ label, value, onChangeText, options, onFocus, onBlu
             <Pressable
               key={option}
               accessibilityRole="button"
-              accessibilityState={{ selected: option.toLowerCase() === query }}
               onPress={() => choose(option)}
               style={({ pressed }) => [styles.option, index > 0 && styles.optionDivider, pressed && styles.pressed]}>
               <Text variant="body" style={styles.optionText} numberOfLines={1}>
                 {option}
               </Text>
-              {option.toLowerCase() === query ? <Icon name="check" size={14} color={colors.primary} /> : null}
             </Pressable>
           ))}
         </View>
@@ -99,7 +88,6 @@ const styles = StyleSheet.create({
   box: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
     minHeight: 48,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
@@ -107,7 +95,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  boxOpen: { borderWidth: 1.5, borderColor: colors.text },
   input: { ...typography.body, flex: 1, color: colors.text, minHeight: 48 },
   menu: {
     borderRadius: radius.md,
