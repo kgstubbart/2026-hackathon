@@ -1,5 +1,9 @@
-export type UpdateKind = 'applied' | 'interview' | 'offer' | 'accepted' | 'milestone';
+export type UpdateKind = 'applied' | 'interview' | 'assessment' | 'offer' | 'accepted' | 'milestone';
 export type Visibility = 'friends' | 'private';
+export type InterviewType = 'Behavioral' | 'Technical' | 'Mixed';
+export type AssessmentFormat = 'Timed' | 'Take-home';
+export type Difficulty = 'Easy' | 'Medium' | 'Hard';
+export type Question = { text: string; difficulty?: Difficulty };
 
 export type User = {
   id: string;
@@ -18,9 +22,13 @@ export type Update = {
   kind: UpdateKind;
   company: string;
   role: string;
-  term: string;
+  term?: string;
   location?: string;
   stage?: string;
+  round?: string;
+  interviewType?: InterviewType;
+  assessmentFormat?: AssessmentFormat;
+  questions?: Question[];
   title?: string;
   note?: string;
   createdAt: number;
@@ -57,16 +65,17 @@ const minutesAgo = (minutes: number) => Date.now() - minutes * 60_000;
 
 export const initialUpdates: Update[] = [
   { id: 'u1', userId: 'priya', kind: 'offer', company: 'Goldman Sachs', role: 'Summer Analyst', term: 'Summer 2027', location: 'New York, NY', note: 'Superday paid off. Still processing this one!', createdAt: minutesAgo(18), visibility: 'friends', congrats: 42, comments: 11 },
-  { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14, comments: 4 },
+  { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final round', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: 'Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14, comments: 4 },
   { id: 'u3', userId: 'maya', kind: 'accepted', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', location: 'San Francisco, CA', note: 'Signed! Who else is going to be in SF this summer?', createdAt: minutesAgo(130), visibility: 'friends', congrats: 67, comments: 19 },
-  { id: 'u4', userId: 'theo', kind: 'applied', company: 'Spotify', role: 'Data Analyst Intern', term: 'Summer 2027', note: 'Number 14 this week. Keeping the streak alive.', createdAt: minutesAgo(240), visibility: 'friends', congrats: 8, comments: 1 },
+  { id: 'u4', userId: 'theo', kind: 'applied', company: 'Spotify', role: 'Data Analyst Intern', term: 'Summer 2027', note: 'Number 14 this week. Keeping the streak alive.', createdAt: minutesAgo(240), visibility: 'private', congrats: 0, comments: 0 },
+  { id: 'u12', userId: 'sam', kind: 'assessment', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'Timed', questions: [{ text: 'LRU Cache' }, { text: 'Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7, comments: 1 },
   { id: 'u5', userId: 'lena', kind: 'milestone', company: 'Microsoft', role: 'UX Research Intern', term: 'Fall 2026', title: 'Wrapped my first research study', note: 'Presented findings to the Teams org. Terrified and thrilled.', createdAt: minutesAgo(410), visibility: 'friends', congrats: 29, comments: 6 },
   { id: 'u6', userId: 'sam', kind: 'interview', company: 'Duolingo', role: 'Machine Learning Intern', term: 'Summer 2027', stage: 'Phone screen', createdAt: minutesAgo(600), visibility: 'friends', congrats: 11, comments: 2 },
   { id: 'u7', userId: 'alex', kind: 'interview', company: 'Airbnb', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Technical interview', note: 'Graph problem went well. Fingers crossed.', createdAt: minutesAgo(900), visibility: 'friends', congrats: 16, comments: 3 },
-  { id: 'u8', userId: 'alex', kind: 'applied', company: 'Notion', role: 'Software Engineering Intern', term: 'Summer 2027', note: 'Referred by Sam. Thank you!', createdAt: minutesAgo(2_800), visibility: 'friends', congrats: 9, comments: 2 },
+  { id: 'u8', userId: 'alex', kind: 'applied', company: 'Notion', role: 'Software Engineering Intern', term: 'Summer 2027', note: 'Referred by Sam. Thank you!', createdAt: minutesAgo(2_800), visibility: 'private', congrats: 0, comments: 0 },
   { id: 'u9', userId: 'maya', kind: 'interview', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', stage: 'Portfolio review', createdAt: minutesAgo(4_300), visibility: 'friends', congrats: 21, comments: 5 },
   { id: 'u10', userId: 'alex', kind: 'applied', company: 'Ramp', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(5_900), visibility: 'private', congrats: 0, comments: 0 },
-  { id: 'u11', userId: 'jordan', kind: 'applied', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(12_000), visibility: 'friends', congrats: 6, comments: 0 },
+  { id: 'u11', userId: 'jordan', kind: 'applied', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(12_000), visibility: 'private', congrats: 0, comments: 0 },
 ];
 
 export const conversations: Conversation[] = [
@@ -103,5 +112,7 @@ export const conversations: Conversation[] = [
   },
 ];
 
-export const terms = ['Summer 2027', 'Fall 2026', 'Spring 2027', 'Winter 2027'];
-export const interviewStages = ['Phone screen', 'Technical interview', 'Behavioral interview', 'Final round'];
+export const interviewRounds = ['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Final round'] as const;
+export const interviewTypes: readonly InterviewType[] = ['Behavioral', 'Technical', 'Mixed'];
+export const assessmentFormats: readonly AssessmentFormat[] = ['Timed', 'Take-home'];
+export const difficulties: readonly Difficulty[] = ['Easy', 'Medium', 'Hard'];

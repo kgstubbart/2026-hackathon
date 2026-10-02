@@ -35,6 +35,8 @@ const icons = {
   share: ['square.and.arrow.up', 'ios_share'],
   clear: ['xmark.circle', 'cancel'],
   globe: ['globe', 'language'],
+  code: ['chevron.left.forwardslash.chevron.right', 'code'],
+  trash: ['trash', 'delete'],
 } satisfies Record<string, [SFSymbol, AndroidSymbol]>;
 
 export type IconName = keyof typeof icons;

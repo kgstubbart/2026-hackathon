@@ -9,9 +9,10 @@ import {
   type Update,
   type User,
 } from './mock-data';
+import { isPrivateKind } from './update-kinds';
 
-export type NewUpdate = Pick<Update, 'kind' | 'company' | 'role' | 'term' | 'visibility'> &
-  Partial<Pick<Update, 'location' | 'stage' | 'title' | 'note'>>;
+export type NewUpdate = Pick<Update, 'kind' | 'company' | 'role'> &
+  Partial<Pick<Update, 'round' | 'interviewType' | 'assessmentFormat' | 'questions'>>;
 
 type Store = {
   users: User[];
@@ -42,7 +43,16 @@ export function StoreProvider({ children }: PropsWithChildren) {
     updates,
     addUpdate: (update) =>
       setUpdates((items) => [
-        { id: `new-${Date.now()}`, userId: currentUserId, createdAt: Date.now(), congrats: 0, comments: 0, ...update },
+        {
+          id: `new-${Date.now()}`,
+          userId: currentUserId,
+          createdAt: Date.now(),
+          congrats: 0,
+          comments: 0,
+          // Applications are personal tracking only; everything else goes to the feed.
+          visibility: isPrivateKind(update.kind) ? 'private' : 'friends',
+          ...update,
+        },
         ...items,
       ]),
     toggleCongrats: (id) =>

@@ -3,24 +3,33 @@ import type { Tone } from '@/constants/theme';
 import type { Update, UpdateKind } from './mock-data';
 
 export const updateKinds: Record<UpdateKind, { label: string; description: string; icon: IconName; tone: Tone }> = {
-  applied: { label: 'Applied', description: 'Sent an application', icon: 'send', tone: 'sky' },
-  interview: { label: 'Interview', description: 'Got or finished an interview', icon: 'calendar', tone: 'amber' },
+  applied: { label: 'Application', description: 'Private, counts for your streak', icon: 'send', tone: 'sky' },
+  interview: { label: 'Interview', description: 'Round, type and questions', icon: 'calendar', tone: 'amber' },
+  assessment: { label: 'Assessment', description: 'Timed or take-home', icon: 'code', tone: 'teal' },
   offer: { label: 'Offer', description: 'Received an offer', icon: 'trophy', tone: 'mint' },
   accepted: { label: 'Accepted', description: 'Said yes to an internship', icon: 'briefcase', tone: 'primary' },
   milestone: { label: 'Milestone', description: 'Something worth celebrating', icon: 'star', tone: 'rose' },
 };
 
-export const updateKindOrder: UpdateKind[] = ['applied', 'interview', 'offer', 'accepted', 'milestone'];
+export const updateKindOrder: UpdateKind[] = ['applied', 'interview', 'assessment', 'offer', 'accepted', 'milestone'];
+// Kinds a user can log from the Share tab.
+export const shareKinds = ['applied', 'interview', 'assessment', 'offer'] as const satisfies readonly UpdateKind[];
+
+// Applications never reach the feed; they only feed personal tracking and the streak.
+export const isPrivateKind = (kind: UpdateKind) => kind === 'applied';
 
 export const isCelebration = (kind: UpdateKind) => kind === 'offer' || kind === 'accepted';
 
-export function headlineFor(update: Pick<Update, 'kind' | 'company' | 'stage' | 'title'>) {
+export function headlineFor(update: Pick<Update, 'kind' | 'company' | 'stage' | 'round' | 'assessmentFormat' | 'title'>) {
   const company = update.company || 'a company';
   switch (update.kind) {
     case 'applied':
       return `Applied to ${company}`;
     case 'interview':
-      return `${update.stage ?? 'Interview'} at ${company}`;
+      if (update.stage) return `${update.stage} at ${company}`;
+      return `${update.round ? `${update.round} interview` : 'Interview'} at ${company}`;
+    case 'assessment':
+      return `${update.assessmentFormat ? `${update.assessmentFormat} assessment` : 'Assessment'} for ${company}`;
     case 'offer':
       return `Got an offer from ${company}`;
     case 'accepted':
