@@ -126,14 +126,9 @@ export default function ShareScreen() {
               <View style={[styles.kindIcon, { backgroundColor: selected ? tone.fg : tone.bg }]}>
                 <Icon name={meta.icon} size={16} color={selected ? colors.onPrimary : tone.fg} />
               </View>
-              <View style={styles.kindText}>
-                <Text variant="callout" style={styles.kindLabel}>
-                  {meta.label}
-                </Text>
-                <Text variant="caption" color={colors.textMuted} numberOfLines={1}>
-                  {meta.description}
-                </Text>
-              </View>
+              <Text variant="callout" style={styles.kindLabel}>
+                {meta.label}
+              </Text>
             </Pressable>
           );
         })}
@@ -151,18 +146,19 @@ export default function ShareScreen() {
         />
         {kind === 'interview' ? (
           <View style={styles.pair}>
-            <View style={styles.half}>
+            <View style={styles.round}>
               <ComboField
+                compact
                 label="Round"
                 value={round}
                 onChangeText={setRound}
                 options={roundOptions(round)}
-                placeholder="e.g. 2 or Final"
+                placeholder="2, Final"
               />
             </View>
-            <View style={[styles.half, styles.group]}>
+            <View style={[styles.type, styles.group]}>
               <FieldLabel>Type</FieldLabel>
-              <ChipGroup wrap options={interviewTypes} value={interviewType} onChange={toggle(interviewType, setInterviewType)} />
+              <ChipGroup compact options={interviewTypes} value={interviewType} onChange={toggle(interviewType, setInterviewType)} />
             </View>
           </View>
         ) : null}
@@ -266,12 +262,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   kindIcon: { width: 32, height: 32, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  kindText: { flex: 1 },
   kindLabel: { fontWeight: '700' },
   form: { gap: spacing.lg },
   group: { gap: spacing.sm },
   pair: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
-  half: { flex: 1 },
+  // Just wide enough for "Round 12"; the type chips take the rest of the row.
+  round: { width: 92 },
+  type: { flex: 1 },
   questionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   questionInput: { flex: 1 },
   submit: { gap: spacing.sm, marginTop: spacing.xxl },

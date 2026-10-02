@@ -63,7 +63,7 @@ const minutesAgo = (minutes: number) => Date.now() - minutes * 60_000;
 
 export const initialUpdates: Update[] = [
   { id: 'u1', userId: 'priya', kind: 'offer', company: 'Goldman Sachs', role: 'Summer Analyst', term: 'Summer 2027', location: 'New York, NY', note: 'Superday paid off. Still processing this one!', createdAt: minutesAgo(18), visibility: 'friends', congrats: 42, comments: 11 },
-  { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final round', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: 'Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14, comments: 4 },
+  { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: 'Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14, comments: 4 },
   { id: 'u3', userId: 'maya', kind: 'accepted', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', location: 'San Francisco, CA', note: 'Signed! Who else is going to be in SF this summer?', createdAt: minutesAgo(130), visibility: 'friends', congrats: 67, comments: 19 },
   { id: 'u4', userId: 'theo', kind: 'applied', company: 'Spotify', role: 'Data Analyst Intern', term: 'Summer 2027', note: 'Number 14 this week. Keeping the streak alive.', createdAt: minutesAgo(240), visibility: 'private', congrats: 0, comments: 0 },
   { id: 'u12', userId: 'sam', kind: 'assessment', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'Timed', questions: [{ text: 'LRU Cache' }, { text: 'Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7, comments: 1 },
@@ -111,7 +111,7 @@ export const conversations: Conversation[] = [
 ];
 
 // Share form: suggestions for the typed fields (any typed answer is accepted) and the fixed options.
-export const finalRound = 'Final round';
+export const finalRound = 'Final';
 export const interviewRounds = ['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Round 5', finalRound];
 export const interviewTypes = ['Behavioral', 'Technical', 'Mixed'];
 export const assessmentFormats = ['Timed', 'Take-home'];

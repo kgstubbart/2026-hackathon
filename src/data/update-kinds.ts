@@ -2,13 +2,13 @@ import type { IconName } from '@/components/ui';
 import type { Tone } from '@/constants/theme';
 import type { Update, UpdateKind } from './mock-data';
 
-export const updateKinds: Record<UpdateKind, { label: string; description: string; icon: IconName; tone: Tone }> = {
-  applied: { label: 'Application', description: 'Private, counts for your streak', icon: 'send', tone: 'sky' },
-  interview: { label: 'Interview', description: 'Round, type and questions', icon: 'calendar', tone: 'amber' },
-  assessment: { label: 'Assessment', description: 'Timed or take-home', icon: 'code', tone: 'teal' },
-  offer: { label: 'Offer', description: 'Received an offer', icon: 'trophy', tone: 'mint' },
-  accepted: { label: 'Accepted', description: 'Said yes to an internship', icon: 'briefcase', tone: 'primary' },
-  milestone: { label: 'Milestone', description: 'Something worth celebrating', icon: 'star', tone: 'rose' },
+export const updateKinds: Record<UpdateKind, { label: string; icon: IconName; tone: Tone }> = {
+  applied: { label: 'Application', icon: 'send', tone: 'sky' },
+  interview: { label: 'Interview', icon: 'calendar', tone: 'amber' },
+  assessment: { label: 'Assessment', icon: 'code', tone: 'teal' },
+  offer: { label: 'Offer', icon: 'trophy', tone: 'mint' },
+  accepted: { label: 'Accepted', icon: 'briefcase', tone: 'primary' },
+  milestone: { label: 'Milestone', icon: 'star', tone: 'rose' },
 };
 
 export const updateKindOrder: UpdateKind[] = ['applied', 'interview', 'assessment', 'offer', 'accepted', 'milestone'];
