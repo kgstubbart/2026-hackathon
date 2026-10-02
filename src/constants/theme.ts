@@ -24,6 +24,10 @@ const palette = {
   mintSoft: '#DCF4E8',
   rose: '#D6336C',
   roseSoft: '#FDE4EE',
+
+  // Streak
+  flame: '#FC5200',
+  flameLight: '#FF8A4C',
 } as const;
 
 export const colors = {
@@ -39,6 +43,8 @@ export const colors = {
   primarySoft: palette.indigoSoft,
   onPrimary: palette.white,
   success: palette.mint,
+  streak: palette.flame,
+  streakSoft: palette.flameLight,
   ...palette,
 } as const;
 

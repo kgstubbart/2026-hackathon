@@ -34,6 +34,8 @@ export type Message = { id: string; fromMe: boolean; body: string; time: string 
 export type Conversation = { userId: string; time: string; unread?: number; messages: Message[] };
 
 export const currentUserId = 'alex';
+// Consecutive weeks (before this one) with at least one logged update.
+export const currentStreakWeeks = 12;
 
 export const users: User[] = [
   { id: 'alex', name: 'Alex Morgan', initials: 'AM', color: '#6C63FF', school: 'University of Michigan', major: 'Computer Science', gradYear: 2028, location: 'Ann Arbor, MI' },

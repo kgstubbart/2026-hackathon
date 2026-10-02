@@ -4,12 +4,13 @@ import { colors, radius, shadow, spacing } from '@/constants/theme';
 import { Icon, type IconName } from './icon';
 import { Text } from './text';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 const variantColors: Record<ButtonVariant, { bg: string; fg: string }> = {
   primary: { bg: colors.primary, fg: colors.onPrimary },
   secondary: { bg: colors.primarySoft, fg: colors.primary },
+  outline: { bg: 'transparent', fg: colors.text },
   ghost: { bg: 'transparent', fg: colors.textMuted },
 };
 
@@ -38,6 +39,7 @@ export function Button({ label, icon, variant = 'primary', size = 'md', fullWidt
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: bg, height: dims.height, paddingHorizontal: dims.paddingHorizontal },
+        variant === 'outline' && styles.outline,
         fullWidth && styles.fullWidth,
         variant === 'primary' && size === 'lg' && !disabled && shadow.raised,
         pressed && styles.pressed,
@@ -55,7 +57,7 @@ type IconButtonProps = Omit<PressableProps, 'children' | 'style'> & {
   icon: IconName;
   label: string;
   badge?: boolean;
-  tone?: 'surface' | 'plain';
+  tone?: 'surface' | 'muted' | 'plain';
 };
 
 export function IconButton({ icon, label, badge, tone = 'surface', ...props }: IconButtonProps) {
@@ -65,7 +67,12 @@ export function IconButton({ icon, label, badge, tone = 'surface', ...props }: I
       accessibilityLabel={label}
       hitSlop={6}
       {...props}
-      style={({ pressed }) => [styles.iconButton, tone === 'surface' && styles.iconSurface, pressed && styles.pressed]}>
+      style={({ pressed }) => [
+        styles.iconButton,
+        tone === 'surface' && styles.iconSurface,
+        tone === 'muted' && styles.iconMuted,
+        pressed && styles.pressed,
+      ]}>
       <Icon name={icon} size={20} />
       {badge ? <View style={styles.badge} /> : null}
     </Pressable>
@@ -80,11 +87,13 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     borderRadius: radius.pill,
   },
+  outline: { borderWidth: 1.5, borderColor: colors.border },
   fullWidth: { alignSelf: 'stretch' },
   smLabel: { fontWeight: '600' },
   pressed: { opacity: 0.75, transform: [{ scale: 0.98 }] },
   disabled: { opacity: 0.4 },
   iconButton: { width: 42, height: 42, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  iconMuted: { backgroundColor: colors.background },
   iconSurface: { backgroundColor: colors.surface, borderWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
   badge: {
     position: 'absolute',

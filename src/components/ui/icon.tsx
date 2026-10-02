@@ -31,6 +31,8 @@ const icons = {
   flame: ['flame.fill', 'local_fire_department'],
   sparkles: ['sparkles', 'auto_awesome'],
   clock: ['clock', 'schedule'],
+  more: ['ellipsis', 'more_horiz'],
+  share: ['square.and.arrow.up', 'ios_share'],
 } satisfies Record<string, [SFSymbol, AndroidSymbol]>;
 
 export type IconName = keyof typeof icons;
