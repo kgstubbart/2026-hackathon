@@ -14,7 +14,7 @@ const profileTabs = [
 
 export default function ProfileScreen() {
   const [selectedTab, setSelectedTab] = useState<(typeof profileTabs)[number]['value']>('history');
-  const { currentUser, updates, friendIds, toggleCongrats } = useStore();
+  const { currentUser, updates, friendIds, toggleCongrats, commentsFor } = useStore();
   const mine = updates.filter((update) => update.userId === currentUser.id);
 
   return (
@@ -70,6 +70,7 @@ export default function ProfileScreen() {
             mine.map((update) => (
               <UpdateCard
                 key={update.id}
+                commentCount={commentsFor(update.id).length}
                 update={update}
                 author={currentUser}
                 onCongrats={() => toggleCongrats(update.id)}

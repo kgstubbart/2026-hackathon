@@ -14,7 +14,7 @@ import { feedKinds } from '@/data/update-kinds';
 
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
-  const { updates, friendIds, currentUser, getUser, toggleCongrats } = useStore();
+  const { updates, friendIds, currentUser, getUser, toggleCongrats, commentsFor } = useStore();
 
   const mine = updates.filter((update) => update.userId === currentUser.id);
   const feed = updates.filter(
@@ -43,6 +43,7 @@ export default function FeedScreen() {
           {feed.map((update) => (
             <UpdateCard
               key={update.id}
+              commentCount={commentsFor(update.id).length}
               update={update}
               author={getUser(update.userId)}
               onCongrats={() => toggleCongrats(update.id)}

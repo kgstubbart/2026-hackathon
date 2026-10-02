@@ -23,7 +23,7 @@ const postCount = (count: number) => `${count} ${count === 1 ? 'post' : 'posts'}
 type SearchMode = 'posts' | 'people';
 
 export default function SearchScreen() {
-  const { updates, friendIds, getUser, toggleCongrats } = useStore();
+  const { updates, friendIds, getUser, toggleCongrats, commentsFor } = useStore();
   const [company, setCompany] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -108,7 +108,12 @@ export default function SearchScreen() {
                   <Fragment key={update.id}>
                     {openId === update.id ? (
                       <View style={styles.expanded}>
-                        <UpdateCard update={update} author={author} onCongrats={() => toggleCongrats(update.id)} />
+                        <UpdateCard
+                          update={update}
+                          author={author}
+                          commentCount={commentsFor(update.id).length}
+                          onCongrats={() => toggleCongrats(update.id)}
+                        />
                       </View>
                     ) : (
                       <ResultRow

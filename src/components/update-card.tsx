@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar, Icon, Text, type IconName } from '@/components/ui';
@@ -22,17 +22,20 @@ export function KindBadge({ kind }: { kind: Update['kind'] }) {
 type UpdateCardProps = {
   update: Update;
   author: User;
+  commentCount?: number;
   onCongrats?: () => void;
   preview?: boolean;
+  /** On the post's own page: show round/type/format and questions, and don't link to itself. */
+  detail?: boolean;
 };
 
 // Full-width feed post: LinkedIn-style author header, one-sentence post with optional comment, Threads-style action row.
-// Round/type/format and questions stay hidden until the post is tapped.
-export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardProps) {
-  const [expanded, setExpanded] = useState(false);
+// In the feed it only shows the sentence; tapping it opens the post page with details and comments.
+export function UpdateCard({ update, author, commentCount, onCongrats, preview, detail }: UpdateCardProps) {
   const sentence = postSentence(update);
   const details = [update.round, update.interviewType, update.assessmentFormat].filter(Boolean).join(' · ');
-  const hasDetails = Boolean(details || update.questions?.length);
+  const open = () => router.navigate({ pathname: '/post/[id]', params: { id: update.id } });
+  const canOpen = !preview && !detail;
 
   return (
     <View style={styles.post}>
@@ -56,10 +59,10 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
       </View>
 
       <Pressable
-        accessibilityRole={hasDetails ? 'button' : undefined}
-        accessibilityState={hasDetails ? { expanded } : undefined}
-        disabled={!hasDetails}
-        onPress={() => setExpanded((value) => !value)}
+        accessibilityRole={canOpen ? 'button' : undefined}
+        accessibilityLabel={canOpen ? 'Open post' : undefined}
+        disabled={!canOpen}
+        onPress={open}
         style={({ pressed }) => [styles.content, pressed && styles.pressed]}>
         <Text variant="headline" style={styles.sentence}>
           {sentence.map((segment, index) => (
@@ -73,7 +76,7 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
             {update.note}
           </Text>
         ) : null}
-        {expanded ? (
+        {detail ? (
           <View style={styles.details}>
             {details ? (
               <Text variant="callout" color={colors.textMuted}>
@@ -94,11 +97,6 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
             ))}
           </View>
         ) : null}
-        {hasDetails ? (
-          <Text variant="caption" color={colors.primary}>
-            {expanded ? 'Hide details' : 'Show details'}
-          </Text>
-        ) : null}
       </Pressable>
 
       {preview ? null : (
@@ -110,7 +108,7 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
             label={update.congratulated ? 'Remove congrats' : 'Send congrats'}
             onPress={onCongrats}
           />
-          <Action icon="comment" count={update.comments} label="Comment" />
+          <Action icon="comment" count={commentCount} label="Comment" onPress={detail ? undefined : open} />
           <Action icon="send" label="Send" />
         </View>
       )}

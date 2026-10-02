@@ -32,9 +32,10 @@ export type Update = {
   createdAt: number;
   visibility: Visibility;
   congrats: number;
-  comments: number;
   congratulated?: boolean;
 };
+
+export type Comment = { id: string; updateId: string; userId: string; body: string; createdAt: number };
 
 export type Message = { id: string; fromMe: boolean; body: string; time: string };
 export type Conversation = { userId: string; time: string; unread?: number; messages: Message[] };
@@ -62,18 +63,32 @@ export const initialRequestIds = ['nia'];
 const minutesAgo = (minutes: number) => Date.now() - minutes * 60_000;
 
 export const initialUpdates: Update[] = [
-  { id: 'u1', userId: 'priya', kind: 'offer', company: 'Goldman Sachs', role: 'Summer Analyst', term: 'Summer 2027', location: 'New York, NY', note: 'Superday paid off. Still processing this one!', createdAt: minutesAgo(18), visibility: 'friends', congrats: 42, comments: 11 },
-  { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: 'Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14, comments: 4 },
-  { id: 'u3', userId: 'maya', kind: 'accepted', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', location: 'San Francisco, CA', note: 'Signed! Who else is going to be in SF this summer?', createdAt: minutesAgo(130), visibility: 'friends', congrats: 67, comments: 19 },
-  { id: 'u4', userId: 'theo', kind: 'applied', company: 'Spotify', role: 'Data Analyst Intern', term: 'Summer 2027', note: 'Number 14 this week. Keeping the streak alive.', createdAt: minutesAgo(240), visibility: 'private', congrats: 0, comments: 0 },
-  { id: 'u12', userId: 'sam', kind: 'takehome', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'OA', questions: [{ text: 'LRU Cache' }, { text: 'Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7, comments: 1 },
-  { id: 'u5', userId: 'lena', kind: 'milestone', company: 'Microsoft', role: 'UX Research Intern', term: 'Fall 2026', title: 'Wrapped my first research study', note: 'Presented findings to the Teams org. Terrified and thrilled.', createdAt: minutesAgo(410), visibility: 'friends', congrats: 29, comments: 6 },
-  { id: 'u6', userId: 'sam', kind: 'interview', company: 'Duolingo', role: 'Machine Learning Intern', term: 'Summer 2027', stage: 'Phone screen', createdAt: minutesAgo(600), visibility: 'friends', congrats: 11, comments: 2 },
-  { id: 'u7', userId: 'alex', kind: 'interview', company: 'Airbnb', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Technical interview', note: 'Graph problem went well. Fingers crossed.', createdAt: minutesAgo(900), visibility: 'friends', congrats: 16, comments: 3 },
-  { id: 'u8', userId: 'alex', kind: 'applied', company: 'Notion', role: 'Software Engineering Intern', term: 'Summer 2027', note: 'Referred by Sam. Thank you!', createdAt: minutesAgo(2_800), visibility: 'private', congrats: 0, comments: 0 },
-  { id: 'u9', userId: 'maya', kind: 'interview', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', stage: 'Portfolio review', createdAt: minutesAgo(4_300), visibility: 'friends', congrats: 21, comments: 5 },
-  { id: 'u10', userId: 'alex', kind: 'applied', company: 'Ramp', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(5_900), visibility: 'private', congrats: 0, comments: 0 },
-  { id: 'u11', userId: 'jordan', kind: 'applied', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(12_000), visibility: 'private', congrats: 0, comments: 0 },
+  { id: 'u1', userId: 'priya', kind: 'offer', company: 'Goldman Sachs', role: 'Summer Analyst', term: 'Summer 2027', location: 'New York, NY', note: 'Superday paid off. Still processing this one!', createdAt: minutesAgo(18), visibility: 'friends', congrats: 42 },
+  { id: 'u2', userId: 'jordan', kind: 'interview', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Final round', round: 'Final', interviewType: 'Technical', questions: [{ text: 'Design a rate limiter', difficulty: 'Hard' }, { text: 'Merge Intervals', difficulty: 'Medium' }], note: 'Two technical rounds and a system design chat tomorrow.', createdAt: minutesAgo(52), visibility: 'friends', congrats: 14 },
+  { id: 'u3', userId: 'maya', kind: 'accepted', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', location: 'San Francisco, CA', note: 'Signed! Who else is going to be in SF this summer?', createdAt: minutesAgo(130), visibility: 'friends', congrats: 67 },
+  { id: 'u4', userId: 'theo', kind: 'applied', company: 'Spotify', role: 'Data Analyst Intern', term: 'Summer 2027', note: 'Number 14 this week. Keeping the streak alive.', createdAt: minutesAgo(240), visibility: 'private', congrats: 0 },
+  { id: 'u12', userId: 'sam', kind: 'takehome', company: 'Datadog', role: 'Software Engineering Intern', assessmentFormat: 'OA', questions: [{ text: 'LRU Cache' }, { text: 'Number of Islands' }], createdAt: minutesAgo(320), visibility: 'friends', congrats: 7 },
+  { id: 'u5', userId: 'lena', kind: 'milestone', company: 'Microsoft', role: 'UX Research Intern', term: 'Fall 2026', title: 'Wrapped my first research study', note: 'Presented findings to the Teams org. Terrified and thrilled.', createdAt: minutesAgo(410), visibility: 'friends', congrats: 29 },
+  { id: 'u6', userId: 'sam', kind: 'interview', company: 'Duolingo', role: 'Machine Learning Intern', term: 'Summer 2027', stage: 'Phone screen', createdAt: minutesAgo(600), visibility: 'friends', congrats: 11 },
+  { id: 'u7', userId: 'alex', kind: 'interview', company: 'Airbnb', role: 'Software Engineering Intern', term: 'Summer 2027', stage: 'Technical interview', note: 'Graph problem went well. Fingers crossed.', createdAt: minutesAgo(900), visibility: 'friends', congrats: 16 },
+  { id: 'u8', userId: 'alex', kind: 'applied', company: 'Notion', role: 'Software Engineering Intern', term: 'Summer 2027', note: 'Referred by Sam. Thank you!', createdAt: minutesAgo(2_800), visibility: 'private', congrats: 0 },
+  { id: 'u9', userId: 'maya', kind: 'interview', company: 'Figma', role: 'Product Design Intern', term: 'Summer 2027', stage: 'Portfolio review', createdAt: minutesAgo(4_300), visibility: 'friends', congrats: 21 },
+  { id: 'u10', userId: 'alex', kind: 'applied', company: 'Ramp', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(5_900), visibility: 'private', congrats: 0 },
+  { id: 'u11', userId: 'jordan', kind: 'applied', company: 'Stripe', role: 'Software Engineering Intern', term: 'Summer 2027', createdAt: minutesAgo(12_000), visibility: 'private', congrats: 0 },
+];
+
+export const initialComments: Comment[] = [
+  { id: 'c1', updateId: 'u1', userId: 'maya', body: 'LETS GO PRIYA!! Superday queen.', createdAt: minutesAgo(15) },
+  { id: 'c2', updateId: 'u1', userId: 'alex', body: 'Huge. Dinner on you?', createdAt: minutesAgo(12) },
+  { id: 'c3', updateId: 'u1', userId: 'theo', body: 'How many rounds was it in total?', createdAt: minutesAgo(9) },
+  { id: 'c4', updateId: 'u2', userId: 'alex', body: 'The rate limiter one is a classic, token bucket and you are golden.', createdAt: minutesAgo(40) },
+  { id: 'c5', updateId: 'u2', userId: 'sam', body: 'Good luck tomorrow!', createdAt: minutesAgo(30) },
+  { id: 'c6', updateId: 'u3', userId: 'priya', body: 'SF summer crew assemble', createdAt: minutesAgo(120) },
+  { id: 'c7', updateId: 'u3', userId: 'lena', body: 'So proud of you. Figma is lucky.', createdAt: minutesAgo(100) },
+  { id: 'c8', updateId: 'u3', userId: 'jordan', body: 'Congrats Maya!!', createdAt: minutesAgo(90) },
+  { id: 'c9', updateId: 'u12', userId: 'alex', body: 'Number of Islands again? They love that one.', createdAt: minutesAgo(300) },
+  { id: 'c10', updateId: 'u7', userId: 'maya', body: 'Graph problems are your thing. You got this.', createdAt: minutesAgo(850) },
+  { id: 'c11', updateId: 'u9', userId: 'alex', body: 'Your portfolio is unreal, no way they pass.', createdAt: minutesAgo(4_000) },
 ];
 
 export const conversations: Conversation[] = [
