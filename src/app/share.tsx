@@ -131,16 +131,23 @@ export default function ShareScreen() {
       </Section>
 
       <Section title="Details">
-        <ComboField label="Company" value={company} onChangeText={setCompany} options={companies} placeholder="e.g. Stripe" />
-        <ComboField
-          label="Position"
-          value={position}
-          onChangeText={setPosition}
-          options={positions}
-          placeholder="e.g. Software Engineering Intern"
-        />
         {kind === 'interview' ? (
-          <View style={styles.pair}>
+          <View style={styles.group}>
+            <FieldLabel>Type</FieldLabel>
+            <ChipGroup options={interviewTypes} value={interviewType} onChange={toggle(interviewType, setInterviewType)} />
+          </View>
+        ) : null}
+        <View style={styles.pair}>
+          <View style={styles.grow}>
+            <ComboField
+              label="Company"
+              value={company}
+              onChangeText={setCompany}
+              options={companies}
+              placeholder="e.g. Stripe"
+            />
+          </View>
+          {kind === 'interview' ? (
             <View style={styles.round}>
               <ComboField
                 compact
@@ -151,12 +158,15 @@ export default function ShareScreen() {
                 placeholder="2, Final"
               />
             </View>
-            <View style={[styles.type, styles.group]}>
-              <FieldLabel>Type</FieldLabel>
-              <ChipGroup compact options={interviewTypes} value={interviewType} onChange={toggle(interviewType, setInterviewType)} />
-            </View>
-          </View>
-        ) : null}
+          ) : null}
+        </View>
+        <ComboField
+          label="Position"
+          value={position}
+          onChangeText={setPosition}
+          options={positions}
+          placeholder="e.g. Software Engineering Intern"
+        />
         {kind === 'assessment' ? (
           <View style={styles.group}>
             <FieldLabel>Format</FieldLabel>
@@ -248,9 +258,9 @@ const styles = StyleSheet.create({
   kindLine: { alignSelf: 'stretch', height: 2, marginTop: spacing.xs, backgroundColor: 'transparent' },
   group: { gap: spacing.sm },
   pair: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
-  // Just wide enough for "Round 12"; the type chips take the rest of the row.
+  grow: { flex: 1 },
+  // Just wide enough for "Round 12"; company takes the rest of the row.
   round: { width: 92 },
-  type: { flex: 1 },
   questionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   questionInput: { flex: 1 },
   addRow: { flexDirection: 'row' },
