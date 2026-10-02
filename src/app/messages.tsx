@@ -1,8 +1,8 @@
 import { Fragment, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-import { Avatar, Card, Divider, Icon, IconButton, Screen, ScreenHeader, SearchField, Text } from '@/components/ui';
-import { colors, radius, spacing, typography } from '@/constants/theme';
+import { Avatar, Divider, Icon, IconButton, Screen, SearchField, Section, Text, TopBar } from '@/components/ui';
+import { colors, layout, radius, spacing, typography } from '@/constants/theme';
 import { conversations, type Conversation, type Message } from '@/data/mock-data';
 import { useStore } from '@/data/store';
 
@@ -37,10 +37,11 @@ export default function MessagesScreen() {
   );
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
-      <ScreenHeader eyebrow={unread ? `${unread} unread` : 'All caught up'} title="Chats" />
-      <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
-      <Card flush style={styles.list}>
+    <Screen flush keyboardShouldPersistTaps="handled" header={<TopBar title={unread ? `Chats · ${unread} unread` : 'Chats'} />}>
+      <Section>
+        <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
+      </Section>
+      <View style={styles.list}>
         {visible.map((conversation, index) => {
           const user = getUser(conversation.userId);
           const all = [...conversation.messages, ...(sent[conversation.userId] ?? [])];
@@ -86,7 +87,12 @@ export default function MessagesScreen() {
             </Fragment>
           );
         })}
-      </Card>
+        {visible.length ? null : (
+          <Text variant="body" color={colors.textMuted} align="center" style={styles.empty}>
+            No chats match “{query}”.
+          </Text>
+        )}
+      </View>
     </Screen>
   );
 }
@@ -109,18 +115,17 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
   };
 
   return (
-    <Screen scroll={false}>
+    <Screen
+      flush
+      scroll={false}
+      header={
+        <TopBar
+          title={user.name}
+          left={<IconButton icon="back" label="Back" tone="muted" onPress={onBack} />}
+          right={<Avatar user={user} size={36} />}
+        />
+      }>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
-        <View style={styles.threadHeader}>
-          <IconButton icon="back" label="Back" onPress={onBack} />
-          <Avatar user={user} size={40} />
-          <View style={styles.flex}>
-            <Text variant="headline">{user.name}</Text>
-            <Text variant="caption" color={colors.textMuted}>
-              {user.school}
-            </Text>
-          </View>
-        </View>
 
         <ScrollView style={styles.flex} contentContainerStyle={styles.messages} showsVerticalScrollIndicator={false}>
           {[...conversation.messages, ...extra].map((message) => (
@@ -157,8 +162,10 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  list: { marginTop: spacing.lg },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
+  // Full-width white list like the feed; rows are separated by hairline dividers, not a card.
+  list: { backgroundColor: colors.surface, paddingVertical: spacing.xs },
+  empty: { paddingVertical: spacing.xxl },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, paddingHorizontal: layout.gutter },
   rowText: { flex: 1, gap: 3 },
   rowTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   unread: {
@@ -172,34 +179,34 @@ const styles = StyleSheet.create({
   },
   unreadText: { fontWeight: '700' },
   pressed: { opacity: 0.6 },
-  threadHeader: {
+  messages: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+    gap: spacing.sm,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: layout.gutter,
+  },
+  bubble: { maxWidth: '80%', paddingHorizontal: spacing.md + 2, paddingVertical: spacing.sm + 2, borderRadius: radius.lg },
+  incoming: { alignSelf: 'flex-start', backgroundColor: colors.surface, borderBottomLeftRadius: spacing.xs },
+  outgoing: { alignSelf: 'flex-end', backgroundColor: colors.primary, borderBottomRightRadius: spacing.xs },
+  // White bottom bar mirroring the top bar.
+  composer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    paddingBottom: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-  },
-  messages: { flexGrow: 1, justifyContent: 'flex-end', gap: spacing.sm, paddingVertical: spacing.lg },
-  bubble: { maxWidth: '80%', paddingHorizontal: spacing.md + 2, paddingVertical: spacing.sm + 2, borderRadius: radius.lg },
-  incoming: {
-    alignSelf: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: layout.gutter,
     backgroundColor: colors.surface,
-    borderBottomLeftRadius: spacing.xs,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
   },
-  outgoing: { alignSelf: 'flex-end', backgroundColor: colors.primary, borderBottomRightRadius: spacing.xs },
-  composer: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.md },
   input: {
     ...typography.body,
     flex: 1,
     height: 44,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    backgroundColor: colors.background,
     color: colors.text,
   },
   send: {
