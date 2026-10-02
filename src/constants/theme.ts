@@ -42,6 +42,7 @@ export const colors = {
   primaryDeep: palette.indigoDeep,
   primarySoft: palette.indigoSoft,
   onPrimary: palette.white,
+  scrim: 'rgba(21,20,26,0.18)',
   success: palette.mint,
   streak: palette.flame,
   streakSoft: palette.flameLight,

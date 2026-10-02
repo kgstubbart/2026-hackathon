@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { NavMenu } from '@/components/nav-menu';
 import { StreakCard } from '@/components/streak-card';
 import { IconButton } from '@/components/ui';
 import { UpdateCard } from '@/components/update-card';
@@ -9,6 +10,7 @@ import { Wordmark } from '@/components/wordmark';
 import { colors, layout, spacing } from '@/constants/theme';
 import { currentStreakWeeks } from '@/data/mock-data';
 import { useStore } from '@/data/store';
+import { feedKinds } from '@/data/update-kinds';
 
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
@@ -16,15 +18,18 @@ export default function FeedScreen() {
 
   const mine = updates.filter((update) => update.userId === currentUser.id);
   const feed = updates.filter(
-    (update) => update.userId === currentUser.id || (friendIds.includes(update.userId) && update.visibility === 'friends'),
+    (update) =>
+      feedKinds.includes(update.kind) &&
+      (update.userId === currentUser.id || (friendIds.includes(update.userId) && update.visibility === 'friends')),
   );
 
   return (
     <View style={styles.screen}>
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
         <View style={[styles.column, styles.topRow]}>
-          {/* Empty left side keeps the wordmark centered. */}
-          <View style={styles.side} />
+          <View style={styles.side}>
+            <NavMenu />
+          </View>
           <Wordmark />
           <View style={[styles.side, styles.sideRight]}>
             <IconButton icon="friends" label="Friends" tone="muted" onPress={() => router.navigate('/friends')} />
