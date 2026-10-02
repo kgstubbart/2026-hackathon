@@ -25,7 +25,7 @@ export default function FeedScreen() {
         <View style={[styles.column, styles.topRow]}>
           <View style={styles.side}>
             <IconButton icon="plus" label="Share an update" tone="muted" onPress={() => router.navigate('/share')} />
-            <IconButton icon="search" label="Find friends" tone="muted" onPress={() => router.navigate('/friends')} />
+            <IconButton icon="search" label="Search" tone="muted" onPress={() => router.navigate('/search')} />
           </View>
           <Wordmark />
           <View style={[styles.side, styles.sideRight]}>

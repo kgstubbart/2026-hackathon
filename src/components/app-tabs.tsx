@@ -9,7 +9,7 @@ import { colors, radius, shadow, spacing } from '@/constants/theme';
 
 const tabs: { name: string; href: Href; icon: IconName; label: string }[] = [
   { name: 'index', href: '/', icon: 'home', label: 'Feed' },
-  { name: 'friends', href: '/friends', icon: 'friends', label: 'Friends' },
+  { name: 'search', href: '/search', icon: 'search', label: 'Search' },
   { name: 'share', href: '/share', icon: 'plus', label: 'Share' },
   { name: 'messages', href: '/messages', icon: 'chat', label: 'Chats' },
   { name: 'profile', href: '/profile', icon: 'profile', label: 'Profile' },
@@ -26,6 +26,8 @@ export default function AppTabs() {
               <TabButton icon={tab.icon} label={tab.label} primary={tab.name === 'share'} />
             </TabTrigger>
           ))}
+          {/* Friends is a route but not a tab; reachable from Search. */}
+          <TabTrigger name="friends" href="/friends" style={styles.hidden} />
         </TabBar>
       </TabList>
     </Tabs>
@@ -61,6 +63,7 @@ function TabButton({ icon, label, primary, isFocused, ...props }: TabButtonProps
 
 const styles = StyleSheet.create({
   slot: { flex: 1 },
+  hidden: { display: 'none' },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
