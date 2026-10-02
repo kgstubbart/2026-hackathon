@@ -29,7 +29,7 @@ Import colors with `import { colors, tones } from '@/constants/theme'`. Use the 
 | `colors.surface` | `#FFFFFF` | Cards, posts, inputs, top and bottom bars |
 | `colors.surfaceMuted` | `#EEECE6` | Disabled or "missed" states (for example a missed streak day) |
 | `colors.border` | `#E6E3DC` | Every hairline border and divider |
-| `colors.text` | `#15141A` | Primary text and icons. Also the selected-chip fill and the bold outlines in Search. |
+| `colors.text` | `#15141A` | Primary text and icons. Also the selected-chip fill. |
 | `colors.textMuted` | `#5D5B66` | Secondary text: subtitles, meta, notes |
 | `colors.textFaint` | `#9C9AA5` | Tertiary text: placeholders, timestamps, field labels, inactive tab icons |
 
@@ -50,7 +50,7 @@ Each kind of update has one tone. A tone is a pair: `fg` for icons and text, `bg
 | --- | --- | --- | --- | --- |
 | Application | `sky` | `#2563EB` | `#E5EDFF` | `send` |
 | Interview | `amber` | `#B45309` | `#FDF0D5` | `calendar` |
-| Assessment | `teal` | `#0E7490` | `#DDF3F7` | `code` |
+| Takehome/OA (`takehome`) | `teal` | `#0E7490` | `#DDF3F7` | `code` |
 | Offer | `mint` | `#0F8A5F` | `#DCF4E8` | `trophy` |
 | Accepted | `primary` | `#4F46E5` | `#ECEBFE` | `briefcase` |
 | Milestone | `rose` | `#D6336C` | `#FDE4EE` | `star` |
@@ -86,13 +86,13 @@ Always use `<Text variant="…">` from `@/components/ui`. It sets the size, line
 
 | Variant | Size / line | Weight | Use for |
 | --- | --- | --- | --- |
-| `display` | 32 / 38 | 800 | Screen titles (via `ScreenHeader`) and big stat numbers. One per screen. |
+| `display` | 32 / 38 | 800 | Big stat numbers only. Pages have no big titles. |
 | `title` | 22 / 28 | 700 | Profile name, large card titles |
 | `headline` | 17 / 23 | 600 | Names, post headlines, section headers, list-row titles, button labels |
 | `body` | 15 / 21 | 400 | Notes, messages, paragraphs. This is the default. |
 | `callout` | 14 / 19 | 500 | Secondary row text, chips, small button labels, counts |
 | `caption` | 12 / 16 | 500 | Meta info (school, time, term), badges |
-| `label` | 11 / 14 | 700, UPPERCASE, +0.8 tracking | Eyebrows above titles and form field labels |
+| `label` | 11 / 14 | 700, UPPERCASE, +0.8 tracking | Form field labels |
 
 ```tsx
 <Text variant="headline">{author.name}</Text>
@@ -154,21 +154,20 @@ Import from `@/components/ui`.
 
 | Component | Use it for | Notes |
 | --- | --- | --- |
-| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style); pass a `TopBar` as `header`. |
-| `TopBar` | Fixed white header on a flush screen | Left and right slots and a centered `headline` title, like the feed header |
+| `Screen` | Every standard screen | Handles the safe area, scrolling, gutter and max width. `scroll={false}` for chat-like layouts. `flush` drops the gutter and stacks full-width `Section`s with thin gaps (feed style). Main pages pass `<AppHeader />` as `header`; task flows (Share) pass a `TopBar`. |
+| `TopBar` | The bar behind `AppHeader`, and the header of task flows (Share) | Left and right slots (`IconButton`s with `tone="muted"`) and a centered title (a `headline` string or a node such as the `Wordmark`). |
 | `Section` | Full-width white block on a flush screen | Optional `title`; the gray background shows between sections. No radius, border or shadow. |
-| `ScreenHeader` | Screen title | Optional `eyebrow` (label above the title) and a `right` slot for `IconButton`s |
 | `SectionHeader` | Titles inside a screen | Optional `action` (usually a small `Button`) |
 | `Text` | All text | See Typography |
 | `Button` | Actions | `variant`: `primary` (one main action per screen), `secondary`, `outline`, `ghost`. `size`: `sm`, `md`, `lg`. Optional `icon`. |
 | `IconButton` | Icon-only actions | Always pass `label` for accessibility. `tone`: `surface` (bordered white), `muted` (gray fill, used for the feed header's friends button), `plain`. |
-| `Chip` / `ChipGroup` | Single-choice pickers with a few fixed options (interview type, assessment format, difficulty) | Selected chip = dark fill. `wrap` for narrow columns, `compact` to squeeze a few options beside another field. Not for filtering the feed; the feed has no filters. |
+| `Chip` / `ChipGroup` | Single-choice pickers with a few fixed options (interview type, OA or take-home, difficulty) | Selected chip = dark fill. `wrap` for narrow columns, `compact` to squeeze a few options beside another field. Not for filtering the feed; the feed has no filters. |
 | `Card` / `Divider` | Grouped content | `flush` for lists of rows separated by `Divider` |
 | `Avatar` | People | Initials on the user's color. Optional `ring` color. |
 | `CompanyMark` | Companies | First letter on white, colored from the tones |
 | `TextField` / `FieldLabel` | Forms | `label` renders in the `label` variant above the input |
 | `ComboField` | Share form fields with many possible answers (company, position, round) | A text field that suggests matches under it while you type. No dropdown arrow, nothing shown until you type; a typed answer that matches nothing is kept as is. |
-| `SearchField` | Simple pill search | The Search tab uses its own Uber-style field box instead |
+| `SearchField` | Pill search on Search, Chats and Friends | |
 
 App-level components:
 
@@ -182,20 +181,23 @@ App-level components:
 
 These are deliberate. Keep new work consistent with them.
 
-- **Feed:** a fixed white header bar with exactly three things: the menu (`NavMenu`) on the left, the centered `Wordmark`, and one friends `IconButton` on the right that opens `/friends`. Don't add more header buttons. Below it, the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
+- **App header** (`AppHeader`): a fixed white bar with exactly three things: the menu (`NavMenu`) on the left, the centered `Wordmark`, and one friends `IconButton` on the right that opens `/friends`. Don't add more header buttons. Every main page uses it: pass `header={<AppHeader />}` to `Screen`. Pages have no big title or eyebrow under it; put page actions (like Profile's edit button) in the content. The only exception is Share, a task flow that uses a plain `TopBar` with a close button.
+- **Feed:** the `AppHeader`, then the `StreakCard`, then posts in chronological order. **No filters, summary banners or highlight carousels.**
 - **Feed content:** only interviews, offers and accepted offers (`feedKinds` in `update-kinds.ts`). Applications and milestones never appear in the feed.
 - **Menu** (`src/components/nav-menu.tsx`): a dropdown below the header listing every page in `src/constants/pages.ts`, with the current page highlighted in `primarySoft`. When you add a page, add it to `pages.ts`; set `tab: true` only if it belongs in the tab bar.
 - **Feed posts** (LinkedIn and Threads style): full-width white sections, not floating rounded cards. From top to bottom:
   1. Author header: avatar, name, "major · school", "time · audience icon", and a `more` icon on the right.
-  2. One sentence from `postSentence()`, in the `headline` variant at regular weight with only the kind in bold: "Got an **Interview** at {company} for the {role} position!", "Got an **Offer** from …", "**Accepted** an offer at …".
+  2. One sentence from `postSentence()`, in the `headline` variant at regular weight with the kind, company and role in bold: "Got an **Interview** at **{company}** for the **{role}** position!", "Got an **Offer** from **…**", "**Accepted** an offer at **…**".
   3. The poster's optional comment (`body`, `textMuted`).
   4. Action row: icons with counts (congrats, comment, send), with no text labels.
 
-  No colored box, company mark or kind badge inside posts; the bold keyword carries the kind.
+  No colored box, company mark or kind badge inside posts; the bold words carry the kind, company and role. Nothing else shows in the feed: tapping the post body or the comment icon opens the post page.
+- **Post page** (`/post/[id]`): a `TopBar` titled "Post" with back on the left, then the same post rendered with `detail` (adds the round, type or format line and the question list under the comment), then a "Comments · n" `Section` of rows (32pt avatar, bold name, time, body) and a white composer bar pinned to the bottom like the chat thread.
 - **Streak** (Strava style): "Your streak" plus an outline Share button. On the left, the flame with the week count and "Weeks" underneath. On the right, Mon–Sun circles: done = dark fill with an icon, today = bold outline, missed = `surfaceMuted` fill, upcoming = hairline outline.
-- **Search** (Uber "Where to?" style): a bordered `lg` box of stacked fields linked by a dot, line and square rail. A round "+" beside the box adds a field. Results are flat rows: an icon on the left, the title with the **matched text in bold**, a muted subtitle, and hairline dividers that start at the text column.
+- **Search** (repository): the `AppHeader`, then a `SearchField`, then flat full-width white lists with hairline dividers (40pt `CompanyMark` or tone icon tile on the left, `headline` title with the matched text in bold, muted `caption` subtitle, a `forward` chevron on the right). Idle shows every company; a query shows Companies, Positions and Questions sections.
+- **Company page**: a `TopBar` with back on the left, the company name as title and its `CompanyMark` on the right, then a `Section` per position whose rows show the experience label, its questions and "author · time".
 - **Forms** (Share): feed style, not cards. A `TopBar` (close on the left, title centered), then full-width `Section`s separated by thin gaps: a flat tab-like kind picker (icon over label, the selected one underlined in its tone), a fields section (`ComboField` for open answers, `ChipGroup` for fixed options), a repeatable list section (interview questions) and a final section with one large primary button and a one-line caption underneath. Disable the button until required fields are filled, and say why in the caption. No audience picker and no preview: applications are always private, everything else always posts to the feed.
-- **Lists** (Friends, Chats): rows inside a `flush` `Card`, separated by `Divider`s, with the avatar on the left and a single action or meta element on the right.
+- **Lists** (Friends, Chats): rows separated by `Divider`s, with the avatar on the left and a single action or meta element on the right. Chats is feed style: the `AppHeader`, a `Section` holding the search field, then a full-width white list (no card). A chat thread keeps the `AppHeader` and adds a white thread bar (back, avatar, name, school) with a hairline bottom border, bubbles over the gray background, and a white composer bar with a hairline top border.
 
 ## 9. Interaction and accessibility
 

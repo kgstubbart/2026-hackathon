@@ -5,9 +5,9 @@ import { colors } from '@/constants/theme';
 
 // "StrJava" with "Str" struck through by a single bold bar. The bar is a drawn View
 // (not textDecorationLine) so its thickness can scale with the wordmark.
-export function Wordmark({ size = 24 }: { size?: number }) {
+export function Wordmark({ size = 24, color = colors.text }: { size?: number; color?: string }) {
   const lineHeight = size * 1.2;
-  const text = [styles.mark, { fontSize: size, lineHeight }];
+  const text = [styles.mark, { fontSize: size, lineHeight, color }];
   return (
     <View accessible accessibilityRole="header" accessibilityLabel="StrJava" style={styles.row}>
       <View>
@@ -15,6 +15,7 @@ export function Wordmark({ size = 24 }: { size?: number }) {
         <View
           style={[
             styles.bar,
+            { backgroundColor: color },
             { height: Math.max(2, Math.round(size * 0.16)), top: lineHeight * 0.5, left: -size * 0.12, right: size * 0.04 },
           ]}
         />

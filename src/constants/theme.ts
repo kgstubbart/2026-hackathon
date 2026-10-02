@@ -66,6 +66,9 @@ export const spacing = { xxs: 2, xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, 
 export const radius = { sm: 10, md: 14, lg: 20, xl: 28, pill: 999 } as const;
 
 export const typography = {
+  // Oversized poster type, only for StrJava Wrapped.
+  hero: { fontSize: 96, lineHeight: 96, fontWeight: '900', letterSpacing: -4 },
+  poster: { fontSize: 40, lineHeight: 44, fontWeight: '900', letterSpacing: -1.5 },
   display: { fontSize: 32, lineHeight: 38, fontWeight: '800', letterSpacing: -0.9 },
   title: { fontSize: 22, lineHeight: 28, fontWeight: '700', letterSpacing: -0.4 },
   headline: { fontSize: 17, lineHeight: 23, fontWeight: '600', letterSpacing: -0.2 },
@@ -81,6 +84,21 @@ export const shadow = {
   card: { boxShadow: '0 1px 2px rgba(21,20,26,0.04), 0 6px 18px rgba(21,20,26,0.05)' },
   raised: { boxShadow: '0 8px 20px rgba(79,70,229,0.32)' },
 } satisfies Record<string, ViewStyle>;
+
+// StrJava Wrapped: one loud gradient per slide. `fg` is the text color, `accent` the highlight color.
+type WrappedTheme = { colors: readonly [string, string, ...string[]]; fg: string; accent: string };
+export const wrapped = {
+  intro: { colors: ['#4F46E5', '#9333EA', '#DB2777'], fg: '#FFFFFF', accent: '#FDE047' },
+  applications: { colors: ['#0B0A12', '#1E1B4B'], fg: '#FFFFFF', accent: '#A3E635' },
+  interviews: { colors: ['#F59E0B', '#EA580C'], fg: '#1C1206', accent: '#FFFFFF' },
+  streak: { colors: ['#FC5200', '#E11D48'], fg: '#FFFFFF', accent: '#FDE047' },
+  circle: { colors: ['#0F8A5F', '#0D9488', '#0E7490'], fg: '#FFFFFF', accent: '#FDE047' },
+  hype: { colors: ['#DB2777', '#7C3AED'], fg: '#FFFFFF', accent: '#A3E635' },
+  archetype: { colors: ['#FDE047', '#FB923C'], fg: '#15141A', accent: '#4F46E5' },
+  summary: { colors: ['#15141A', '#2E2A8F', '#4F46E5'], fg: '#FFFFFF', accent: '#FDE047' },
+} satisfies Record<string, WrappedTheme>;
+export type WrappedSlideTheme = (typeof wrapped)[keyof typeof wrapped];
+export const wrappedGlass = { fill: 'rgba(255,255,255,0.14)', line: 'rgba(255,255,255,0.35)', track: 'rgba(255,255,255,0.3)' };
 
 export const layout = {
   gutter: spacing.xl,

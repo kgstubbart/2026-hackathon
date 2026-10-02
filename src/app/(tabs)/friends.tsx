@@ -1,8 +1,9 @@
 import { Fragment, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { AppHeader } from '@/components/app-header';
 import { KindBadge } from '@/components/update-card';
-import { Avatar, Button, Card, Divider, Screen, ScreenHeader, SearchField, SectionHeader, Text } from '@/components/ui';
+import { Avatar, Button, Card, Divider, Screen, SearchField, SectionHeader, Text } from '@/components/ui';
 import { colors, spacing } from '@/constants/theme';
 import type { User } from '@/data/mock-data';
 import { useStore } from '@/data/store';
@@ -23,8 +24,7 @@ export default function FriendsScreen() {
   const latestFor = (id: string) => updates.find((update) => update.userId === id && update.visibility === 'friends');
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
-      <ScreenHeader eyebrow={`${friendIds.length} friends`} title="Friends" />
+    <Screen keyboardShouldPersistTaps="handled" header={<AppHeader />}>
       <SearchField value={query} onChangeText={setQuery} placeholder="Search by name or school" />
 
       {requests.length ? (
