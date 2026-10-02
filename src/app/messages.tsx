@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
+import { AppHeader } from '@/components/app-header';
 import { Avatar, Card, Divider, Icon, IconButton, Screen, ScreenHeader, SearchField, Text } from '@/components/ui';
 import { colors, radius, spacing, typography } from '@/constants/theme';
 import { conversations, type Conversation, type Message } from '@/data/mock-data';
@@ -37,7 +38,7 @@ export default function MessagesScreen() {
   );
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
+    <Screen keyboardShouldPersistTaps="handled" header={<AppHeader />}>
       <ScreenHeader eyebrow={unread ? `${unread} unread` : 'All caught up'} title="Chats" />
       <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
       <Card flush style={styles.list}>
@@ -109,7 +110,7 @@ function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
   };
 
   return (
-    <Screen scroll={false}>
+    <Screen scroll={false} header={<AppHeader />}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
         <View style={styles.threadHeader}>
           <IconButton icon="back" label="Back" onPress={onBack} />

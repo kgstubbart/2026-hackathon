@@ -2,6 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import { Fragment, useCallback, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
+import { AppHeader } from '@/components/app-header';
 import { KindBadge, UpdateCard } from '@/components/update-card';
 import { Avatar, Button, Card, Chip, Divider, Icon, Screen, ScreenHeader, SectionHeader, Text, type IconName } from '@/components/ui';
 import { colors, radius, spacing, typography } from '@/constants/theme';
@@ -57,7 +58,7 @@ export default function SearchScreen() {
 
   if (!searchActive && mode === 'posts') {
     return (
-      <Screen scroll={false}>
+      <Screen scroll={false} header={<AppHeader />}>
         <ScreenHeader eyebrow="Find updates and people" title="Search" />
         <ModeToggle mode={mode} onChange={selectMode} />
         <View style={styles.idleLayout}>
@@ -85,7 +86,7 @@ export default function SearchScreen() {
   }
 
   return (
-    <Screen keyboardShouldPersistTaps="handled">
+    <Screen keyboardShouldPersistTaps="handled" header={<AppHeader />}>
       <ScreenHeader eyebrow="Find updates and people" title="Search" />
       <ModeToggle mode={mode} onChange={selectMode} />
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { AppHeader } from '@/components/app-header';
 import { ProfileStats } from '@/components/profile-stats';
 import { Avatar, Icon, IconButton, Screen, ScreenHeader, SegmentedControl, Text } from '@/components/ui';
 import { UpdateCard } from '@/components/update-card';
@@ -18,7 +19,7 @@ export default function ProfileScreen() {
   const mine = updates.filter((update) => update.userId === currentUser.id);
 
   return (
-    <Screen>
+    <Screen header={<AppHeader />}>
       <ScreenHeader eyebrow="Your internship hunt" title="Profile" right={<IconButton icon="edit" label="Edit profile" />} />
 
       <View style={styles.profile}>

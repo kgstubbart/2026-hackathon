@@ -17,7 +17,8 @@ type ScreenProps = PropsWithChildren<
 
 export function Screen({ children, scroll = true, flush, header, keyboardShouldPersistTaps }: ScreenProps) {
   const insets = useSafeAreaInsets();
-  const top = header ? 0 : Math.max(insets.top, spacing.lg);
+  // The header handles the safe area; gutter screens still need breathing room below it.
+  const top = header ? (flush ? 0 : spacing.lg) : Math.max(insets.top, spacing.lg);
   const column = [styles.column, flush ? styles.flush : styles.gutter];
 
   if (!scroll) {
@@ -47,13 +48,13 @@ export function Screen({ children, scroll = true, flush, header, keyboardShouldP
 }
 
 // Fixed white bar at the top of a flush screen, like the feed header: a slot on each side and a title in the middle.
-export function TopBar({ title, left, right }: { title: string; left?: ReactNode; right?: ReactNode }) {
+export function TopBar({ title, left, right }: { title: ReactNode; left?: ReactNode; right?: ReactNode }) {
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
       <View style={[styles.column, styles.topRow]}>
         <View style={styles.topSide}>{left}</View>
-        <Text variant="headline">{title}</Text>
+        {typeof title === 'string' ? <Text variant="headline">{title}</Text> : title}
         <View style={[styles.topSide, styles.topSideRight]}>{right}</View>
       </View>
     </View>
