@@ -120,7 +120,6 @@ export default function ShareScreen() {
     <Screen flush keyboardShouldPersistTaps="handled">
       <HeaderBlock>
         <ScreenHeader
-          eyebrow="New update"
           title="Share"
           right={
             <IconButton
