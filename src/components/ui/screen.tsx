@@ -63,7 +63,7 @@ export function TopBar({ title, left, right }: { title: ReactNode; left?: ReactN
   const topInset = useTopInset();
   return (
     <View style={[styles.topBar, { paddingTop: topInset + spacing.md }]}>
-      <View style={[styles.column, styles.topRow]}>
+      <View style={styles.topRow}>
         <View style={styles.topSide}>{left}</View>
         {typeof title === 'string' ? <Text variant="headline">{title}</Text> : title}
         <View style={[styles.topSide, styles.topSideRight]}>{right}</View>
@@ -121,7 +121,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg },
+  // No `flex: 1` here: inside an auto-height bar that collapses the row to zero height and its contents
+  // overflow upward out of the bar.
+  topRow: {
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 42,
+    paddingHorizontal: spacing.lg,
+  },
   topSide: { flexDirection: 'row', gap: spacing.sm, flex: 1 },
   topSideRight: { justifyContent: 'flex-end' },
   header: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingTop: spacing.sm, paddingBottom: spacing.xl },
