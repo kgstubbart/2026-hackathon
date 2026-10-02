@@ -1,31 +1,214 @@
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Avatar, Chip, Heading, Screen } from '@/components/job-hunt-ui';
-import { theme } from '@/constants/theme';
-import { useJobHunt } from '@/data/job-hunt-store';
+import { Fragment, useState } from 'react';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
-type Conversation = { userId: string; tag?: string; time: string; body: string; unread?: number };
-const conversations: Conversation[] = [
-  { userId: 'nina', tag: 'Recruiter', time: '9:24 AM', body: 'Great news — the team would love to meet you...', unread: 2 },
-  { userId: 'sam', tag: 'Peer', time: '8:51 AM', body: 'I sent the referral — rooting for you!', unread: 1 },
-  { userId: 'maya', tag: 'Peer', time: 'Yesterday', body: 'Want to practice portfolio stories Sunday?' },
-  { userId: 'marcus', tag: 'Recruiter', time: 'Tue', body: 'Thanks for sharing your availability.' },
-  { userId: 'priya', time: 'Mon', body: 'You’ve got this. Your case study is strong.' },
-];
+import { Avatar, Card, Divider, Icon, IconButton, Screen, ScreenHeader, SearchField, Text } from '@/components/ui';
+import { colors, radius, spacing, typography } from '@/constants/theme';
+import { conversations, type Conversation, type Message } from '@/data/mock-data';
+import { useStore } from '@/data/store';
 
 export default function MessagesScreen() {
-  const { users } = useJobHunt();
-  const [selected, setSelected] = useState<Conversation | null>(null);
-  const [filter, setFilter] = useState('All');
-  const [reply, setReply] = useState('');
-  const [sent, setSent] = useState<string[]>([]);
-  if (selected) {
-    const user = users.find((item) => item.id === selected.userId)!;
-    return <Screen><View style={styles.chatHeader}><Pressable onPress={() => setSelected(null)}><Text style={styles.back}>‹</Text></Pressable><Avatar user={user} size={42} /><View><Text style={styles.chatName}>{user.name}</Text><Text style={styles.online}>● Active now</Text></View></View><View style={styles.messages}><Bubble body={selected.body.replace('...', '')} /><Bubble body="How can I help you prepare?" />{sent.map((body) => <Bubble key={body} body={body} outgoing />)}</View><View style={styles.composer}><TextInput value={reply} onChangeText={setReply} placeholder="Message..." style={styles.composerInput} /><Pressable onPress={() => { if (reply.trim()) { setSent((items) => [...items, reply]); setReply(''); } }} style={styles.send}><Text style={styles.sendText}>↑</Text></Pressable></View></Screen>;
+  const { getUser } = useStore();
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [sent, setSent] = useState<Record<string, Message[]>>({});
+  const [readIds, setReadIds] = useState<string[]>([]);
+  const unreadFor = (conversation: Conversation) => (readIds.includes(conversation.userId) ? 0 : (conversation.unread ?? 0));
+
+  const open = conversations.find((conversation) => conversation.userId === openId);
+  if (open) {
+    return (
+      <Thread
+        conversation={open}
+        extra={sent[open.userId] ?? []}
+        onBack={() => setOpenId(null)}
+        onSend={(body) =>
+          setSent((all) => ({
+            ...all,
+            [open.userId]: [...(all[open.userId] ?? []), { id: `${Date.now()}`, fromMe: true, body, time: 'Now' }],
+          }))
+        }
+      />
+    );
   }
-  const visible = conversations.filter((conversation) => filter === 'All' || (filter === 'Unread' ? !!conversation.unread : conversation.tag === filter.slice(0, -1)));
-  return <Screen><ScrollView contentContainerStyle={styles.content}><Heading eyebrow="3 unread" title="Messages" action="□" /><View style={styles.search}><Text style={styles.searchIcon}>⌕</Text><TextInput placeholder="Search conversations" placeholderTextColor={theme.colors.lightText} style={styles.searchInput} /></View><View style={styles.filters}><Chip label="All" selected={filter === 'All'} onPress={() => setFilter('All')} /><Chip label="Recruiters" selected={filter === 'Recruiters'} onPress={() => setFilter('Recruiters')} /><Chip label="Peers" selected={filter === 'Peers'} onPress={() => setFilter('Peers')} /><Chip label="Unread" selected={filter === 'Unread'} onPress={() => setFilter('Unread')} /></View><View style={styles.reminder}><Text style={styles.clock}>◷</Text><View><Text style={styles.reminderTitle}>Reply to Nina today</Text><Text style={styles.reminderCopy}>Keep your average response time under 4 hours</Text></View><Text style={styles.chevron}>›</Text></View><View style={styles.list}>{visible.map((conversation) => <ConversationRow key={conversation.userId} conversation={conversation} onPress={() => setSelected(conversation)} />)}</View></ScrollView></Screen>;
+
+  const unread = conversations.reduce((sum, conversation) => sum + unreadFor(conversation), 0);
+  const visible = conversations.filter((conversation) =>
+    getUser(conversation.userId).name.toLowerCase().includes(query.trim().toLowerCase()),
+  );
+
+  return (
+    <Screen keyboardShouldPersistTaps="handled">
+      <ScreenHeader eyebrow={unread ? `${unread} unread` : 'All caught up'} title="Chats" />
+      <SearchField value={query} onChangeText={setQuery} placeholder="Search chats" />
+      <Card flush style={styles.list}>
+        {visible.map((conversation, index) => {
+          const user = getUser(conversation.userId);
+          const all = [...conversation.messages, ...(sent[conversation.userId] ?? [])];
+          const last = all[all.length - 1];
+          const unreadCount = unreadFor(conversation);
+          return (
+            <Fragment key={conversation.userId}>
+              {index > 0 ? <Divider /> : null}
+              <Pressable
+                onPress={() => {
+                  setOpenId(conversation.userId);
+                  setReadIds((ids) => [...ids, conversation.userId]);
+                }}
+                style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+                <Avatar user={user} size={48} />
+                <View style={styles.rowText}>
+                  <View style={styles.rowTop}>
+                    <Text variant="headline" numberOfLines={1} style={styles.flex}>
+                      {user.name}
+                    </Text>
+                    <Text variant="caption" color={unreadCount ? colors.primary : colors.textFaint}>
+                      {last.time}
+                    </Text>
+                  </View>
+                  <View style={styles.rowTop}>
+                    <Text
+                      variant="callout"
+                      numberOfLines={1}
+                      color={unreadCount ? colors.text : colors.textMuted}
+                      style={styles.flex}>
+                      {last.fromMe ? `You: ${last.body}` : last.body}
+                    </Text>
+                    {unreadCount ? (
+                      <View style={styles.unread}>
+                        <Text variant="caption" color={colors.onPrimary} style={styles.unreadText}>
+                          {unreadCount}
+                        </Text>
+                      </View>
+                    ) : null}
+                  </View>
+                </View>
+              </Pressable>
+            </Fragment>
+          );
+        })}
+      </Card>
+    </Screen>
+  );
 }
-function ConversationRow({ conversation, onPress }: { conversation: Conversation; onPress: () => void }) { const { users } = useJobHunt(); const user = users.find((item) => item.id === conversation.userId)!; return <Pressable onPress={onPress} style={styles.row}><Avatar user={user} size={59} /><View style={{ flex: 1 }}><View style={styles.nameLine}><Text style={styles.rowName}>{user.name}</Text>{conversation.tag ? <Text style={styles.tag}>{conversation.tag}</Text> : null}</View><Text style={styles.rowSub}>{user.headline}</Text><Text numberOfLines={1} style={styles.preview}>{conversation.body}</Text></View><View style={styles.rowEnd}><Text style={[styles.time, conversation.unread ? styles.unreadTime : undefined]}>{conversation.time}</Text>{conversation.unread ? <View style={styles.unread}><Text style={styles.unreadText}>{conversation.unread}</Text></View> : null}</View></Pressable>; }
-function Bubble({ body, outgoing = false }: { body: string; outgoing?: boolean }) { return <View style={[styles.bubble, outgoing ? styles.outgoing : styles.incoming]}><Text style={[styles.messageText, outgoing && styles.outgoingText]}>{body}</Text></View>; }
-const styles = StyleSheet.create({ content: { paddingBottom: 25 }, search: { marginHorizontal: 24, flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', height: 73, borderRadius: 24, borderWidth: 1, borderColor: theme.colors.line, paddingHorizontal: 20 }, searchIcon: { color: theme.colors.muted, fontSize: 29, marginRight: 12 }, searchInput: { flex: 1, fontSize: 19, color: theme.colors.ink }, filters: { flexDirection: 'row', gap: 9, marginHorizontal: 24, marginTop: 22 }, reminder: { marginHorizontal: 24, marginTop: 20, padding: 20, borderRadius: 25, backgroundColor: '#FFF0EC', flexDirection: 'row', gap: 15, alignItems: 'center' }, clock: { color: theme.colors.coral, fontSize: 29 }, reminderTitle: { color: theme.colors.ink, fontSize: 18, marginBottom: 4 }, reminderCopy: { color: theme.colors.muted, fontSize: 14 }, chevron: { color: theme.colors.coral, fontSize: 31, marginLeft: 'auto' }, list: { backgroundColor: '#fff', borderRadius: 28, borderWidth: 1, borderColor: theme.colors.line, marginHorizontal: 24, marginTop: 20, paddingHorizontal: 20 }, row: { flexDirection: 'row', gap: 13, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: theme.colors.line }, nameLine: { flexDirection: 'row', alignItems: 'center', gap: 8 }, rowName: { color: theme.colors.ink, fontSize: 20 }, tag: { backgroundColor: theme.colors.blueSoft, color: theme.colors.blue, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, overflow: 'hidden', fontSize: 12 }, rowSub: { color: theme.colors.lightText, fontSize: 14, marginTop: 4 }, preview: { color: theme.colors.ink, fontSize: 16, marginTop: 7 }, rowEnd: { alignItems: 'flex-end', gap: 12 }, time: { color: theme.colors.lightText, fontSize: 14 }, unreadTime: { color: theme.colors.coral }, unread: { backgroundColor: theme.colors.coral, width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center' }, unreadText: { color: '#fff', fontWeight: '800' }, chatHeader: { paddingHorizontal: 24, paddingVertical: 15, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: theme.colors.line }, back: { color: theme.colors.ink, fontSize: 42, lineHeight: 42 }, chatName: { color: theme.colors.ink, fontSize: 19, fontWeight: '700' }, online: { color: theme.colors.green, fontSize: 13, marginTop: 2 }, messages: { flex: 1, padding: 24, gap: 12, justifyContent: 'flex-end' }, bubble: { maxWidth: '82%', borderRadius: 18, padding: 14 }, incoming: { alignSelf: 'flex-start', backgroundColor: '#fff', borderBottomLeftRadius: 4 }, outgoing: { alignSelf: 'flex-end', backgroundColor: theme.colors.coral, borderBottomRightRadius: 4 }, messageText: { color: theme.colors.ink, fontSize: 17, lineHeight: 23 }, outgoingText: { color: '#fff' }, composer: { padding: 12, flexDirection: 'row', gap: 10, borderTopWidth: 1, borderColor: theme.colors.line, backgroundColor: '#fff' }, composerInput: { flex: 1, backgroundColor: theme.colors.input, borderRadius: 20, paddingHorizontal: 15, fontSize: 16 }, send: { backgroundColor: theme.colors.coral, borderRadius: 20, width: 44, alignItems: 'center', justifyContent: 'center' }, sendText: { color: '#fff', fontWeight: '800' } });
+
+type ThreadProps = {
+  conversation: Conversation;
+  extra: Message[];
+  onBack: () => void;
+  onSend: (body: string) => void;
+};
+
+function Thread({ conversation, extra, onBack, onSend }: ThreadProps) {
+  const { getUser } = useStore();
+  const [draft, setDraft] = useState('');
+  const user = getUser(conversation.userId);
+  const send = () => {
+    if (!draft.trim()) return;
+    onSend(draft.trim());
+    setDraft('');
+  };
+
+  return (
+    <Screen scroll={false}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
+        <View style={styles.threadHeader}>
+          <IconButton icon="back" label="Back" onPress={onBack} />
+          <Avatar user={user} size={40} />
+          <View style={styles.flex}>
+            <Text variant="headline">{user.name}</Text>
+            <Text variant="caption" color={colors.textMuted}>
+              {user.school}
+            </Text>
+          </View>
+        </View>
+
+        <ScrollView style={styles.flex} contentContainerStyle={styles.messages} showsVerticalScrollIndicator={false}>
+          {[...conversation.messages, ...extra].map((message) => (
+            <View key={message.id} style={[styles.bubble, message.fromMe ? styles.outgoing : styles.incoming]}>
+              <Text variant="body" color={message.fromMe ? colors.onPrimary : colors.text}>
+                {message.body}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+
+        <View style={styles.composer}>
+          <TextInput
+            value={draft}
+            onChangeText={setDraft}
+            onSubmitEditing={send}
+            placeholder={`Message ${user.name.split(' ')[0]}`}
+            placeholderTextColor={colors.textFaint}
+            style={styles.input}
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Send"
+            onPress={send}
+            disabled={!draft.trim()}
+            style={[styles.send, !draft.trim() && styles.sendDisabled]}>
+            <Icon name="arrowUp" size={18} color={colors.onPrimary} />
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  list: { marginTop: spacing.lg },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
+  rowText: { flex: 1, gap: 3 },
+  rowTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  unread: {
+    minWidth: 20,
+    height: 20,
+    paddingHorizontal: 6,
+    borderRadius: 10,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  unreadText: { fontWeight: '700' },
+  pressed: { opacity: 0.6 },
+  threadHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingBottom: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  messages: { flexGrow: 1, justifyContent: 'flex-end', gap: spacing.sm, paddingVertical: spacing.lg },
+  bubble: { maxWidth: '80%', paddingHorizontal: spacing.md + 2, paddingVertical: spacing.sm + 2, borderRadius: radius.lg },
+  incoming: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.surface,
+    borderBottomLeftRadius: spacing.xs,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+  },
+  outgoing: { alignSelf: 'flex-end', backgroundColor: colors.primary, borderBottomRightRadius: spacing.xs },
+  composer: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.md },
+  input: {
+    ...typography.body,
+    flex: 1,
+    height: 44,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    color: colors.text,
+  },
+  send: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendDisabled: { opacity: 0.4 },
+});

@@ -1,14 +1,144 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ActivityCard, Avatar, Heading, Screen } from '@/components/job-hunt-ui';
-import { theme } from '@/constants/theme';
-import { currentUserId } from '@/data/mock-data';
-import { useJobHunt } from '@/data/job-hunt-store';
+import { router } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
+
+import { KindBadge } from '@/components/update-card';
+import { Avatar, Button, Card, Icon, IconButton, Screen, ScreenHeader, SectionHeader, Text } from '@/components/ui';
+import { colors, radius, spacing, tones } from '@/constants/theme';
+import { useStore } from '@/data/store';
+import { headlineFor, timeAgo, updateKinds } from '@/data/update-kinds';
 
 export default function ProfileScreen() {
-  const { activities, currentUser } = useJobHunt();
-  const mine = activities.filter((activity) => activity.user_id === currentUserId); const interviews = mine.filter((activity) => activity.type === 'interview').length; const applications = mine.filter((activity) => activity.type === 'application').length;
-  return <Screen><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}><Heading eyebrow="Job search dashboard" title="Your profile" action="⚙" /><View style={styles.profileCard}><Avatar user={currentUser} size={104} /><View style={{ flex: 1 }}><Text style={styles.name}>{currentUser.name} <Text style={styles.verified}>✧</Text></Text><Text style={styles.headline}>{currentUser.headline} · {currentUser.location}</Text><View style={styles.status}><Text style={styles.statusText}>●  Actively interviewing</Text></View><Text style={styles.counts}>248 followers    186 following</Text></View></View><View style={styles.week}><View style={styles.weekTop}><Text style={styles.thisWeek}>This week</Text><Text style={styles.date}>Sep 28–Oct 4</Text></View><View style={styles.weekStats}><Stat value={String(applications)} label="Applications" coral /><Stat value={String(interviews)} label="Interviews" /><Stat value="3" label="Connections" /><Stat value="72%" label="Goal" /></View></View><View style={styles.streakCard}><View style={styles.streakRing}><Text style={styles.streakNumber}>8</Text><Text style={styles.streakDays}>days</Text></View><View><Text style={styles.streakTitle}>♨  Personal best streak</Text><Text style={styles.streakCopy}>Log one action tomorrow to reach 9 days.</Text></View></View><View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Recent activity</Text><Text style={styles.sectionAction}>View history</Text></View><View style={styles.recent}>{mine.slice(0, 3).map((activity) => <ActivityCard key={activity.id} activity={activity} compact />)}</View><View style={styles.sectionHeader}><Text style={styles.sectionTitle}>Achievements</Text><Text style={styles.unlocked}>6 unlocked</Text></View><View style={styles.badges}><Badge icon="♨" title="On a roll" copy="7 day streak" color="#FFE0D8" /><Badge icon="◎" title="Focused five" copy="5 apps in a week" color="#E4EDFF" /><Badge icon="♧" title="Connector" copy="10 coffee chats" color="#EEE8FF" /></View></ScrollView></Screen>;
+  const { currentUser, updates, friendIds } = useStore();
+  const mine = updates.filter((update) => update.userId === currentUser.id);
+  const count = (kinds: string[]) => mine.filter((update) => kinds.includes(update.kind)).length;
+  const latest = mine[0];
+
+  const stats = [
+    { label: 'Applied', value: count(['applied']), tone: tones.sky },
+    { label: 'Interviews', value: count(['interview']), tone: tones.amber },
+    { label: 'Offers', value: count(['offer', 'accepted']), tone: tones.mint },
+  ];
+
+  return (
+    <Screen>
+      <ScreenHeader eyebrow="Your internship hunt" title="Profile" right={<IconButton icon="settings" label="Settings" />} />
+
+      <Card style={styles.profile}>
+        <Avatar user={currentUser} size={72} />
+        <View style={styles.identity}>
+          <Text variant="title">{currentUser.name}</Text>
+          <View style={styles.meta}>
+            <Icon name="school" size={14} color={colors.textMuted} />
+            <Text variant="callout" color={colors.textMuted} numberOfLines={1} style={styles.flex}>
+              {currentUser.major} · {currentUser.school}
+            </Text>
+          </View>
+          <View style={styles.meta}>
+            <Icon name="location" size={14} color={colors.textMuted} />
+            <Text variant="callout" color={colors.textMuted}>
+              {currentUser.location} · Class of {currentUser.gradYear}
+            </Text>
+          </View>
+        </View>
+        {latest ? (
+          <View style={styles.status}>
+            <KindBadge kind={latest.kind} />
+            <Text variant="callout" numberOfLines={1} style={styles.flex}>
+              {headlineFor(latest)}
+            </Text>
+          </View>
+        ) : null}
+        <View style={styles.counts}>
+          <Text variant="callout">
+            <Text variant="callout" style={styles.bold}>
+              {friendIds.length}
+            </Text>{' '}
+            <Text variant="callout" color={colors.textMuted}>
+              friends
+            </Text>
+          </Text>
+          <Text variant="callout">
+            <Text variant="callout" style={styles.bold}>
+              {mine.filter((update) => update.visibility === 'friends').length}
+            </Text>{' '}
+            <Text variant="callout" color={colors.textMuted}>
+              shared updates
+            </Text>
+          </Text>
+        </View>
+      </Card>
+
+      <View style={styles.stats}>
+        {stats.map((stat) => (
+          <View key={stat.label} style={[styles.stat, { backgroundColor: stat.tone.bg }]}>
+            <Text variant="display" color={stat.tone.fg}>
+              {stat.value}
+            </Text>
+            <Text variant="label" color={stat.tone.fg}>
+              {stat.label}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      <SectionHeader
+        title="Your journey"
+        action={<Button label="Share" icon="plus" size="sm" variant="secondary" onPress={() => router.navigate('/share')} />}
+      />
+      <Card>
+        {mine.map((update, index) => {
+          const meta = updateKinds[update.kind];
+          const tone = tones[meta.tone];
+          const last = index === mine.length - 1;
+          return (
+            <View key={update.id} style={styles.step}>
+              <View style={styles.rail}>
+                <View style={[styles.dot, { backgroundColor: tone.bg }]}>
+                  <Icon name={meta.icon} size={14} color={tone.fg} />
+                </View>
+                {last ? null : <View style={styles.line} />}
+              </View>
+              <View style={[styles.stepText, !last && styles.stepGap]}>
+                <Text variant="headline">{headlineFor(update)}</Text>
+                <Text variant="caption" color={colors.textMuted}>
+                  {update.role} · {update.term}
+                </Text>
+                <View style={styles.meta}>
+                  <Icon name={update.visibility === 'private' ? 'lock' : 'friends'} size={12} color={colors.textFaint} />
+                  <Text variant="caption" color={colors.textFaint}>
+                    {update.visibility === 'private' ? 'Only you' : 'Friends'} · {timeAgo(update.createdAt)}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          );
+        })}
+      </Card>
+    </Screen>
+  );
 }
-function Stat({ value, label, coral }: { value: string; label: string; coral?: boolean }) { return <View style={styles.stat}><Text style={[styles.statNumber, coral && { color: theme.colors.coral }]}>{value}</Text><Text style={styles.statLabel}>{label}</Text></View>; }
-function Badge({ icon, title, copy, color }: { icon: string; title: string; copy: string; color: string }) { return <View style={[styles.badge, { backgroundColor: color }]}><View style={styles.badgeIcon}><Text style={{ fontSize: 25, color: theme.colors.coral }}>{icon}</Text></View><Text style={styles.badgeTitle}>{title}</Text><Text style={styles.badgeCopy}>{copy}</Text></View>; }
-const styles = StyleSheet.create({ content: { paddingBottom: 26 }, profileCard: { backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.line, borderRadius: 34, padding: 22, marginHorizontal: theme.spacing.xl, flexDirection: 'row', gap: 20 }, name: { color: theme.colors.ink, fontWeight: '800', fontSize: 31, letterSpacing: -1 }, verified: { color: theme.colors.coral }, headline: { color: theme.colors.muted, fontSize: 17, marginTop: 7 }, status: { backgroundColor: theme.colors.greenSoft, alignSelf: 'flex-start', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6, marginTop: 10 }, statusText: { color: theme.colors.green, fontSize: 15 }, counts: { color: theme.colors.muted, fontSize: 15, marginTop: 10 }, week: { backgroundColor: theme.colors.surface, borderColor: theme.colors.line, borderWidth: 1, borderRadius: 26, marginHorizontal: theme.spacing.xl, padding: 20, marginTop: 18 }, weekTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }, thisWeek: { color: theme.colors.ink, fontSize: 21 }, date: { color: theme.colors.lightText, fontSize: 15, fontWeight: '700' }, weekStats: { flexDirection: 'row', justifyContent: 'space-between' }, stat: { alignItems: 'center', flex: 1, borderRightColor: theme.colors.line, borderRightWidth: 1 }, statNumber: { fontSize: 29, color: theme.colors.ink }, statLabel: { color: theme.colors.muted, fontSize: 12, marginTop: 3, fontWeight: '700' }, streakCard: { backgroundColor: theme.colors.black, borderRadius: 34, marginHorizontal: theme.spacing.xl, marginTop: 18, padding: 24, flexDirection: 'row', alignItems: 'center', gap: 20 }, streakRing: { borderWidth: 11, borderColor: '#fff', width: 105, height: 105, borderRadius: 55, alignItems: 'center', justifyContent: 'center' }, streakNumber: { color: '#fff', fontSize: 29, fontWeight: '800' }, streakDays: { color: '#B9BDB5', fontSize: 14, fontWeight: '700' }, streakTitle: { color: '#fff', fontSize: 24, marginBottom: 8 }, streakCopy: { color: '#B9BDB5', fontSize: 15, maxWidth: 190 }, sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: theme.spacing.xl, alignItems: 'center', marginTop: 20, marginBottom: 10 }, sectionTitle: { color: theme.colors.ink, fontSize: 23 }, sectionAction: { color: theme.colors.coral, fontWeight: '700', fontSize: 15 }, unlocked: { color: theme.colors.lightText, fontSize: 15 }, recent: { backgroundColor: theme.colors.surface, marginHorizontal: theme.spacing.xl, paddingHorizontal: 20, borderRadius: 26, borderWidth: 1, borderColor: theme.colors.line }, badges: { flexDirection: 'row', marginHorizontal: theme.spacing.xl, gap: 10 }, badge: { flex: 1, minHeight: 170, borderRadius: 25, padding: 16 }, badgeIcon: { backgroundColor: '#fff', width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 15 }, badgeTitle: { color: theme.colors.ink, fontSize: 17 }, badgeCopy: { color: theme.colors.muted, fontSize: 12, marginTop: 7, lineHeight: 16 } });
+
+const styles = StyleSheet.create({
+  flex: { flexShrink: 1 },
+  bold: { fontWeight: '700' },
+  profile: { gap: spacing.lg },
+  identity: { gap: spacing.xs },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 2 },
+  status: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    padding: spacing.sm + 2,
+    borderRadius: radius.md,
+    backgroundColor: colors.background,
+  },
+  counts: { flexDirection: 'row', gap: spacing.xl },
+  stats: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
+  stat: { flex: 1, padding: spacing.md + 2, borderRadius: radius.lg, gap: spacing.xxs },
+  step: { flexDirection: 'row', gap: spacing.md },
+  rail: { alignItems: 'center' },
+  dot: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  line: { flex: 1, width: 2, marginVertical: spacing.xs, backgroundColor: colors.border, borderRadius: 1 },
+  stepText: { flex: 1, gap: 3, paddingTop: 4 },
+  stepGap: { paddingBottom: spacing.xl },
+});
