@@ -72,7 +72,6 @@ export default function SearchScreen() {
                 const author = getUser(update.userId);
                 return (
                   <Fragment key={update.id}>
-                    {index === 2 ? <FindPeopleRow onPress={() => setMode('people')} /> : null}
                     {openId === update.id ? (
                       <View style={styles.expanded}>
                         <UpdateCard update={update} author={author} onCongrats={() => toggleCongrats(update.id)} />
@@ -88,7 +87,6 @@ export default function SearchScreen() {
                   </Fragment>
                 );
               })}
-              {results.length < 3 ? <FindPeopleRow onPress={() => setMode('people')} /> : null}
               {results.length === 0 ? (
                 <Text variant="body" color={colors.textMuted} align="center" style={styles.empty}>
                   None of your friends have posted about that yet.
@@ -106,8 +104,7 @@ export default function SearchScreen() {
                   onPress={() => setCompany(term)}
                 />
               ))}
-              <FindPeopleRow onPress={() => setMode('people')} />
-            </>
+              </>
           )}
           </Card>
         </View>
@@ -284,17 +281,6 @@ function ResultRow({ icon, title, subtitle, circle, onPress }: ResultRowProps) {
         ) : null}
       </View>
     </Pressable>
-  );
-}
-
-function FindPeopleRow({ onPress }: { onPress: () => void }) {
-  return (
-    <ResultRow
-      icon="globe"
-      circle
-      title={<Text variant="headline">Find people to follow</Text>}
-      onPress={onPress}
-    />
   );
 }
 
