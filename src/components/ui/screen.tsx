@@ -61,6 +61,24 @@ export function TopBar({ title, left, right }: { title: ReactNode; left?: ReactN
   );
 }
 
+// Big page title with optional side slots (back/close on the left, an action on the right). Title only, no subheading.
+export function ScreenHeader({ title, left, right }: { title: string; left?: ReactNode; right?: ReactNode }) {
+  return (
+    <View style={styles.header}>
+      {left ? <View style={styles.headerSide}>{left}</View> : null}
+      <Text variant="display" style={styles.headerTitle} numberOfLines={1}>
+        {title}
+      </Text>
+      {right ? <View style={styles.headerSide}>{right}</View> : null}
+    </View>
+  );
+}
+
+// Gutter-padded wrapper so a `ScreenHeader` can sit above the sections of a flush screen.
+export function HeaderBlock({ children }: PropsWithChildren) {
+  return <View style={styles.headerBlock}>{children}</View>;
+}
+
 // Full-width white block inside a flush screen; the gray background shows through the gaps between sections.
 export function Section({ title, children }: PropsWithChildren<{ title?: string }>) {
   return (
@@ -95,6 +113,10 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing.lg },
   topSide: { flexDirection: 'row', gap: spacing.sm, flex: 1 },
   topSideRight: { justifyContent: 'flex-end' },
+  header: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingTop: spacing.sm, paddingBottom: spacing.xl },
+  headerTitle: { flex: 1 },
+  headerSide: { flexDirection: 'row', gap: spacing.sm },
+  headerBlock: { paddingHorizontal: layout.gutter },
   sectionBlock: {
     backgroundColor: colors.surface,
     paddingHorizontal: layout.gutter,

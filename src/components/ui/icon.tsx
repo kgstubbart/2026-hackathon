@@ -27,6 +27,7 @@ const icons = {
   bell: ['bell', 'notifications'],
   settings: ['gearshape', 'settings'],
   edit: ['pencil', 'edit'],
+  compose: ['square.and.pencil', 'edit_square'],
   lock: ['lock.fill', 'lock'],
   arrowUp: ['arrow.up', 'arrow_upward'],
   flame: ['flame.fill', 'local_fire_department'],
