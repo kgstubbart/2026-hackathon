@@ -57,9 +57,10 @@ export default function ShareScreen() {
 
   const isPrivate = isPrivateKind(kind);
   const hasQuestions = kind === 'interview' || kind === 'assessment';
-  const behavioral = interviewType.trim().toLowerCase() === 'behavioral';
-  // Difficulty is a coding-question thing, so behavioral interviews don't ask for it.
-  const hasDifficulty = kind === 'interview' && !behavioral;
+  const typeKey = interviewType.trim().toLowerCase();
+  const behavioral = typeKey === 'behavioral';
+  // Difficulty is a coding-question thing: only technical or mixed interviews ask for it, never behavioral.
+  const hasDifficulty = kind === 'interview' && (typeKey === 'technical' || typeKey === 'mixed');
 
   const companies = unique([...updates.map((update) => update.company), ...companySuggestions]);
   const positions = unique([...updates.map((update) => update.role), ...positionSuggestions]);
