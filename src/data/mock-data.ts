@@ -37,7 +37,8 @@ export type Update = {
 
 export type Comment = { id: string; updateId: string; userId: string; body: string; createdAt: number };
 
-export type Message = { id: string; fromMe: boolean; body: string; time: string };
+// A message can carry a shared post (`updateId`), rendered as a small post preview in the thread.
+export type Message = { id: string; fromMe: boolean; body: string; time: string; updateId?: string };
 export type Conversation = { userId: string; time: string; unread?: number; messages: Message[] };
 
 export const currentUserId = 'alex';
