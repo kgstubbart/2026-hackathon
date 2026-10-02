@@ -88,8 +88,8 @@ export const seasonStats = {
 export const users: User[] = [
   {
     id: "alex",
-    name: "Alex Morgan",
-    initials: "AM",
+    name: "Chase Ashton",
+    initials: "CA",
     color: "#6C63FF",
     school: "Brigham Young University",
     major: "Computer Science",
@@ -295,7 +295,7 @@ export const initialUpdates: Update[] = (
     },
     {
       id: "u7",
-      userId: "alex",
+      userId: "chase",
       kind: "interview",
       company: "Airbnb",
       role: "Software Engineering Intern",
@@ -314,7 +314,7 @@ export const initialUpdates: Update[] = (
     },
     {
       id: "u8",
-      userId: "alex",
+      userId: "chase",
       kind: "applied",
       company: "Notion",
       role: "Software Engineering Intern",
@@ -344,7 +344,7 @@ export const initialUpdates: Update[] = (
     },
     {
       id: "u10",
-      userId: "alex",
+      userId: "chase",
       kind: "applied",
       company: "Ramp",
       role: "Software Engineering Intern",
@@ -478,7 +478,7 @@ export const initialUpdates: Update[] = (
     },
     {
       id: "u20",
-      userId: "alex",
+      userId: "chase",
       kind: "takehome",
       company: "Notion",
       role: "Software Engineering Intern",
@@ -540,6 +540,52 @@ export const initialUpdates: Update[] = (
       visibility: "friends",
       congrats: 9,
     },
+    {
+      id: "u24",
+      userId: "jordan",
+      kind: "offer",
+      company: "Stripe",
+      role: "Software Engineering Intern",
+      term: "Summer 2027",
+      note: "Final round went through. Still shaking.",
+      createdAt: minutesAgo(35),
+      visibility: "friends",
+      congrats: 31,
+    },
+    {
+      id: "u25",
+      userId: "sam",
+      kind: "offer",
+      company: "Stripe",
+      role: "Software Engineering Intern",
+      term: "Summer 2027",
+      createdAt: minutesAgo(6_400),
+      visibility: "friends",
+      congrats: 24,
+    },
+    {
+      id: "u26",
+      userId: "priya",
+      kind: "offer",
+      company: "Goldman Sachs",
+      role: "Summer Analyst",
+      term: "Summer 2027",
+      note: "Superday paid off. Still processing this one!",
+      createdAt: minutesAgo(18),
+      visibility: "friends",
+      congrats: 42,
+    },
+    {
+      id: "u27",
+      userId: "theo",
+      kind: "offer",
+      company: "Spotify",
+      role: "Data Analyst Intern",
+      term: "Summer 2027",
+      createdAt: minutesAgo(2_900),
+      visibility: "friends",
+      congrats: 18,
+    },
   ] satisfies Update[]
 ).sort((a, b) => b.createdAt - a.createdAt);
 
@@ -554,7 +600,7 @@ export const initialComments: Comment[] = [
   {
     id: "c2",
     updateId: "u1",
-    userId: "alex",
+    userId: "chase",
     body: "Huge. Dinner on you?",
     createdAt: minutesAgo(12),
   },
@@ -568,7 +614,7 @@ export const initialComments: Comment[] = [
   {
     id: "c4",
     updateId: "u2",
-    userId: "alex",
+    userId: "chase",
     body: "The rate limiter one is a classic, token bucket and you are golden.",
     createdAt: minutesAgo(40),
   },
@@ -603,7 +649,7 @@ export const initialComments: Comment[] = [
   {
     id: "c9",
     updateId: "u12",
-    userId: "alex",
+    userId: "chase",
     body: "Number of Islands again? They love that one.",
     createdAt: minutesAgo(300),
   },
@@ -617,7 +663,7 @@ export const initialComments: Comment[] = [
   {
     id: "c11",
     updateId: "u9",
-    userId: "alex",
+    userId: "chase",
     body: "Your portfolio is unreal, no way they pass.",
     createdAt: minutesAgo(4_000),
   },
@@ -631,7 +677,7 @@ export const initialComments: Comment[] = [
   {
     id: "c13",
     updateId: "u15",
-    userId: "alex",
+    userId: "chase",
     body: "Accounts Merge is just union find in disguise.",
     createdAt: minutesAgo(300),
   },
