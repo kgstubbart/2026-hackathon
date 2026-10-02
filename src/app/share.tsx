@@ -5,26 +5,26 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import {
   Button,
   Card,
+  ChipGroup,
   ComboField,
+  FieldLabel,
   Icon,
   IconButton,
   Screen,
   ScreenHeader,
   SectionHeader,
   Text,
+  TextField,
 } from '@/components/ui';
 import { colors, radius, spacing, tones } from '@/constants/theme';
 import {
   assessmentFormats,
-  assessmentTasks,
-  behavioralQuestions,
   companySuggestions,
   difficulties,
   finalRound,
   interviewRounds,
   interviewTypes,
   positionSuggestions,
-  technicalQuestions,
   type Question,
 } from '@/data/mock-data';
 import { useStore, type NewUpdate } from '@/data/store';
@@ -34,6 +34,9 @@ type ShareKind = (typeof shareKinds)[number];
 type DraftQuestion = { text: string; difficulty: string };
 
 const blankQuestion: DraftQuestion = { text: '', difficulty: '' };
+
+// Tapping the selected option again clears it.
+const toggle = (current: string, set: (value: string) => void) => (next: string) => set(next === current ? '' : next);
 
 const unique = (items: string[]) => [...new Set(items.filter(Boolean))];
 
@@ -61,14 +64,6 @@ export default function ShareScreen() {
 
   const companies = unique([...updates.map((update) => update.company), ...companySuggestions]);
   const positions = unique([...updates.map((update) => update.role), ...positionSuggestions]);
-  const questionOptions =
-    kind === 'assessment'
-      ? [...technicalQuestions, ...assessmentTasks]
-      : behavioral
-        ? behavioralQuestions
-        : interviewType.trim().toLowerCase() === 'technical'
-          ? technicalQuestions
-          : [...technicalQuestions, ...behavioralQuestions];
   const canShare = company.trim().length > 0 && position.trim().length > 0;
 
   const editQuestion = (index: number, patch: Partial<DraftQuestion>) =>
@@ -155,31 +150,27 @@ export default function ShareScreen() {
           placeholder="e.g. Software Engineering Intern"
         />
         {kind === 'interview' ? (
-          <>
-            <ComboField
-              label="Round"
-              value={round}
-              onChangeText={setRound}
-              options={roundOptions(round)}
-              placeholder="Pick one, or type a round number"
-            />
-            <ComboField
-              label="Type"
-              value={interviewType}
-              onChangeText={setInterviewType}
-              options={interviewTypes}
-              placeholder="Behavioral, technical or mixed"
-            />
-          </>
+          <View style={styles.pair}>
+            <View style={styles.half}>
+              <ComboField
+                label="Round"
+                value={round}
+                onChangeText={setRound}
+                options={roundOptions(round)}
+                placeholder="e.g. 2 or Final"
+              />
+            </View>
+            <View style={[styles.half, styles.group]}>
+              <FieldLabel>Type</FieldLabel>
+              <ChipGroup wrap options={interviewTypes} value={interviewType} onChange={toggle(interviewType, setInterviewType)} />
+            </View>
+          </View>
         ) : null}
         {kind === 'assessment' ? (
-          <ComboField
-            label="Format"
-            value={format}
-            onChangeText={setFormat}
-            options={assessmentFormats}
-            placeholder="Timed or take-home"
-          />
+          <View style={styles.group}>
+            <FieldLabel>Format</FieldLabel>
+            <ChipGroup options={assessmentFormats} value={format} onChange={toggle(format, setFormat)} />
+          </View>
         ) : null}
       </Card>
 
@@ -191,10 +182,9 @@ export default function ShareScreen() {
               <View key={index} style={styles.group}>
                 <View style={styles.questionRow}>
                   <View style={styles.questionInput}>
-                    <ComboField
+                    <TextField
                       value={item.text}
                       onChangeText={(text) => editQuestion(index, { text })}
-                      options={questionOptions}
                       placeholder={
                         kind === 'assessment'
                           ? 'e.g. LRU Cache, or build a rate limiter'
@@ -215,12 +205,10 @@ export default function ShareScreen() {
                   ) : null}
                 </View>
                 {hasDifficulty ? (
-                  <ComboField
-                    value={item.difficulty}
-                    onChangeText={(difficulty) => editQuestion(index, { difficulty })}
+                  <ChipGroup
                     options={difficulties}
-                    placeholder="Difficulty"
-                    accessibilityLabel={`Difficulty of question ${index + 1}`}
+                    value={item.difficulty}
+                    onChange={toggle(item.difficulty, (difficulty) => editQuestion(index, { difficulty }))}
                   />
                 ) : null}
               </View>
@@ -282,7 +270,9 @@ const styles = StyleSheet.create({
   kindLabel: { fontWeight: '700' },
   form: { gap: spacing.lg },
   group: { gap: spacing.sm },
-  questionRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
+  pair: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  half: { flex: 1 },
+  questionRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   questionInput: { flex: 1 },
   submit: { gap: spacing.sm, marginTop: spacing.xxl },
   pressed: { opacity: 0.75 },
