@@ -30,7 +30,7 @@ type UpdateCardProps = {
 // Round/type/format and questions stay hidden until the post is tapped.
 export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const [before, keyword, after] = postSentence(update);
+  const sentence = postSentence(update);
   const details = [update.round, update.interviewType, update.assessmentFormat].filter(Boolean).join(' · ');
   const hasDetails = Boolean(details || update.questions?.length);
 
@@ -62,11 +62,11 @@ export function UpdateCard({ update, author, onCongrats, preview }: UpdateCardPr
         onPress={() => setExpanded((value) => !value)}
         style={({ pressed }) => [styles.content, pressed && styles.pressed]}>
         <Text variant="headline" style={styles.sentence}>
-          {before}
-          <Text variant="headline" style={styles.keyword}>
-            {keyword}
-          </Text>
-          {after}
+          {sentence.map((segment, index) => (
+            <Text key={index} variant="headline" style={segment.bold ? styles.keyword : styles.sentence}>
+              {segment.text}
+            </Text>
+          ))}
         </Text>
         {update.note ? (
           <Text variant="body" color={colors.textMuted}>
