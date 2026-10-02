@@ -1,6 +1,7 @@
-import { StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Card, CompanyMark, Divider, SectionHeader, Text } from '@/components/ui';
+import { Card, CompanyMark, Divider, Icon, SectionHeader, Text } from '@/components/ui';
 import { colors, radius, spacing, tones } from '@/constants/theme';
 import type { Update } from '@/data/mock-data';
 import { timeAgo } from '@/data/update-kinds';
@@ -88,7 +89,11 @@ export function ProfileStats({ updates }: { updates: Update[] }) {
         <Card flush>
           {companies.map((update, index) => (
             <View key={update.id}>
-              <View style={styles.companyRow}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Open ${update.company}`}
+                onPress={() => router.navigate({ pathname: '/company/[company]', params: { company: update.company } })}
+                style={({ pressed }) => [styles.companyRow, pressed && styles.pressed]}>
                 <CompanyMark company={update.company} />
                 <View style={styles.companyInfo}>
                   <Text variant="headline" numberOfLines={1}>
@@ -101,7 +106,8 @@ export function ProfileStats({ updates }: { updates: Update[] }) {
                 <Text variant="caption" color={colors.textFaint}>
                   {timeAgo(update.createdAt)}
                 </Text>
-              </View>
+                <Icon name="forward" size={16} color={colors.textFaint} />
+              </Pressable>
               {index < companies.length - 1 ? <Divider /> : null}
             </View>
           ))}
@@ -125,5 +131,6 @@ const styles = StyleSheet.create({
   bar: { width: spacing.xl, maxWidth: '100%', backgroundColor: tones.sky.fg, borderTopLeftRadius: radius.sm, borderTopRightRadius: radius.sm },
   companyRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md },
   companyInfo: { flex: 1, gap: spacing.xxs },
+  pressed: { opacity: 0.6 },
   empty: { paddingVertical: spacing.xl },
 });

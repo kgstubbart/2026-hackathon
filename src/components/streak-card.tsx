@@ -1,4 +1,5 @@
-import { StyleSheet, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Share, StyleSheet, View } from 'react-native';
 
 import { Button, Icon, Text } from '@/components/ui';
 import { colors, spacing } from '@/constants/theme';
@@ -10,6 +11,24 @@ const dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const sameDay = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
+const copiedMs = 2000;
+
+// Native share sheet first; on web fall back to the browser share sheet, then the clipboard.
+async function shareText(text: string): Promise<'shared' | 'copied'> {
+  try {
+    await Share.share({ message: text });
+    return 'shared';
+  } catch {
+    if (typeof navigator === 'undefined') return 'shared';
+    if (navigator.share) {
+      await navigator.share({ text });
+      return 'shared';
+    }
+    await navigator.clipboard?.writeText(text);
+    return 'copied';
+  }
+}
+
 // Strava-style weekly streak: flame with week count, then this week's days (Mon–Sun).
 export function StreakCard({ updates, priorWeeks }: { updates: Update[]; priorWeeks: number }) {
   const now = new Date();
@@ -20,13 +39,32 @@ export function StreakCard({ updates, priorWeeks }: { updates: Update[]; priorWe
     const state: DayState = done ? 'done' : index === todayIndex ? 'today' : index < todayIndex ? 'missed' : 'upcoming';
     return { letter, date: date.getDate(), state };
   });
-  const weeks = priorWeeks + (week.some((day) => day.state === 'done') ? 1 : 0);
+  const doneDays = week.filter((day) => day.state === 'done').length;
+  const weeks = priorWeeks + (doneDays > 0 ? 1 : 0);
+
+  const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (copiedTimer.current) clearTimeout(copiedTimer.current);
+  }, []);
+
+  const share = async () => {
+    const message = `${weeks} week${weeks === 1 ? '' : 's'} and counting on StrJava. ${doneDays} update${doneDays === 1 ? '' : 's'} logged this week.`;
+    try {
+      if ((await shareText(message)) !== 'copied') return;
+      setCopied(true);
+      if (copiedTimer.current) clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => setCopied(false), copiedMs);
+    } catch {
+      // The user dismissed the sheet or the browser refused; nothing to show.
+    }
+  };
 
   return (
     <View style={styles.card}>
       <View style={styles.top}>
         <Text variant="headline">Your streak</Text>
-        <Button label="Share" icon="share" size="sm" variant="outline" />
+        <Button label={copied ? 'Copied' : 'Share'} icon={copied ? 'check' : 'share'} size="sm" variant="outline" onPress={share} />
       </View>
 
       <View style={styles.body}>
