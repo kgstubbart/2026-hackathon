@@ -1,9 +1,7 @@
 export type UpdateKind = 'applied' | 'interview' | 'assessment' | 'offer' | 'accepted' | 'milestone';
 export type Visibility = 'friends' | 'private';
-export type InterviewType = 'Behavioral' | 'Technical' | 'Mixed';
-export type AssessmentFormat = 'Timed' | 'Take-home';
-export type Difficulty = 'Easy' | 'Medium' | 'Hard';
-export type Question = { text: string; difficulty?: Difficulty };
+// Either part can be left out: someone may share only the difficulty, or only the question.
+export type Question = { text?: string; difficulty?: string };
 
 export type User = {
   id: string;
@@ -26,8 +24,8 @@ export type Update = {
   location?: string;
   stage?: string;
   round?: string;
-  interviewType?: InterviewType;
-  assessmentFormat?: AssessmentFormat;
+  interviewType?: string;
+  assessmentFormat?: string;
   questions?: Question[];
   title?: string;
   note?: string;
@@ -112,7 +110,14 @@ export const conversations: Conversation[] = [
   },
 ];
 
-export const interviewRounds = ['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Final round'] as const;
-export const interviewTypes: readonly InterviewType[] = ['Behavioral', 'Technical', 'Mixed'];
-export const assessmentFormats: readonly AssessmentFormat[] = ['Timed', 'Take-home'];
-export const difficulties: readonly Difficulty[] = ['Easy', 'Medium', 'Hard'];
+// Suggestions for the Share form's dropdowns. Every field also accepts a typed answer.
+export const finalRound = 'Final round';
+export const interviewRounds = ['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Round 5', finalRound];
+export const interviewTypes = ['Behavioral', 'Technical', 'Mixed'];
+export const assessmentFormats = ['Timed', 'Take-home'];
+export const difficulties = ['Easy', 'Medium', 'Hard'];
+export const companySuggestions = ['Airbnb', 'Amazon', 'Apple', 'Datadog', 'Duolingo', 'Figma', 'Goldman Sachs', 'Google', 'Meta', 'Microsoft', 'Notion', 'Ramp', 'Spotify', 'Stripe'];
+export const positionSuggestions = ['Software Engineering Intern', 'Machine Learning Intern', 'Data Science Intern', 'Data Analyst Intern', 'Product Design Intern', 'Product Management Intern', 'UX Research Intern', 'Summer Analyst'];
+export const technicalQuestions = ['Two Sum', 'Valid Parentheses', 'Merge Intervals', 'LRU Cache', 'Number of Islands', 'Course Schedule', 'Longest Substring Without Repeating Characters', 'Word Ladder', 'Design a rate limiter', 'Design a URL shortener'];
+export const behavioralQuestions = ['Tell me about yourself', 'Why this company?', 'Tell me about a time you disagreed with a teammate', 'Tell me about a project you are proud of', 'Tell me about a time you failed', 'Describe a time you had to learn something quickly'];
+export const assessmentTasks = ['Build a small REST API', 'Build a to-do app', 'Debug a failing test suite', 'Clean and analyze a dataset'];
