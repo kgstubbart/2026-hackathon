@@ -1,6 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { ScrollView, StyleSheet, View, type ScrollViewProps } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform, ScrollView, StatusBar, StyleSheet, View, type ScrollViewProps } from 'react-native';
+import { initialWindowMetrics, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, layout, spacing } from '@/constants/theme';
 import { Text } from './text';
@@ -15,10 +15,19 @@ type ScreenProps = PropsWithChildren<
   } & Pick<ScrollViewProps, 'keyboardShouldPersistTaps'>
 >;
 
-export function Screen({ children, scroll = true, flush, header, keyboardShouldPersistTaps }: ScreenProps) {
+// Top inset that is never 0 on a phone: the live inset first, then the window's initial metrics (the first
+// frame can render before the provider measures), then a platform floor so a header never sits under the
+// status bar or the Dynamic Island.
+export function useTopInset() {
   const insets = useSafeAreaInsets();
+  const fallback = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : Platform.OS === 'ios' ? 20 : 0;
+  return Math.max(insets.top, initialWindowMetrics?.insets.top ?? 0, fallback);
+}
+
+export function Screen({ children, scroll = true, flush, header, keyboardShouldPersistTaps }: ScreenProps) {
+  const topInset = useTopInset();
   // The header handles the safe area; gutter screens still need breathing room below it.
-  const top = header ? (flush ? 0 : spacing.lg) : Math.max(insets.top, spacing.lg);
+  const top = header ? (flush ? 0 : spacing.lg) : Math.max(topInset, spacing.lg);
   const column = [styles.column, flush ? styles.flush : styles.gutter];
 
   if (!scroll) {
@@ -49,9 +58,9 @@ export function Screen({ children, scroll = true, flush, header, keyboardShouldP
 
 // Fixed white bar at the top of a flush screen, like the feed header: a slot on each side and a title in the middle.
 export function TopBar({ title, left, right }: { title: ReactNode; left?: ReactNode; right?: ReactNode }) {
-  const insets = useSafeAreaInsets();
+  const topInset = useTopInset();
   return (
-    <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
+    <View style={[styles.topBar, { paddingTop: topInset + spacing.sm }]}>
       <View style={[styles.column, styles.topRow]}>
         <View style={styles.topSide}>{left}</View>
         {typeof title === 'string' ? <Text variant="headline">{title}</Text> : title}
